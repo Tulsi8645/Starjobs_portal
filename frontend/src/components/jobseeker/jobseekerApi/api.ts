@@ -12,6 +12,8 @@ export interface Job {
   salary: string;
   experience: string;
   level: string;
+  deadline: string;
+  istrending: boolean;
   openings: number;
   description: string;
   likeCount: number;
@@ -139,7 +141,7 @@ export const toggleSaveJob = async (jobId: string): Promise<{ message: string; s
 };
 
 // Fetch saved jobs
-export const fetchSavedJobs = async (): Promise<string[]> => {
+export const fetchSavedJobs = async (): Promise<Job[]> => {
   const token = localStorage.getItem("token");
   if (!token) throw new Error("Not authenticated");
 
@@ -147,5 +149,17 @@ export const fetchSavedJobs = async (): Promise<string[]> => {
     headers: { Authorization: `Bearer ${token}` },
   });
 
-  return response.data.map((job: { _id: string }) => job._id);
+  return response.data;
+};
+
+// Fetch applied jobs
+export const fetchAppliedJobs = async (): Promise<Job[]> => {
+  const token = localStorage.getItem("token");
+  if (!token) throw new Error("Not authenticated");
+
+  const response = await axios.get(`${API_BASE_URL}/api/jobs/applied-jobs`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+
+  return response.data;
 };

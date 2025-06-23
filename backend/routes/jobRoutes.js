@@ -9,7 +9,8 @@ const {
   likeJob,
   dislikeJob,
   saveJob,
-  getSavedJobs
+  getSavedJobs,
+  getAppliedJobs
 } = require("../controllers/jobController");
 
 // Route to get all jobs
@@ -17,6 +18,9 @@ router.get("/", getJobs);
 
 // Get saved jobs for a jobseeker
 router.get("/saved-jobs", authenticate, getSavedJobs);
+
+// Get applied jobs for a jobseeker
+router.get("/applied-jobs", authenticate, getAppliedJobs);
 
 // Apply to a job
 router.post("/apply", authenticate, applicationUpload, applyInJob);

@@ -84,7 +84,8 @@ const JobDetailPage = () => {
     };
 
     loadSimilarJobs();
-  }, [job]);
+  }, [job?._id, job?.jobcategory]);
+
 
   const handleLike = async () => {
     if (!job || isLiking) return;
@@ -144,7 +145,15 @@ const JobDetailPage = () => {
                   <div className="flex flex-wrap text-sm text-gray-500 gap-x-3 gap-y-1">
                     <span><MapPin size={14} className="inline mr-1" />{job.location}</span>
                     <span><Clock size={14} className="inline mr-1" />{job.jobtype}</span>
-                    <span>{job.status}</span>
+                    <span
+                      className={`text-white text-xs font-semibold px-3 py-1 rounded-full
+                         ${job.status === 'Active' ? 'bg-green-600' :
+                          job.status === 'Inactive' ? 'bg-yellow-800' :
+                            'bg-gray-500'}`}
+                    >
+                      {job.status}
+                    </span>
+
                   </div>
                 </div>
               </div>
@@ -184,7 +193,10 @@ const JobDetailPage = () => {
             {/* Description */}
             <div>
               <h2 className="text-lg font-semibold text-gray-800 mb-2">Job Description</h2>
-              <p className="text-sm text-gray-600 leading-relaxed whitespace-pre-line">{job.description}</p>
+              <div
+                className="text-sm text-gray-600 leading-relaxed prose max-w-none"
+                dangerouslySetInnerHTML={{ __html: job.description }}
+              />
             </div>
 
             {/* Likes/Dislikes */}

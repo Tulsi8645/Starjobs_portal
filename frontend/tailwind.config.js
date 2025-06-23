@@ -1,5 +1,7 @@
+const typography = require('@tailwindcss/typography');
+
 /** @type {import('tailwindcss').Config} */
-export default {
+module.exports = {
   content: ['./index.html', './src/**/*.{js,ts,jsx,tsx}'],
   theme: {
     extend: {
@@ -24,14 +26,14 @@ export default {
         sans: ['Inter', 'sans-serif'],
       },
       boxShadow: {
-        'card': '0 4px 6px rgba(0, 0, 0, 0.05)',
+        card: '0 4px 6px rgba(0, 0, 0, 0.05)',
         'card-hover': '0 10px 15px rgba(0, 0, 0, 0.1)',
       },
       transitionProperty: {
-        'height': 'height',
-        'spacing': 'margin, padding',
+        height: 'height',
+        spacing: 'margin, padding',
       },
     },
   },
-  plugins: [],
+  plugins: [typography],
 };

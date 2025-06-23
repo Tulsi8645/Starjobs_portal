@@ -4,7 +4,7 @@ const CallToAction: React.FC = () => {
   return (
     <div className="relative bg-white mt-10 py-12">
       <div className="container mx-auto px-12 py-2">
-        <div className="flex flex-col md:flex-row items-center pl-6 pb-1 rounded-lg bg-secondary justify-between">
+        <div className="flex flex-col md:flex-row items-center pl-6 pb-1 rounded-xl bg-secondary justify-between">
           <div className="md:w-1/2 mb-8 md:mb-0">
             <div className="max-w-lg">
               <h2 className="text-2xl font-semibold text-gray-600 leading-tight mb-4">

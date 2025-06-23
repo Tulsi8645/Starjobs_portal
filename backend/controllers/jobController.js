@@ -203,7 +203,7 @@ const dislikeJob = async (req, res) => {
 // Save/Unsave job
 const saveJob = async (req, res) => {
   const userId = req.user._id;
-  const jobId = req.params.id; // ✅ match the route param
+  const jobId = req.params.id;
 
   try {
     const jobExists = await Job.exists({ _id: jobId });
@@ -258,6 +258,32 @@ const getSavedJobs = async (req, res) => {
   }
 };
 
+// Get applied jobs
+const getAppliedJobs = async (req, res) => {
+  const jobseekerId = req.user._id;
+
+  try {
+    // Find all applications by the jobseeker
+    const applications = await Application.find({ applicant: jobseekerId })
+      .populate({
+        path: "job",
+        populate: { path: "employer", select: "name email companyLogo" },
+      })
+      .sort({ createdAt: -1 });
+
+    // Filter out any null jobs (in case a job was deleted)
+    const appliedJobs = applications
+      .map(app => app.job)
+      .filter(job => job !== null);
+
+    res.status(200).json(appliedJobs);
+  } catch (error) {
+    console.error("Error fetching applied jobs:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+
 module.exports = {
   getJobs,
   getJobById,
@@ -265,5 +291,6 @@ module.exports = {
   likeJob,
   dislikeJob,
   saveJob,
-  getSavedJobs
+  getSavedJobs,
+  getAppliedJobs
 };

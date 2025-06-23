@@ -25,7 +25,7 @@ type JobseekerProfile = {
   experiences: Experience[];
   role: string;
 };
-
+const MEDIA_URL = import.meta.env.VITE_MEDIA_URL || '';
 const UserProfile = () => {
   const [profile, setProfile] = useState<JobseekerProfile | null>(null);
 
@@ -51,20 +51,19 @@ const UserProfile = () => {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {/* Left Column */}
             <div className="text-center">
-            <div className="w-32 h-32 rounded-full mx-auto mb-4 bg-gray-200 flex items-center justify-center overflow-hidden">
-             {profile.profilePic ? (
-               <img
-                 src={profile.profilePic}
-                 alt={profile.name}
-                 className="w-full h-full object-cover"
-               />
-             ) : (
-               <span className="text-gray-500 text-3xl font-semibold">
-                 {profile.name?.charAt(0).toUpperCase()}
-               </span>
-             )}
-           </div>
-           
+              <div className="w-32 h-32 rounded-full mx-auto mb-4 bg-gray-200 flex items-center justify-center overflow-hidden">
+                {profile.profilePic ? (
+                  <img
+                    src={`${MEDIA_URL.replace(/\/$/, '')}/${profile.profilePic.replace(/^\//, '')}`}
+                    alt={profile.name}
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <span className="text-gray-500 text-3xl font-semibold">
+                    {profile.name?.charAt(0).toUpperCase()}
+                  </span>
+                )}
+              </div>
               <h2 className="text-xl font-semibold">{profile.name}</h2>
               <p className="text-gray-600">{profile.role}</p>
               <div className="flex justify-center space-x-4 mt-6">
