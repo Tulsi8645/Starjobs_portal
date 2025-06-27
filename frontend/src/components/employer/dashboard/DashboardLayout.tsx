@@ -1,6 +1,6 @@
-import logo from '../../assets/star 1.svg';
+import logo from '../../../assets/star 1.svg';
 import { Link, useLocation, Outlet } from 'react-router-dom';
-import { LayoutDashboard, Users, FileText, Settings } from 'lucide-react';
+import { LayoutDashboard, Users, FileText, Settings,PlusCircle,  } from 'lucide-react';
 
 const DashboardLayout = () => {
   const location = useLocation();
@@ -10,7 +10,8 @@ const DashboardLayout = () => {
     { path: '/employer/profile', icon: <Users size={20} />, label: 'PROFILE' },
     { path: '/employer/dashboard', icon: <LayoutDashboard size={20} />, label: 'DASHBOARD' },
     { path: '/employer/insight', icon: <FileText size={20} />, label: 'Insight' },
-    { path: '/employer/joblist', icon: <Settings size={20} />, label: 'JOB LIST' }
+    { path: '/employer/joblist', icon: <Settings size={20} />, label: 'JOB LIST' },
+    { path: '/employer/postjob', icon: <PlusCircle size={20} />, label: 'POST JOB' }
   ];
 
   return (

@@ -1,47 +1,44 @@
-import { MapPin, Clock, DollarSign, Users, PenSquare, X, MoreVertical } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { MapPin, Clock, DollarSign, Users, PenSquare, X, MoreVertical} from "lucide-react";
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { getEmployerJobs } from "../employerApi/api";
+
+
 interface Job {
-  id: number;
+  _id: string;
   title: string;
-  company: string;
+  companyName: string;
   location: string;
-  type: 'Full-time' | 'Part-time' | 'Contract';
-  postedDate: string;
+  type: string;
+  createdAt: string;
   salary: string;
-  totalApplicants: number;
-  newApplicants: number;
-  shortlisted: number;
-  interview: number;
-  status: 'Active' | 'Inactive' | 'Closed';
-  logo: string;
+  jobseekers?: number;
+  newApplicants?: number;
+  shortlisted?: number;
+  interview?: number;
+  status: string;
+  logo?: string;
 }
 
 const JobList = () => {
-  const initialJobs: Job[] = [
-    {
-      id: 1,
-      title: 'Senior Frontend Developer',
-      company: 'TechCorp',
-      location: 'Remote',
-      type: 'Full-time',
-      postedDate: 'Mar 14 2025',
-      salary: '$10000-$20000',
-      totalApplicants: 12,
-      newApplicants: 12,
-      shortlisted: 12,
-      interview: 0,
-      status: 'Active',
-      logo: 'https://images.pexels.com/photos/3182812/pexels-photo-3182812.jpeg?auto=compress&cs=tinysrgb&w=60&h=60&dpr=1'
-    },
-    // Duplicate entries for demonstration
-  ];
-
-  const jobs: Job[] = initialJobs.concat(Array(2).fill(initialJobs?.[0]));
-
+  const [jobs, setJobs] = useState<Job[]>([]);
   const navigate = useNavigate();
 
+  useEffect(() => {
+    const fetchJobs = async () => {
+      try {
+        const data = await getEmployerJobs();
+        setJobs(data);
+      } catch (error) {
+        console.error("Error fetching employer jobs:", error);
+      }
+    };
+
+    fetchJobs();
+  }, []);
+
   return (
-    <div className="min-h-screen overflow-auto bg-gray-50 p-6"  style={{ maxHeight: 'calc(100vh - 50px)' }}>
+    <div className="min-h-screen overflow-auto bg-gray-50 p-6" style={{ maxHeight: "calc(100vh - 50px)" }}>
       <div className="max-w-7xl mx-auto">
         <div className="flex items-center justify-between mb-6">
           <div className="relative flex-1 max-w-xl">
@@ -66,18 +63,21 @@ const JobList = () => {
             </select>
           </div>
         </div>
-        <div className='flex justify-end'>
-        <button onClick={() => navigate('/employer/postjobs')} className="bg-primary  text-white px-4 py-2 rounded-md hover:bg-primary/90">
+
+        <div className="flex justify-end mb-4">
+          <button
+            onClick={() => navigate("/employer/postjob")}
+            className="bg-primary text-white px-4 py-2 rounded-md hover:bg-primary/90"
+          >
             Post Job
           </button>
         </div>
 
         <div className="space-y-4">
-          {jobs.map((job: Job) => (
-            <div key={job.id} className="bg-white rounded-lg shadow-sm p-6">
+          {jobs.map((job) => (
+            <div key={job._id} className="bg-white rounded-lg shadow-sm p-6">
               <div className="flex items-start justify-between">
                 <div className="flex items-start space-x-4">
-                  <img src={job.logo} alt={job.company} className="w-12 h-12 rounded-lg" />
                   <div>
                     <div className="flex items-center space-x-2">
                       <h3 className="text-lg font-semibold">{job.title}</h3>
@@ -85,7 +85,6 @@ const JobList = () => {
                         {job.status}
                       </span>
                     </div>
-                    <p className="text-gray-600">{job.company}</p>
                     <div className="flex items-center space-x-4 mt-2 text-sm text-gray-500">
                       <div className="flex items-center">
                         <MapPin size={16} className="mr-1" />
@@ -112,17 +111,17 @@ const JobList = () => {
                   <div>
                     <div className="text-gray-600">Total Applicants</div>
                     <div className="flex items-center mt-1">
-                      <span className="font-semibold">{job.totalApplicants}</span>
-                      <span className="ml-2 text-green-600 text-sm">+{job.newApplicants} new</span>
+                      <span className="font-semibold">{job.jobseekers?.length || 0}</span>
+                      <span className="ml-2 text-green-600 text-sm">+{job.newApplicants || 0} new</span>
                     </div>
                   </div>
                   <div>
                     <div className="text-gray-600">Shortlisted</div>
-                    <div className="mt-1 font-semibold">{job.shortlisted}</div>
+                    <div className="mt-1 font-semibold">{job.shortlisted || 0}</div>
                   </div>
                   <div>
                     <div className="text-gray-600">Interview</div>
-                    <div className="mt-1 font-semibold">{job.interview}</div>
+                    <div className="mt-1 font-semibold">{job.interview || 0}</div>
                   </div>
                 </div>
 

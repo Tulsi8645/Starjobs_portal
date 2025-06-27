@@ -11,6 +11,7 @@ const UserDashboardLayout = () => {
     { path: '/user/dashboard', icon: <LayoutDashboard size={20} />, label: 'DASHBOARD' },
     { path: '/user/savedjobs', icon: <FileText size={20} />, label: 'Saved Jobs' },
     { path: '/user/settings', icon: <Settings size={20} />, label: 'Settings' }
+    
   ];
 
   return (

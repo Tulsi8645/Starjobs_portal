@@ -1,4 +1,4 @@
-// src/api/jobs.ts
+
 import axios from 'axios';
 
 const API_BASE_URL = 'http://localhost:8000';
@@ -37,6 +37,19 @@ export const fetchJobs = async ({ page = 1, limit = 10 }: { page?: number; limit
   });
   return response.data;
 };
+
+// Fetch trending jobs
+export const fetchTrendingJobs = async () => {
+  const response = await axios.get(`${API_BASE_URL}/api/jobs/trending`);
+  return response.data.jobs;
+};
+
+// Fetch trending jobs
+export const fetchRecentJobs = async () => {
+  const response = await axios.get(`${API_BASE_URL}/api/jobs/recent`);
+  return response.data.jobs;
+};
+
 
 // Fetch a specific job by ID
 export const fetchJobById = async (id: string): Promise<Job> => {

@@ -46,6 +46,58 @@ const getJobs = async (req, res) => {
 
 
 
+// Get latest 3 trending jobs
+const getTrendingJobs = async (req, res) => {
+  try {
+    const trendingJobs = await Job.find({ istrending: true })
+      .sort({ createdAt: -1 }) // Latest first
+      .limit(3)
+      .populate("employer", "name companyLogo")
+      .lean();
+
+    const trendingJobsWithCounts = trendingJobs.map(job => {
+      const isSaved = req.user?.savedJobs?.includes(job._id.toString());
+      return {
+        ...job,
+        likeCount: job.likes?.length || 0,
+        dislikeCount: job.dislikes?.length || 0,
+        isSaved: !!isSaved,
+      };
+    });
+
+    res.json({ jobs: trendingJobsWithCounts });
+  } catch (error) {
+    console.error("Error fetching trending jobs:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+
+// Get recent 6 jobs
+const getRecentJobs = async (req, res) => {
+  try {
+    const trendingJobs = await Job.find({ istrending: false })
+      .sort({ createdAt: -1 }) 
+      .limit(6)
+      .populate("employer", "name companyLogo")
+      .lean();
+
+    const trendingJobsWithCounts = trendingJobs.map(job => {
+      const isSaved = req.user?.savedJobs?.includes(job._id.toString());
+      return {
+        ...job,
+        likeCount: job.likes?.length || 0,
+        dislikeCount: job.dislikes?.length || 0,
+        isSaved: !!isSaved,
+      };
+    });
+
+    res.json({ jobs: trendingJobsWithCounts });
+  } catch (error) {
+    console.error("Error fetching trending jobs:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+};
 
 // Get job by ID
 const getJobById = async (req, res) => {
@@ -286,6 +338,8 @@ const getAppliedJobs = async (req, res) => {
 
 module.exports = {
   getJobs,
+  getTrendingJobs,
+  getRecentJobs,
   getJobById,
   applyInJob,
   likeJob,

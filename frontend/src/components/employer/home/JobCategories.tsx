@@ -1,10 +1,10 @@
 import React from 'react';
-import Backend from '../../assets/jobcategories/backend.svg';
-import Content from '../../assets/jobcategories/content.svg';
-import Ui from '../../assets/jobcategories/uiux.svg';
-import Digital from '../../assets/jobcategories/digital.svg';
-import Frontend from '../../assets/jobcategories/frontend.svg';
-import Graphic from '../../assets/jobcategories/graphic.svg';
+import Backend from '../../../assets/jobcategories/backend.svg';
+import Content from '../../../assets/jobcategories/content.svg';
+import Ui from '../../../assets/jobcategories/uiux.svg';
+import Digital from '../../../assets/jobcategories/digital.svg';
+import Frontend from '../../../assets/jobcategories/frontend.svg';
+import Graphic from '../../../assets/jobcategories/graphic.svg';
 
 // Define the type if you're using TypeScript
 type CategoryType = {

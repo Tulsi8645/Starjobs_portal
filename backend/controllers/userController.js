@@ -12,11 +12,11 @@ const registerUser = async (req, res) => {
     email,
     password,
     role,
-    // Jobseeker fields from req.body (initially as strings from FormData)
+    // Jobseeker fields 
     skills,
     qualifications,
     experiences,
-    // Employer fields from req.body (non-file fields)
+    // Employer fields 
     panNumber,
     establishedDate,
     industryType,
@@ -67,8 +67,6 @@ const registerUser = async (req, res) => {
     let user;
 
     if (role === "jobseeker") {
-      // === IMPORTANT FIX ===
-      // Parse JSON strings back into arrays/objects for Mongoose
       let parsedSkills = [];
       if (skills) {
         try {
@@ -255,4 +253,42 @@ const resetPassword = async (req, res) => {
   }
 };
 
-module.exports = { registerUser, loginUser, forgotPassword, resetPassword };
+const changePassword = async (req, res) => {
+  const userId = req.user?.id; // authenticated user ID
+  const { currentPassword, newPassword } = req.body;
+
+  if (!currentPassword || !newPassword) {
+    return res.status(400).json({ message: "Current and new passwords are required" });
+  }
+
+  if (newPassword.length < 6) {
+    return res.status(400).json({ message: "New password must be at least 6 characters" });
+  }
+
+  try {
+    const user = await User.findById(userId);
+
+    if (!user) return res.status(404).json({ message: "User not found" });
+
+    const isMatch = await bcrypt.compare(currentPassword, user.password);
+    if (!isMatch) {
+      return res.status(401).json({ message: "Current password is incorrect" });
+    }
+
+    const isSamePassword = await bcrypt.compare(newPassword, user.password);
+    if (isSamePassword) {
+      return res.status(400).json({ message: "New password cannot be the same as the current password" });
+    }
+
+    const salt = await bcrypt.genSalt(10);
+    user.password = await bcrypt.hash(newPassword, salt);
+    await user.save();
+
+    res.json({ message: "Password changed successfully" });
+  } catch (error) {
+    console.error("Change password error:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+module.exports = { registerUser, loginUser, forgotPassword, resetPassword, changePassword };

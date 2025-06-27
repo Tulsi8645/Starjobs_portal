@@ -1,24 +1,65 @@
-import React, { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Eye, EyeOff } from 'lucide-react';
+import { getJobseekerProfile } from '../jobseekerApi/api';
+import { changePassword } from '../../auth/authApi/authApi';
+
+const MEDIA_URL = import.meta.env.VITE_MEDIA_URL || "";
 
 const UserSettings = () => {
   const [showOldPassword, setShowOldPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
+  const [oldPassword, setOldPassword] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [loading, setLoading] = useState(false);
+
+  const [user, setUser] = useState<{ name: string; profilePic: string } | null>(null);
   const [notifications, setNotifications] = useState({
     allNotifications: true,
     newInternship: true,
-    newEvent: true,
-    applicationInvitation: true,
-    jobMatched: true,
     preferredJob: true
   });
+
+  useEffect(() => {
+    const fetchProfile = async () => {
+      try {
+        const data = await getJobseekerProfile();
+        setUser({ name: data.name, profilePic: data.profilePic });
+      } catch (err) {
+        console.error('Error fetching user profile:', err);
+      }
+    };
+
+    fetchProfile();
+  }, []);
 
   const handleNotificationChange = (key: keyof typeof notifications) => {
     setNotifications(prev => ({
       ...prev,
       [key]: !prev[key]
     }));
+  };
+
+  const handleChangePassword = async () => {
+    if (newPassword !== confirmPassword) {
+      alert('New password and confirmation do not match');
+      return;
+    }
+
+    try {
+      setLoading(true);
+      await changePassword({ currentPassword: oldPassword, newPassword });
+      alert('Password updated successfully');
+      setOldPassword('');
+      setNewPassword('');
+      setConfirmPassword('');
+    } catch (err: any) {
+      alert(err?.message || 'Failed to update password');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -28,12 +69,18 @@ const UserSettings = () => {
           <div className="flex items-center justify-between mb-8">
             <h1 className="text-2xl font-bold">Settings</h1>
             <div className="flex items-center space-x-3">
-              <img
-                src="https://images.pexels.com/photos/2379004/pexels-photo-2379004.jpeg?auto=compress&cs=tinysrgb&w=32&h=32&dpr=1"
-                alt="Profile"
-                className="w-8 h-8 rounded-full"
-              />
-              <span>Seth Prajapati</span>
+              {user?.profilePic ? (
+                <img
+                  src={`${MEDIA_URL.replace(/\/$/, "")}/${user.profilePic.replace(/^\//, "")}`}
+                  alt={user.name}
+                  className="w-8 h-8 rounded-full object-cover"
+                />
+              ) : (
+                <span className="w-8 h-8 flex items-center justify-center rounded-full bg-gray-300 text-3xl font-bold text-gray-500">
+                  {user?.name?.charAt(0).toUpperCase() || 'U'}
+                </span>
+              )}
+              <span>{user?.name || 'Loading...'}</span>
             </div>
           </div>
 
@@ -49,6 +96,8 @@ const UserSettings = () => {
                   <div className="relative">
                     <input
                       type={showOldPassword ? 'text' : 'password'}
+                      value={oldPassword}
+                      onChange={(e) => setOldPassword(e.target.value)}
                       className="w-full px-3 py-2 border rounded-lg"
                     />
                     <button
@@ -68,6 +117,8 @@ const UserSettings = () => {
                   <div className="relative">
                     <input
                       type={showNewPassword ? 'text' : 'password'}
+                      value={newPassword}
+                      onChange={(e) => setNewPassword(e.target.value)}
                       className="w-full px-3 py-2 border rounded-lg"
                     />
                     <button
@@ -87,6 +138,8 @@ const UserSettings = () => {
                   <div className="relative">
                     <input
                       type={showConfirmPassword ? 'text' : 'password'}
+                      value={confirmPassword}
+                      onChange={(e) => setConfirmPassword(e.target.value)}
                       className="w-full px-3 py-2 border rounded-lg"
                     />
                     <button
@@ -99,8 +152,12 @@ const UserSettings = () => {
                   </div>
                 </div>
 
-                <button className="w-full bg-primary text-white py-2 rounded-lg hover:bg-primary/90">
-                  Save Changes
+                <button
+                  onClick={handleChangePassword}
+                  disabled={loading}
+                  className="w-full bg-primary text-white py-2 rounded-lg hover:bg-primary/90"
+                >
+                  {loading ? 'Updating...' : 'Change Password'}
                 </button>
               </div>
             </div>
@@ -109,101 +166,27 @@ const UserSettings = () => {
             <div>
               <h2 className="text-lg font-semibold mb-4">Notification Setting</h2>
               <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <span>All notifications</span>
-                  <button
-                    onClick={() => handleNotificationChange('allNotifications')}
-                    className={`w-12 h-6 rounded-full transition-colors duration-200 ${
-                      notifications.allNotifications ? 'bg-primary' : 'bg-gray-300'
-                    }`}
-                  >
-                    <div
-                      className={`w-4 h-4 bg-white rounded-full transform transition-transform duration-200 ${
-                        notifications.allNotifications ? 'translate-x-7' : 'translate-x-1'
-                      }`}
-                    />
-                  </button>
-                </div>
-
-                <div className="flex items-center justify-between">
-                  <span>Notify me on new internship post</span>
-                  <button
-                    onClick={() => handleNotificationChange('newInternship')}
-                    className={`w-12 h-6 rounded-full transition-colors duration-200 ${
-                      notifications.newInternship ? 'bg-primary' : 'bg-gray-300'
-                    }`}
-                  >
-                    <div
-                      className={`w-4 h-4 bg-white rounded-full transform transition-transform duration-200 ${
-                        notifications.newInternship ? 'translate-x-7' : 'translate-x-1'
-                      }`}
-                    />
-                  </button>
-                </div>
-
-                <div className="flex items-center justify-between">
-                  <span>Notify me on new event post</span>
-                  <button
-                    onClick={() => handleNotificationChange('newEvent')}
-                    className={`w-12 h-6 rounded-full transition-colors duration-200 ${
-                      notifications.newEvent ? 'bg-primary' : 'bg-gray-300'
-                    }`}
-                  >
-                    <div
-                      className={`w-4 h-4 bg-white rounded-full transform transition-transform duration-200 ${
-                        notifications.newEvent ? 'translate-x-7' : 'translate-x-1'
-                      }`}
-                    />
-                  </button>
-                </div>
-
-                <div className="flex items-center justify-between">
-                  <span>Notify me on application invitation</span>
-                  <button
-                    onClick={() => handleNotificationChange('applicationInvitation')}
-                    className={`w-12 h-6 rounded-full transition-colors duration-200 ${
-                      notifications.applicationInvitation ? 'bg-primary' : 'bg-gray-300'
-                    }`}
-                  >
-                    <div
-                      className={`w-4 h-4 bg-white rounded-full transform transition-transform duration-200 ${
-                        notifications.applicationInvitation ? 'translate-x-7' : 'translate-x-1'
-                      }`}
-                    />
-                  </button>
-                </div>
-
-                <div className="flex items-center justify-between">
-                  <span>Notify me on job matched internship</span>
-                  <button
-                    onClick={() => handleNotificationChange('jobMatched')}
-                    className={`w-12 h-6 rounded-full transition-colors duration-200 ${
-                      notifications.jobMatched ? 'bg-primary' : 'bg-gray-300'
-                    }`}
-                  >
-                    <div
-                      className={`w-4 h-4 bg-white rounded-full transform transition-transform duration-200 ${
-                        notifications.jobMatched ? 'translate-x-7' : 'translate-x-1'
-                      }`}
-                    />
-                  </button>
-                </div>
-
-                <div className="flex items-center justify-between">
-                  <span>Notify me on preferred job</span>
-                  <button
-                    onClick={() => handleNotificationChange('preferredJob')}
-                    className={`w-12 h-6 rounded-full transition-colors duration-200 ${
-                      notifications.preferredJob ? 'bg-primary' : 'bg-gray-300'
-                    }`}
-                  >
-                    <div
-                      className={`w-4 h-4 bg-white rounded-full transform transition-transform duration-200 ${
-                        notifications.preferredJob ? 'translate-x-7' : 'translate-x-1'
-                      }`}
-                    />
-                  </button>
-                </div>
+                {['allNotifications', 'newInternship', 'preferredJob'].map((key) => (
+                  <div className="flex items-center justify-between" key={key}>
+                    <span>
+                      {{
+                        allNotifications: 'All notifications',
+                        newInternship: 'Notify me on new internship post',
+                        preferredJob: 'Notify me on preferred job'
+                      }[key as keyof typeof notifications]}
+                    </span>
+                    <button
+                      onClick={() => handleNotificationChange(key as keyof typeof notifications)}
+                      className={`w-12 h-6 rounded-full transition-colors duration-200 ${notifications[key as keyof typeof notifications] ? 'bg-primary' : 'bg-gray-300'
+                        }`}
+                    >
+                      <div
+                        className={`w-4 h-4 bg-white rounded-full transform transition-transform duration-200 ${notifications[key as keyof typeof notifications] ? 'translate-x-7' : 'translate-x-1'
+                          }`}
+                      />
+                    </button>
+                  </div>
+                ))}
               </div>
             </div>
           </div>

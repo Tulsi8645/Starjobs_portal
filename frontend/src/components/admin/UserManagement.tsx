@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Search, UserPlus, FileText, Eye, Trash2, Bell } from 'lucide-react';
 
 const UserManagement = () => {

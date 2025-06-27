@@ -80,7 +80,7 @@ const ApplyPage: React.FC = () => {
             onChange={(e) => setCoverLetter(e.target.value)}
             required
             className="w-full border rounded p-2 mt-1"
-            rows={5}
+            rows={8}
           />
         </label>
 

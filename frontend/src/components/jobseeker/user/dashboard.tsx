@@ -1,5 +1,6 @@
 // src/pages/UserDashboard.tsx
 import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { MapPin, Clock } from 'lucide-react';
 import { fetchAppliedJobs } from '../jobseekerApi/api';
 
@@ -13,6 +14,7 @@ interface AppliedJob {
 }
 
 const UserDashboard = () => {
+  const navigate = useNavigate();
   const [appliedJobs, setAppliedJobs] = useState<AppliedJob[]>([]);
   const [stats, setStats] = useState([
     { id: 1, title: 'Applied Jobs', value: '0', icon: '📝' },
@@ -91,7 +93,8 @@ const UserDashboard = () => {
                     </div>
                     <p className="text-xs mt-1 text-gray-400">Status: {job.status}</p>
                   </div>
-                  <button className="px-4 py-2 bg-primary text-white rounded-md hover:bg-primary/90">
+                  <button className="px-4 py-2 bg-primary text-white rounded-md hover:bg-primary/90"
+                    onClick={() => navigate(`/job/${job._id}`)}>
                     View Details
                   </button>
                 </div>

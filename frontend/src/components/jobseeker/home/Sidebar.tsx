@@ -4,9 +4,7 @@ import {
   X,
   User,
   LayoutDashboard,
-  Briefcase,
   Bookmark,
-  FileText,
   Settings,
   LogOut
 } from 'lucide-react';
@@ -21,11 +19,9 @@ interface SidebarItem {
 const sidebarItems: SidebarItem[] = [
   { id: '1', name: 'Profile', icon: <User size={24} />, path: '/user/profile' },
   { id: '2', name: 'Dashboard', icon: <LayoutDashboard size={24} />, path: '/user/dashboard' },
-  { id: '3', name: 'Job List', icon: <Briefcase size={24} />, path: '/user/joblist' },
-  { id: '4', name: 'Saved Jobs', icon: <Bookmark size={24} />, path: '/user/saved' },
-  { id: '5', name: 'Applications', icon: <FileText size={24} />, path: '/user/applications' },
-  { id: '6', name: 'Settings', icon: <Settings size={24} />, path: '/user/settings' },
-  { id: '7', name: 'Logout', icon: <LogOut size={24} />, path: '/logout' }
+  { id: '3', name: 'Saved Jobs', icon: <Bookmark size={24} />, path: '/user/savedjobs' },
+  { id: '4', name: 'Settings', icon: <Settings size={24} />, path: '/user/settings' },
+  { id: '5', name: 'Logout', icon: <LogOut size={24} />, path: '/logout' }
 ];
 
 interface SidebarProps {

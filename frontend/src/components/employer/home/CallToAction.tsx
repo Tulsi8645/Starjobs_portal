@@ -1,5 +1,5 @@
 import React from 'react';
-import Bagman from '../../assets/bag.png'
+import Bagman from '../../../assets/bag.png'
 const CallToAction: React.FC = () => {
   return (
     <div className="relative bg-white mt-5 py-16">

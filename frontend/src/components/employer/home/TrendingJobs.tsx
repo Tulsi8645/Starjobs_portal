@@ -1,11 +1,11 @@
 import React from 'react';
 import { MapPin, Clock, BriefcaseIcon } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { jobs } from '../../utils/mockData';
+import { jobs } from '../../../utils/mockData';
 
 const TrendingJobs: React.FC = () => {
 
-  const navigate = useNavigate(); 
+  const navigate = useNavigate();
   return (
     <div className="bg-secondary py-12">
       <div className="container mx-auto px-4">
@@ -49,11 +49,11 @@ const TrendingJobs: React.FC = () => {
                 {/* Button container to push it to the right */}
                 <div className="flex justify-end mt-4"> {/* Use flex and justify-end */}
                   <button
-                     className="bg-primary text-white py-2 px-6 rounded-md hover:bg-primary/90 transition-colors duration-200"
-                     onClick={() => navigate(`/job/jobdetails`)}
-                   >
-                     Apply now
-                   </button>
+                    className="bg-primary text-white py-2 px-6 rounded-md hover:bg-primary/90 transition-colors duration-200"
+                    onClick={() => navigate(`/job/jobdetails`)}
+                  >
+                    Apply now
+                  </button>
                 </div>
               </div>
             </div>

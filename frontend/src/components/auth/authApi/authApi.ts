@@ -2,10 +2,6 @@ import axios from 'axios';
 
 const API_BASE_URL = 'http://localhost:8000'; // Your backend URL
 
-/**
- * Registers a new employer.
- * Sends FormData including text fields and files.
- */
 export const registerEmployer = async (formData: FormData) => {
   const response = await axios.post(`${API_BASE_URL}/api/users/register`, formData, {
     headers: {
@@ -15,11 +11,7 @@ export const registerEmployer = async (formData: FormData) => {
   return response.data;
 };
 
-/**
- * Registers a new job seeker.
- * Sends FormData including text fields and files (profilePic, resume), skills (stringified array),
- * qualifications (stringified array of objects), and experiences (stringified array of objects).
- */
+
 export const registerJobseeker = async (formData: FormData) => {
   try {
     const response = await axios.post(`${API_BASE_URL}/api/users/register`, formData, {
@@ -41,9 +33,6 @@ interface OtpVerificationPayload {
 }
 
 
-/**
- * Verifies the One-Time Password (OTP) for a given email.
- */
 export const verifyOtp = async (payload: OtpVerificationPayload) => {
   try {
     const response = await axios.post(`${API_BASE_URL}/api/users/verify-otp`, payload);
@@ -86,3 +75,31 @@ export const loginUser = async (payload: LoginPayload) => {
     throw error.response?.data || error.message;
   }
 };
+
+
+
+interface ChangePasswordPayload {
+  currentPassword: string;
+  newPassword: string;
+}
+
+export const changePassword = async (payload: ChangePasswordPayload) => {
+  const token = localStorage.getItem("token");
+  if (!token) throw new Error("Not authenticated");
+
+  try {
+    const response = await axios.post(
+      `${API_BASE_URL}/api/users/change-password`,
+      payload,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    return response.data;
+  } catch (error: any) {
+    throw error.response?.data || error.message;
+  }
+};
+

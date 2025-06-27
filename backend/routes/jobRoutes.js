@@ -4,6 +4,8 @@ const { authenticate } = require("../middleware/authMiddleware");
 const applicationUpload = require("../middleware/applicationUploadMiddleware");
 const {
   getJobs,
+  getTrendingJobs,
+  getRecentJobs,
   applyInJob,
   getJobById,
   likeJob,
@@ -15,6 +17,12 @@ const {
 
 // Route to get all jobs
 router.get("/", getJobs);
+
+// Route to get trending jobs
+router.get("/trending", getTrendingJobs);
+
+// Route to get recent jobs
+router.get("/recent", getRecentJobs);
 
 // Get saved jobs for a jobseeker
 router.get("/saved-jobs", authenticate, getSavedJobs);
