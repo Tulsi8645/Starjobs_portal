@@ -1,4 +1,6 @@
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
+import Header from './components/layout/Header';
+import Footer from './components/layout/Footer';
 import Login from './components/auth/Login';
 import Signup from './components/auth/Signup';
 import VerifyOtp from './components/auth/verifyOtp';
@@ -12,26 +14,14 @@ import JobList from './components/employer/dashboard/JobList';
 import Applicants from './components/employer/dashboard/Applicants';
 import JobApplicants from './components/employer/dashboard/JobApplicants';
 import PostJob from './components/employer/jobs/postjobs';
-
-
-
-
-// jobseeker imports
-
 import { HomePageJobSeeker } from './components/jobseeker/home/Home';
 import AllJobListing from './components/jobseeker/jobListing/jobListing';
 import JobDetailPage from './components/jobseeker/jobListing/jobdetail';
-
 import UserDashboardLayout from './components/jobseeker/user/DashboardLayout';
 import UserProfile from './components/jobseeker/user/profile';
 import UserDashboard from './components/jobseeker/user/dashboard';
 import UserSavedJobs from './components/jobseeker/user/savedJobs';
 import UserSettings from './components/jobseeker/user/settings';
-
-
-
-
-// Admin Components
 import AdminLayout from './components/admin/AdminLayout';
 import AdminDashboard from './components/admin/AdminDashboard';
 import UserManagement from './components/admin/UserManagement';
@@ -40,78 +30,93 @@ import Settings from './components/admin/Settings';
 import DashboardLayout from './components/employer/dashboard/DashboardLayout';
 import ApplyPage from './components/jobseeker/apply';
 
+function AppWrapper() {
+  const location = useLocation();
 
+  // Routes where Header and Footer should not be shown
+  const hideHeaderFooter = [
+    '/user',
+    '/user/profile',
+    '/user/dashboard',
+    '/user/savedjobs',
+    '/user/settings',
+    '/employer',
+    '/employer/profile',
+    '/employer/dashboard',
+    '/employer/insight',
+    '/employer/joblist',
+    '/employer/applicants',
+    '/admin',
+    '/admin/dashboard',
+    '/admin/users',
+    '/admin/reports',
+    '/admin/settings',
+  ];
 
+  const shouldHideHeaderFooter = hideHeaderFooter.some((path) =>
+    location.pathname.startsWith(path)
+  );
 
-
-function App() {
   return (
-    <Router>
-      <div className="min-h-screen bg-secondary flex flex-col">
+    <div className="min-h-screen bg-secondary flex flex-col">
+      {!shouldHideHeaderFooter && <Header />}
+
+      <div className="flex-1">
         <Routes>
-          {/* home routes */}
-          <Route path="/" element={<HomePageJobSeeker />} />
-
           {/* auth routes */}
-
           <Route path="/signup" element={<Signup />} />
           <Route path="/signup/verify-otp" element={<VerifyOtp />} />
           <Route path="/login" element={<Login />} />
           <Route path="/signup/jobseeker" element={<JobseekerSignup />} />
           <Route path="/signup/employer" element={<EmployerSignup />} />
 
+          {/* home routes */}
+          <Route path="/" element={<HomePageJobSeeker />} />
 
-
-          {/* jobseeker routes start */}
+          {/* jobseeker routes */}
           <Route path="/jobs" element={<AllJobListing />} />
-          <Route path="/job/:id" element={< JobDetailPage />} />
+          <Route path="/job/:id" element={<JobDetailPage />} />
           <Route path="/notifications" element={<Notifications />} />
           <Route path="/jobs/:jobId/apply" element={<ApplyPage />} />
 
-          {/* Dashboard routes wrapped with DashboardLayout */}
-          <Route path="/user" element={<UserDashboardLayout />} >
+          {/* jobseeker dashboard */}
+          <Route path="/user" element={<UserDashboardLayout />}>
             <Route path="profile" element={<UserProfile />} />
             <Route path="dashboard" element={<UserDashboard />} />
             <Route path="savedjobs" element={<UserSavedJobs />} />
             <Route path="settings" element={<UserSettings />} />
           </Route>
-          {/* jobseeker routes end */}
 
-
-
-
-          {/* Dashboard routes wrapped with DashboardLayout */}
-          <Route path="/employer" element={<DashboardLayout />} >
+          {/* employer dashboard */}
+          <Route path="/employer" element={<DashboardLayout />}>
             <Route path="profile" element={<Profile />} />
             <Route path="dashboard" element={<Dashboard />} />
             <Route path="insight" element={<Insight />} />
             <Route path="joblist" element={<JobList />} />
             <Route path="applicants" element={<Applicants />} />
             <Route path="jobs/:jobId/applicants" element={<JobApplicants />} />
-            <Route path="/employer/postjob/:jobId?" element={<PostJob />} />
+            <Route path="postjob/:jobId?" element={<PostJob />} />
           </Route>
-          {/* employer routes end */}
 
-
-
-
-
-
-          {/* admin routes start*/}
-          {/* Admin routes wrapped with AdminLayout */}
+          {/* admin dashboard */}
           <Route path="/admin" element={<AdminLayout />}>
             <Route path="dashboard" element={<AdminDashboard />} />
             <Route path="users" element={<UserManagement />} />
             <Route path="reports" element={<ReportsManagement />} />
             <Route path="settings" element={<Settings />} />
           </Route>
-          {/* admin routes end*/}
-
-
-
-
         </Routes>
       </div>
+
+      {!shouldHideHeaderFooter && <Footer />}
+    </div>
+  );
+}
+
+function App() {
+  return (
+    <Router>
+      <AppWrapper />
     </Router>
   );
 }

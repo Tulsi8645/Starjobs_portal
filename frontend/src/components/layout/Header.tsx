@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Menu, Home, User, BriefcaseIcon, Bell, Info } from 'lucide-react';
+import { Menu, Home,  BriefcaseIcon, Bell, Info } from 'lucide-react';
 import Sidebar from './Sidebar';
 import StarLogo from '../../assets/star 1.svg';
 import { useLocation } from 'react-router-dom';
@@ -20,12 +20,14 @@ const Header: React.FC = () => {
     setIsSidebarOpen(open => !open);
   };
 
+
+
   const navItems = [
-    { name: 'Home', icon: <Home size={20} />, path: '/' },
-    { name: 'Candidate', icon: <User size={20} />, path: '/candidate' },
-    { name: 'Job Listings', icon: <BriefcaseIcon size={20} />, path: '/jobs' },
-    { name: 'Notifications', icon: <Bell size={20} />, path: '/notifications' },
-    { name: 'About us', icon: <Info size={20} />, path: '/about' },
+    { name: 'Home', icon: <Home size={22} />, path: '/' },
+    { name: 'Job Listings', icon: <BriefcaseIcon size={22} />, path: '/jobs' },
+    { name: 'About Us', icon: <Info size={22} />, path: '/about' },
+    { name: 'Notifications', icon: <Bell size={22} />, path: '/notifications' },
+
   ];
 
   return (
@@ -44,7 +46,7 @@ const Header: React.FC = () => {
               <a
                 key={item.name}
                 href={item.path}
-                className={`flex items-center px-3 py-1 rounded-md text-sm font-medium transition duration-200 ${
+                className={`flex items-center px-3 py-1 rounded-md text-md font-medium transition duration-200 ${
                   isActive
                     ? 'bg-primary text-white'
                     : 'text-brown hover:text-primary'
@@ -65,7 +67,7 @@ const Header: React.FC = () => {
                 Login
               </a>
               <a
-                href="/register"
+                href="/signup"
                 className="bg-brown text-white bg-primary px-4 py-1.5 rounded-md text-sm font-medium hover:bg-primary"
               >
                 Register
@@ -83,7 +85,7 @@ const Header: React.FC = () => {
         </div>
       </div>
 
-      {/* Sidebar */}
+      {/* Sidebar (only if logged in) */}
       {isLoggedIn && (
         <Sidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
       )}

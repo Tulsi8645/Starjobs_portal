@@ -56,7 +56,7 @@ const UserDashboardLayout = () => {
         <div className="p-4 border-t">
           <button
             onClick={() => setShowLogoutModal(true)}
-            className="flex items-center space-x-3 px-4 py-3 rounded-lg text-gray-600 font-semibold hover:bg-primary hover:text-white w-full"
+            className="flex items-center space-x-3 px-4 py-3 rounded-lg text-gray-600 font-semibold hover:bg-red-600 hover:text-white w-full"
           >
             <LogOut size={20} />
             <span>Logout</span>
@@ -84,7 +84,7 @@ const UserDashboardLayout = () => {
               </button>
               <button
                 onClick={handleLogout}
-                className="px-3 py-1 rounded bg-red-500 text-white hover:bg-red-800 hover:text-white"
+                className="px-3 py-1 rounded bg-red-500 text-white hover:bg-red-700 hover:text-white"
               >
                 Logout
               </button>

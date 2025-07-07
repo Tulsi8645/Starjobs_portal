@@ -4,49 +4,24 @@ import {
   X,
   User,
   LayoutDashboard,
-  LineChart,
-  ClipboardList,
+  Bookmark,
+  Settings,
   LogOut
 } from 'lucide-react';
 
 interface SidebarItem {
   id: string;
   name: string;
-  icon: string;
+  icon: React.ReactNode;
   path: string;
 }
 
 const sidebarItems: SidebarItem[] = [
-  {
-    id: '1',
-    name: 'Profile',
-    icon: 'UserIcon',
-    path: '/employer/profile'
-  },
-  {
-    id: '2',
-    name: 'Dashboard',
-    icon: 'LayoutDashboardIcon',
-    path: '/employer/dashboard'
-  },
-  {
-    id: '3',
-    name: 'Insight',
-    icon: 'LineChartIcon',
-    path: '/employer/insight'
-  },
-  {
-    id: '4',
-    name: 'JobList',
-    icon: 'ClipboardListIcon',
-    path: '/employer/joblist'
-  },
-  {
-    id: '5',
-    name: 'Logout',
-    icon: 'LogOutIcon',
-    path: '/employer/logout'
-  }
+  { id: '1', name: 'Profile', icon: <User size={24} />, path: '/user/profile' },
+  { id: '2', name: 'Dashboard', icon: <LayoutDashboard size={24} />, path: '/user/dashboard' },
+  { id: '3', name: 'Saved Jobs', icon: <Bookmark size={24} />, path: '/user/savedjobs' },
+  { id: '4', name: 'Settings', icon: <Settings size={24} />, path: '/user/settings' },
+  { id: '5', name: 'Logout', icon: <LogOut size={24} />, path: '/logout' }
 ];
 
 interface SidebarProps {
@@ -58,14 +33,6 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
   const [showLogoutModal, setShowLogoutModal] = useState(false);
   const navigate = useNavigate();
 
-  const iconMap: Record<string, React.ReactNode> = {
-    'UserIcon': <User size={24} />,
-    'LayoutDashboardIcon': <LayoutDashboard size={24} />,
-    'LineChartIcon': <LineChart size={24} />,
-    'ClipboardListIcon': <ClipboardList size={24} />,
-    'LogOutIcon': <LogOut size={24} />
-  };
-
   const handleLogout = () => {
     // Clear auth token from localStorage
     localStorage.removeItem('token');
@@ -75,22 +42,15 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
     navigate('/');
   };
 
+
   return (
-    <div
-      className={`fixed inset-0 z-50 transform ${
-        isOpen ? 'translate-x-0' : 'translate-x-full'
-      } transition-transform duration-300 ease-in-out`}
-    >
+    <div className={`fixed inset-0 z-50 transform ${isOpen ? 'translate-x-0' : 'translate-x-full'} transition-transform duration-300 ease-in-out`}>
       <div className="absolute inset-0 bg-black bg-opacity-50" onClick={onClose}></div>
 
       <div className="absolute right-0 top-0 h-full w-64 md:w-80 bg-white shadow-lg">
         <div className="p-4 border-b flex justify-between items-center">
           <h2 className="text-xl font-semibold text-primary">Menu</h2>
-          <button
-            onClick={onClose}
-            className="text-gray-500 hover:text-primary transition-colors duration-200"
-            aria-label="Close menu"
-          >
+          <button onClick={onClose} className="text-gray-500 hover:text-primary" aria-label="Close menu">
             <X size={24} />
           </button>
         </div>
@@ -104,7 +64,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
                     onClick={() => setShowLogoutModal(true)}
                     className="w-full flex items-center p-3 text-gray-600 hover:text-primary hover:bg-secondary rounded-lg transition-colors duration-200"
                   >
-                    <span className="mr-3 text-primary">{iconMap[item.icon]}</span>
+                    <span className="mr-3 text-primary">{item.icon}</span>
                     <span className="font-medium">{item.name}</span>
                   </button>
                 ) : (
@@ -112,7 +72,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
                     href={item.path}
                     className="flex items-center p-3 text-gray-600 hover:text-primary hover:bg-secondary rounded-lg transition-colors duration-200"
                   >
-                    <span className="mr-3 text-primary">{iconMap[item.icon]}</span>
+                    <span className="mr-3 text-primary">{item.icon}</span>
                     <span className="font-medium">{item.name}</span>
                   </a>
                 )}
