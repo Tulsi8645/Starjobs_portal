@@ -1,66 +1,69 @@
-// src/pages/UserDashboard.tsx
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { MapPin, Clock } from 'lucide-react';
-import { fetchAppliedJobs } from '../jobseekerApi/api';
+import { fetchAppliedJobs, fetchDashboardStats } from '../jobseekerApi/api';
 
 interface AppliedJob {
   _id: string;
   title: string;
   location: string;
   type: string;
-  status: string;
+  applicationStatus: string;
   appliedAt: string;
 }
+
 
 const UserDashboard = () => {
   const navigate = useNavigate();
   const [appliedJobs, setAppliedJobs] = useState<AppliedJob[]>([]);
   const [stats, setStats] = useState([
-    { id: 1, title: 'Applied Jobs', value: '0', icon: '📝' },
-    { id: 2, title: 'Reviewed Jobs', value: '0', icon: '👀' },
-    { id: 3, title: 'Accepted Jobs', value: '0', icon: '✅' }
+    { id: 1, title: 'Total Applications', value: '0', icon: '📄' },
+    { id: 2, title: 'Pending', value: '0', icon: '⏳' },
+    { id: 3, title: 'Reviewed', value: '0', icon: '👀' },
+    { id: 4, title: 'Accepted', value: '0', icon: '✅' },
+    { id: 5, title: 'Rejected', value: '0', icon: '❌' }
   ]);
 
   useEffect(() => {
-    const getJobs = async () => {
+    const fetchData = async () => {
       try {
+        // Fetch applied jobs
         const jobs = await fetchAppliedJobs();
-
-        // Transform the returned jobs to match AppliedJob type
         const transformedJobs: AppliedJob[] = jobs.map((job: any) => ({
           _id: job._id,
           title: job.title,
           location: job.location,
-          type: job.type || 'Full Time',
-          status: job.status || 'Pending',
-          appliedAt: job.createdAt || '', // if available
+          type: job.jobtype || 'Full Time',         // use job.jobtype not job.type
+          applicationStatus: job.applicationStatus || 'Pending',
+          appliedAt: job.appliedAt || '',
         }));
-
+        
         setAppliedJobs(transformedJobs);
 
-        const reviewed = transformedJobs.filter(job => job.status === 'Reviewed').length;
-        const accepted = transformedJobs.filter(job => job.status === 'Accepted').length;
+        // Fetch dashboard stats
+        const dashboardStats = await fetchDashboardStats();
 
-        setStats(prevStats => prevStats.map(stat => {
-          if (stat.title === 'Applied Jobs') return { ...stat, value: transformedJobs.length.toString() };
-          if (stat.title === 'Reviewed Jobs') return { ...stat, value: reviewed.toString() };
-          if (stat.title === 'Accepted Jobs') return { ...stat, value: accepted.toString() };
-          return stat;
-        }));
+        setStats([
+          { id: 1, title: 'Total Applications', value: dashboardStats.totalApplications.toString(), icon: '📄' },
+          { id: 2, title: 'Pending', value: dashboardStats.pending.toString(), icon: '⏳' },
+          { id: 3, title: 'Reviewed', value: dashboardStats.reviewed.toString(), icon: '👀' },
+          { id: 4, title: 'Accepted', value: dashboardStats.accepted.toString(), icon: '✅' },
+          { id: 5, title: 'Rejected', value: dashboardStats.rejected.toString(), icon: '❌' }
+        ]);
       } catch (error) {
-        console.error("Failed to fetch applied jobs", error);
+        console.error("Failed to fetch dashboard data:", error);
       }
     };
 
-    getJobs();
+    fetchData();
   }, []);
 
   return (
     <div className="min-h-screen bg-gray-50 overflow-auto p-6" style={{ maxHeight: 'calc(100vh - 50px)' }}>
       <div className="max-w-7xl mx-auto">
+
         {/* Stats Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-6 mb-6">
           {stats.map((stat) => (
             <div key={stat.id} className="bg-white p-6 rounded-lg shadow-sm">
               <div className="flex justify-between items-center">
@@ -74,7 +77,7 @@ const UserDashboard = () => {
           ))}
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-[65%_35%] gap-6">
 
           {/* Applied Jobs */}
           <div className="bg-white rounded-lg shadow-sm p-6">
@@ -91,10 +94,25 @@ const UserDashboard = () => {
                       <Clock size={14} className="mr-1" />
                       <span>{job.type}</span>
                     </div>
-                    <p className="text-xs mt-1 text-gray-400">Status: {job.status}</p>
+                    <span
+                      className={`text-xs font-semibold px-2 py-1 rounded
+    ${job.applicationStatus === "Accepted"
+                          ? "bg-green-100 text-green-800"
+                          : job.applicationStatus === "Reviewed"
+                            ? "bg-yellow-100 text-yellow-800"
+                            : job.applicationStatus === "Rejected"
+                              ? "bg-red-100 text-red-800"
+                              : "bg-gray-100 text-gray-800"
+                        }`}
+                    >
+                      {job.applicationStatus}
+                    </span>
+
                   </div>
-                  <button className="px-4 py-2 bg-primary text-white rounded-md hover:bg-primary/90"
-                    onClick={() => navigate(`/job/${job._id}`)}>
+                  <button
+                    className="px-4 py-2 bg-primary text-white rounded-md hover:bg-primary/90"
+                    onClick={() => navigate(`/job/${job._id}`)}
+                  >
                     View Details
                   </button>
                 </div>
@@ -103,13 +121,12 @@ const UserDashboard = () => {
             </div>
           </div>
 
-          {/* Recent Activities */}
+          {/* Recent Activities Placeholder */}
           <div className="bg-white rounded-lg shadow-sm p-6">
             <h2 className="text-lg font-semibold mb-4">Recent Activities</h2>
             <p className="text-gray-400">No recent activities.</p>
           </div>
 
-          
         </div>
       </div>
     </div>

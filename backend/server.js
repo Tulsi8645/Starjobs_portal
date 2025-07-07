@@ -21,6 +21,7 @@ app.use("/api/users", require("./routes/userRoutes"));
 app.use("/api/jobs", require("./routes/jobRoutes"));
 app.use("/api/jobseeker", require("./routes/jobseekerRoutes"));
 app.use("/api/employer", require("./routes/employerRoutes"));
+app.use("/api/insights", require("./routes/insightRoutes"));
 app.use("/api/admin", require("./routes/adminRoutes"));
 
 

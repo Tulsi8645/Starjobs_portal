@@ -40,6 +40,7 @@ const verifyEmployer = async (req, res) => {
     res.status(500).json({ message: "Server error" });
   }
 };
+
 // Get All Users
 const getAllUsers = async (req, res) => {
   try {
@@ -81,7 +82,6 @@ const deleteUser = async (req, res) => {
 };
 
 
-
 // Get All Jobs
 const getAllJobs = async (req, res) => {
   try {
@@ -94,7 +94,6 @@ const getAllJobs = async (req, res) => {
     res.status(500).json({ message: "Server error" });
   }
 };
-
 
 // Delete a Job
 const deleteJob = async (req, res) => {

@@ -34,7 +34,7 @@ const Profile = () => {
   }
 
   return (
-    <div className="bg-gray-50 p-6 overflow-auto" style={{ maxHeight: "calc(100vh - 50px)" }}>
+    <div className="bg-gray-50 p-6 pt-20 overflow-auto" style={{ maxHeight: "calc(100vh - 50px)" }}>
       <div className="max-w-4xl mx-auto">
         <div className="bg-white rounded-lg shadow-sm p-8">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">

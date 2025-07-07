@@ -1,8 +1,7 @@
-import { MapPin, Clock, DollarSign, Users, PenSquare, X, MoreVertical} from "lucide-react";
+import { MapPin, Clock, DollarSign, Users, PenSquare, MoreVertical } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { getEmployerJobs } from "../employerApi/api";
-
+import { getEmployerJobs, patchJob } from "../employerApi/api";
 
 interface Job {
   _id: string;
@@ -12,7 +11,7 @@ interface Job {
   type: string;
   createdAt: string;
   salary: string;
-  jobseekers?: number;
+  jobseekers?: string[];
   newApplicants?: number;
   shortlisted?: number;
   interview?: number;
@@ -22,6 +21,10 @@ interface Job {
 
 const JobList = () => {
   const [jobs, setJobs] = useState<Job[]>([]);
+  const [filteredJobs, setFilteredJobs] = useState<Job[]>([]);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [sortOrder, setSortOrder] = useState("Newest");
+
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -29,37 +32,75 @@ const JobList = () => {
       try {
         const data = await getEmployerJobs();
         setJobs(data);
+        setFilteredJobs(data);
       } catch (error) {
         console.error("Error fetching employer jobs:", error);
       }
     };
-
     fetchJobs();
   }, []);
 
+  useEffect(() => {
+    let filtered = [...jobs];
+
+    if (searchQuery.trim()) {
+      const lower = searchQuery.toLowerCase();
+      filtered = filtered.filter(
+        (job) =>
+          job.title.toLowerCase().includes(lower) ||
+          job.location.toLowerCase().includes(lower)
+      );
+    }
+
+    filtered.sort((a, b) => {
+      const dateA = new Date(a.createdAt).getTime();
+      const dateB = new Date(b.createdAt).getTime();
+      return sortOrder === "Newest" ? dateB - dateA : dateA - dateB;
+    });
+
+    setFilteredJobs(filtered);
+  }, [searchQuery, sortOrder, jobs]);
+
+  const handleStatusChange = async (jobId: string, newStatus: string) => {
+    try {
+      await patchJob(jobId, { status: newStatus });
+      setJobs((prevJobs) =>
+        prevJobs.map((job) =>
+          job._id === jobId ? { ...job, status: newStatus } : job
+        )
+      );
+    } catch (error) {
+      console.error("Failed to update job status:", error);
+    }
+  };
+
   return (
-    <div className="min-h-screen overflow-auto bg-gray-50 p-6" style={{ maxHeight: "calc(100vh - 50px)" }}>
+    <div
+      className="min-h-screen overflow-auto bg-gray-50 p-6"
+      style={{ maxHeight: "calc(100vh - 50px)" }}
+    >
       <div className="max-w-7xl mx-auto">
         <div className="flex items-center justify-between mb-6">
           <div className="relative flex-1 max-w-xl">
             <input
               type="text"
               placeholder="Search job titles or locations..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full pl-10 pr-4 py-2 border rounded-lg"
             />
             <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400">
               <Users size={20} />
             </div>
           </div>
-          <div className="flex space-x-4 ml-4">
-            <select className="border rounded-lg px-4 py-2">
-              <option>All Jobs</option>
-            </select>
-            <select className="border rounded-lg px-4 py-2">
-              <option>All Types</option>
-            </select>
-            <select className="border rounded-lg px-4 py-2">
-              <option>Newest First</option>
+          <div className="ml-4">
+            <select
+              className="border rounded-lg px-4 py-2"
+              value={sortOrder}
+              onChange={(e) => setSortOrder(e.target.value)}
+            >
+              <option value="Newest">Newest First</option>
+              <option value="Oldest">Oldest First</option>
             </select>
           </div>
         </div>
@@ -74,14 +115,22 @@ const JobList = () => {
         </div>
 
         <div className="space-y-4">
-          {jobs.map((job) => (
+          {filteredJobs.map((job) => (
             <div key={job._id} className="bg-white rounded-lg shadow-sm p-6">
               <div className="flex items-start justify-between">
                 <div className="flex items-start space-x-4">
                   <div>
                     <div className="flex items-center space-x-2">
                       <h3 className="text-lg font-semibold">{job.title}</h3>
-                      <span className="px-2 py-1 text-xs rounded bg-green-100 text-green-600">
+                      <span
+                        className={`px-2 py-1 text-sm rounded-md
+                           ${job.status === "Active"
+                            ? "bg-green-200 text-black"
+                            : job.status === "Inactive"
+                              ? "bg-blue-200 text-black"
+                              : "bg-gray-300 text-black"
+                          }`}
+                      >
                         {job.status}
                       </span>
                     </div>
@@ -111,37 +160,55 @@ const JobList = () => {
                   <div>
                     <div className="text-gray-600">Total Applicants</div>
                     <div className="flex items-center mt-1">
-                      <span className="font-semibold">{job.jobseekers?.length || 0}</span>
-                      <span className="ml-2 text-green-600 text-sm">+{job.newApplicants || 0} new</span>
+                      <span className="font-semibold">
+                        {job.jobseekers?.length ?? 0}
+                      </span>
+                      <span className="ml-2 text-green-600 text-sm">
+                        +{job.newApplicants || 0} new
+                      </span>
                     </div>
-                  </div>
-                  <div>
-                    <div className="text-gray-600">Shortlisted</div>
-                    <div className="mt-1 font-semibold">{job.shortlisted || 0}</div>
-                  </div>
-                  <div>
-                    <div className="text-gray-600">Interview</div>
-                    <div className="mt-1 font-semibold">{job.interview || 0}</div>
                   </div>
                 </div>
 
                 <div className="flex items-center space-x-4">
-                  <button className="flex items-center text-gray-600 hover:text-primary">
+                  <button
+                    className="flex items-center text-gray-600 hover:text-primary"
+                    onClick={() =>
+                      navigate(`/employer/jobs/${job._id}/applicants`)
+                    }
+                  >
                     <Users size={20} className="mr-2" />
                     View Applicants
                   </button>
-                  <button className="flex items-center text-gray-600 hover:text-primary">
+
+                  <button
+                    className="flex items-center text-gray-600 hover:text-primary"
+                    onClick={() => navigate(`/employer/postjob/${job._id}`)}
+                  >
                     <PenSquare size={20} className="mr-2" />
                     Edit Job
                   </button>
-                  <button className="flex items-center text-gray-600 hover:text-primary">
-                    <X size={20} className="mr-2" />
-                    Close Job
-                  </button>
+
+                  <select
+                    value={job.status}
+                    onChange={(e) =>
+                      handleStatusChange(job._id, e.target.value)
+                    }
+                    className="border px-2 py-1 rounded-md text-sm"
+                  >
+                    <option value="Active">Active</option>
+                    <option value="Inactive">Inactive</option>
+                    <option value="Closed">Closed</option>
+                  </select>
                 </div>
               </div>
             </div>
           ))}
+          {filteredJobs.length === 0 && (
+            <div className="text-center text-gray-500 mt-10">
+              No jobs found matching your criteria.
+            </div>
+          )}
         </div>
       </div>
     </div>

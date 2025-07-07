@@ -45,7 +45,6 @@ const getJobs = async (req, res) => {
 };
 
 
-
 // Get latest 3 trending jobs
 const getTrendingJobs = async (req, res) => {
   try {
@@ -102,20 +101,28 @@ const getRecentJobs = async (req, res) => {
 // Get job by ID
 const getJobById = async (req, res) => {
   const { id } = req.params;
+  const viewerIp = req.ip;
 
   try {
     const job = await Job.findById(id)
-      .populate("employer", "name email companyLogo")
-      .lean();
+      .populate("employer", "name email companyLogo");
 
     if (!job) {
       return res.status(404).json({ message: "Job not found" });
     }
 
-    job.likeCount = job.likes?.length || 0;
-    job.dislikeCount = job.dislikes?.length || 0;
+    // Track unique IP views
+    if (!job.views.some((view) => view.ip === viewerIp)) {
+      job.views.push({ ip: viewerIp, date: new Date() });
+      await job.save();
+    }
 
-    res.json(job);
+    const jobData = job.toObject();
+    jobData.likeCount = job.likes?.length || 0;
+    jobData.dislikeCount = job.dislikes?.length || 0;
+    jobData.viewCount = job.views?.length || 0;
+
+    res.json(jobData);
   } catch (error) {
     console.error("Error fetching job by ID:", error);
     res.status(500).json({ message: "Server error" });
@@ -123,6 +130,41 @@ const getJobById = async (req, res) => {
 };
 
 
+// Get job views per unique ip
+const getJobViews = async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const job = await Job.findById(id).select("views");
+
+    if (!job) return res.status(404).json({ message: "Job not found" });
+
+    let updated = false;
+
+    // Fix invalid dates
+    job.views.forEach((view) => {
+      if (!(view.date instanceof Date) || isNaN(new Date(view.date))) {
+        view.date = new Date();
+        updated = true;
+      }
+    });
+
+    if (updated) {
+      await job.save();
+    }
+
+    // Get unique IPs
+    const uniqueIPs = [...new Map(job.views.map(v => [v.ip, v])).values()];
+
+    res.json({
+      uniqueViewCount: uniqueIPs.length,
+      uniqueViews: uniqueIPs, // array of unique view objects by IP
+    });
+  } catch (err) {
+    console.error("Error getting job views:", err);
+    res.status(500).json({ message: "Server error" });
+  }
+};
 
 
 // Apply in Job
@@ -341,6 +383,7 @@ module.exports = {
   getTrendingJobs,
   getRecentJobs,
   getJobById,
+  getJobViews,
   applyInJob,
   likeJob,
   dislikeJob,

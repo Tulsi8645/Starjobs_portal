@@ -1,47 +1,107 @@
 import logo from '../../../assets/star 1.svg';
-import { Link, useLocation, Outlet } from 'react-router-dom';
-import { LayoutDashboard, Users, FileText, Settings,PlusCircle,  } from 'lucide-react';
+import { Link, useLocation, Outlet, useNavigate } from 'react-router-dom';
+import {
+  LayoutDashboard,
+  Users,
+  FileText,
+  Settings,
+  PlusCircle,
+  FilePlus,
+  LogOut
+} from 'lucide-react';
+import { useState } from 'react';
 
 const DashboardLayout = () => {
   const location = useLocation();
+  const navigate = useNavigate();
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
+
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    window.dispatchEvent(new Event('authChange'));
+    setShowLogoutModal(false);
+    navigate('/');
+  };
 
   const menuItems = [
-    
     { path: '/employer/profile', icon: <Users size={20} />, label: 'PROFILE' },
     { path: '/employer/dashboard', icon: <LayoutDashboard size={20} />, label: 'DASHBOARD' },
     { path: '/employer/insight', icon: <FileText size={20} />, label: 'Insight' },
     { path: '/employer/joblist', icon: <Settings size={20} />, label: 'JOB LIST' },
+    { path: '/employer/applicants', icon: <FilePlus size={20} />, label: 'APPLICANTS' },
     { path: '/employer/postjob', icon: <PlusCircle size={20} />, label: 'POST JOB' }
   ];
 
   return (
     <div className="flex min-h-screen bg-gray-50">
-      <aside className="w-64 bg-white border-r">
+      <aside className="w-64 bg-white border-r flex flex-col">
+        {/* Logo */}
         <div className="p-4 border-b">
-          <div className="flex items-center">
+          <div
+            className="flex items-center cursor-pointer"
+            onClick={() => navigate('/employer/profile')}
+          >
             <img src={logo} alt="Logo" className="w-30 h-30 mr-2" />
           </div>
         </div>
-        <nav className="p-4">
+
+        {/* Navigation */}
+        <nav className="p-4 flex-1">
           {menuItems.map((item) => (
             <Link
               key={item.path}
               to={item.path}
-              className={`flex items-center space-x-3 px-4 py-3 rounded-lg mb-1 ${
-                location.pathname === item.path
-                  ? 'bg-primary text-white '
-                  : 'text-gray-600 text-bold hover:bg-gray-100'
-              }`}
+              className={`flex items-center space-x-3 px-4 py-3 rounded-lg mb-1 ${location.pathname === item.path
+                  ? 'bg-primary text-white'
+                : 'text-gray-600 font-semibold hover:bg-gray-100'
+                }`}
             >
               {item.icon}
               <span>{item.label}</span>
             </Link>
           ))}
         </nav>
+
+        {/* Logout Button */}
+        <div className="p-4 border-t">
+          <button
+            onClick={() => setShowLogoutModal(true)}
+            className="flex items-center space-x-3 px-4 py-3 rounded-lg text-gray-600 font-semibold hover:bg-primary hover:text-white w-full"
+          >
+            <LogOut size={20} />
+            <span>Logout</span>
+          </button>
+        </div>
       </aside>
+
+      {/* Main Content */}
       <main className="flex-1">
         <Outlet />
       </main>
+
+      {/* Logout Modal */}
+      {showLogoutModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center z-50">
+          <div className="bg-white p-6 rounded-lg shadow-xl max-w-sm w-full">
+            <h2 className="text-lg font-semibold mb-4">Confirm Logout</h2>
+            <p className="mb-4">Are you sure you want to log out?</p>
+            <div className="flex justify-end space-x-2">
+              <button
+                onClick={() => setShowLogoutModal(false)}
+                className="px-4 py-2 rounded bg-gray-200 hover:bg-gray-300"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleLogout}
+                className="px-3 py-1 rounded bg-red-500 text-white hover:bg-red-900 hover:text-white"
+              >
+                Logout
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

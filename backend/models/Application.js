@@ -17,11 +17,11 @@ const applicationSchema = new mongoose.Schema(
       trim: true,
     },
     coverLetter: {
-      type: String, // assume rich text (HTML or Markdown)
+      type: String, 
       required: true,
     },
     resume: {
-      type: String, // URL or file path to the uploaded resume
+      type: String, 
       required: true,
     },
     status: {

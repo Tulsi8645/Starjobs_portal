@@ -8,6 +8,7 @@ const {
   getRecentJobs,
   applyInJob,
   getJobById,
+  getJobViews,
   likeJob,
   dislikeJob,
   saveJob,
@@ -42,7 +43,10 @@ router.post("/:id/dislike", authenticate, dislikeJob);
 // Save a job route
 router.patch("/:id/save", authenticate, saveJob);
 
-// Route to get a job by ID (must come last!)
+// Route to get a job by ID
 router.get("/:id", getJobById);
+
+//Route to get job views
+router.get("/:id/views", getJobViews);
 
 module.exports = router;

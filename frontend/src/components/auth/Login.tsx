@@ -31,7 +31,7 @@ const Login: React.FC = () => {
       if (role === 'jobseeker') {
         navigate('/');
       } else if (role === 'employer') {
-        navigate('/employer');
+        navigate('/employer/dashboard');
       } else if (role === 'admin') {
         navigate('/admin/dashboard');
       } else {

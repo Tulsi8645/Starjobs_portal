@@ -28,7 +28,7 @@ const jobSchema = new mongoose.Schema(
       enum: ["Active", "Inactive", "Closed"],
     },
 
-    description: { type: String, required: true }, // rich text assumed as HTML/Markdown
+    description: { type: String, required: true }, 
 
     employer: {
       type: mongoose.Schema.Types.ObjectId,
@@ -39,6 +39,13 @@ const jobSchema = new mongoose.Schema(
     jobseekers: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
     likes: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
     dislikes: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
+
+    views: [
+      {
+        ip: { type: String, required: true },
+        date: { type: Date, required: true, default: Date.now },
+      }
+    ],    
   },
   {
     timestamps: true,

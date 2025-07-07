@@ -1,19 +1,17 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import HomePageEmployer from './components/employer/HomePage';
 import Login from './components/auth/Login';
 import Signup from './components/auth/Signup';
 import VerifyOtp from './components/auth/verifyOtp';
 import JobseekerSignup from './components/auth/jobseekerSignup';
 import EmployerSignup from './components/auth/employerSignup';
-import CandidateList from './components/employer/dashboard/CandidateList';
-import JobListings from './components/employer/dashboard/JobListings';
 import Notifications from './components/employer/dashboard/Notifications';
 import Profile from './components/employer/dashboard/Profile';
 import Dashboard from './components/employer/dashboard/Dashboard';
 import Insight from './components/employer/dashboard/Insight';
 import JobList from './components/employer/dashboard/JobList';
+import Applicants from './components/employer/dashboard/Applicants';
+import JobApplicants from './components/employer/dashboard/JobApplicants';
 import PostJob from './components/employer/jobs/postjobs';
-import ApplicantProfile from './components/employer/candidate/Applicant';
 
 
 
@@ -41,6 +39,7 @@ import ReportsManagement from './components/admin/ReportsManagement';
 import Settings from './components/admin/Settings';
 import DashboardLayout from './components/employer/dashboard/DashboardLayout';
 import ApplyPage from './components/jobseeker/apply';
+
 
 
 
@@ -81,22 +80,15 @@ function App() {
 
 
 
-          {/* employer routes start*/}
-          <Route path="/employer" element={<HomePageEmployer />} />
-          <Route path="/candidate" element={<CandidateList />} />
-          <Route path="/jobs" element={<JobListings />} />
-          <Route path="/job/candidate" element={<ApplicantProfile />} />
-          <Route path="/notifications" element={<Notifications />} />
-
-
-
           {/* Dashboard routes wrapped with DashboardLayout */}
           <Route path="/employer" element={<DashboardLayout />} >
             <Route path="profile" element={<Profile />} />
             <Route path="dashboard" element={<Dashboard />} />
             <Route path="insight" element={<Insight />} />
             <Route path="joblist" element={<JobList />} />
-            <Route path="postjob" element={<PostJob />} />
+            <Route path="applicants" element={<Applicants />} />
+            <Route path="jobs/:jobId/applicants" element={<JobApplicants />} />
+            <Route path="/employer/postjob/:jobId?" element={<PostJob />} />
           </Route>
           {/* employer routes end */}
 

@@ -1,5 +1,15 @@
-import React from 'react';
-import { Eye, FileText, CheckCircle, Clock } from 'lucide-react';
+import React, { useEffect, useState } from "react";
+import {
+  Eye,
+  Mail,
+  BarChart,
+  Briefcase,
+  UserCheck,
+} from "lucide-react";
+import { getAllApplicants } from "../employerApi/api";
+import { fetchDashboardStats } from "../insightsApi/api";
+
+const MEDIA_URL = import.meta.env.VITE_MEDIA_URL || "";
 
 interface Stat {
   id: number;
@@ -8,73 +18,93 @@ interface Stat {
   icon: React.ReactNode;
 }
 
-interface Activity {
-  id: number;
-  action: string;
-  user: string;
-  email: string;
-  time: string;
-  avatar: string;
-}
-
 interface Application {
-  id: number;
+  id: string;
   name: string;
-  location: string;
+  email: string;
   position: string;
   avatar: string;
+  resume: string;
+  appliedAt: string;
 }
 
 const Dashboard = () => {
-  const stats: Stat[] = [
-    { id: 1, title: 'Total Jobs', value: '4', icon: <FileText className="text-green-500" size={24} /> },
-    { id: 2, title: 'Total Applicant', value: '5', icon: <FileText className="text-yellow-500" size={24} /> },
-    { id: 3, title: 'Shortlisted', value: '5', icon: <CheckCircle className="text-blue-500" size={24} /> },
-    { id: 4, title: 'Views', value: '5', icon: <Eye className="text-primary" size={24} /> }
-  ];
+  const [applications, setApplications] = useState<Application[]>([]);
+  const [stats, setStats] = useState<Stat[]>([]);
 
-  const initialActivities: Activity[] = [
-    {
-      id: 1,
-      action: 'Password Reset Successfully',
-      user: 'John Doe',
-      email: 'johndoe@gmail.com',
-      time: '10 mins Ago',
-      avatar: 'https://images.pexels.com/photos/2379004/pexels-photo-2379004.jpeg?auto=compress&cs=tinysrgb&w=32&h=32&dpr=1'
-    },
-    // Duplicate entries for demonstration
-  ];
+  useEffect(() => {
+    const fetchStats = async () => {
+      try {
+        const data = await fetchDashboardStats();
+        const dynamicStats: Stat[] = [
+          {
+            id: 1,
+            title: "Total Jobs",
+            value: data.totalJobs.toString(),
+            icon: <Briefcase className="text-green-500" size={24} />,
+          },
+          {
+            id: 2,
+            title: "Total Views",
+            value: data.totalViews.toString(),
+            icon: <BarChart className="text-yellow-500" size={24} />,
+          },
+          {
+            id: 3,
+            title: "Total Applications",
+            value: data.totalApplications.toString(),
+            icon: <UserCheck className="text-blue-500" size={24} />,
+          },
+          {
+            id: 4,
+            title: "Pending Applications",
+            value: data.pendingApplications.toString(),
+            icon: <Eye className="text-primary" size={24} />,
+          },
+        ];
+        setStats(dynamicStats);
+      } catch (error) {
+        console.error("Error fetching stats", error);
+      }
+    };
 
-  const activities: Activity[] = initialActivities.concat(Array(2).fill(initialActivities?.[0]));
+    const fetchApplications = async () => {
+      try {
+        const data = await getAllApplicants();
+        const flatApps: Application[] = [];
 
-  const applications: Application[] = [
-    {
-      id: 1,
-      name: 'Mary Jane',
-      location: 'Kathmandu',
-      position: 'UI/UX Designer',
-      avatar: 'https://images.pexels.com/photos/415829/pexels-photo-415829.jpeg?auto=compress&cs=tinysrgb&w=32&h=32&dpr=1'
-    },
-    {
-      id: 2,
-      name: 'Peter Parker',
-      location: 'Kathmandu',
-      position: 'UI/UX Designer',
-      avatar: 'https://images.pexels.com/photos/2379004/pexels-photo-2379004.jpeg?auto=compress&cs=tinysrgb&w=32&h=32&dpr=1'
-    },
-    {
-      id: 3,
-      name: 'Flash',
-      location: 'Kathmandu',
-      position: 'UI/UX Designer',
-      avatar: 'https://images.pexels.com/photos/2379004/pexels-photo-2379004.jpeg?auto=compress&cs=tinysrgb&w=32&h=32&dpr=1'
-    }
-  ];
+        data.forEach((job: any) => {
+          job.applicants.forEach((app: any) => {
+            flatApps.push({
+              id: app.applicationId,
+              name: app.applicant.name,
+              email: app.applicant.email,
+              avatar: app.applicant.profilePic,
+              position: job.jobTitle,
+              resume: app.resume,
+              appliedAt: app.appliedAt,
+            });
+          });
+        });
+
+        const latestFive = flatApps
+          .sort((a, b) => new Date(b.appliedAt).getTime() - new Date(a.appliedAt).getTime())
+          .slice(0, 5);
+
+        setApplications(latestFive);
+      } catch (err) {
+        console.error("Failed to fetch applications:", err);
+      }
+    };
+
+    fetchStats();
+    fetchApplications();
+  }, []);
 
   return (
-    <div className="min-h-screen overflow-auto bg-gray-50 p-6"  style={{ maxHeight: 'calc(100vh - 50px)' }}>
+    <div className="min-h-screen overflow-auto bg-gray-50 p-6" style={{ maxHeight: "calc(100vh - 50px)" }}>
       <div className="max-w-7xl mx-auto">
-        {/* Stats Grid */}
+        {/* Stats */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
           {stats.map((stat) => (
             <div key={stat.id} className="bg-white p-6 rounded-lg shadow-sm">
@@ -89,66 +119,72 @@ const Dashboard = () => {
           ))}
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-[35%_65%] gap-6">
-          {/* Recent Activities */}
+        {/* Applications and Activities */}
+        <div className="grid grid-cols-1 md:grid-cols-[65%_35%] gap-6">
+          {/* Applications */}
           <div className="bg-white rounded-lg shadow-sm p-6">
-            <h2 className="text-lg font-semibold mb-4">Recent Activities</h2>
-            <div className="space-y-4">
-              {activities.map((activity: Activity) => (
-                <div key={activity.id} className="flex items-start space-x-3">
-                  <img
-                    src={activity.avatar}
-                    alt={activity.user}
-                    className="w-10 h-10 rounded-full"
-                  />
-                  <div>
-                    <p className="text-primary">{activity.action}</p>
-                    <p className="text-sm text-gray-500">
-                      {activity.user} | {activity.email}
-                    </p>
-                    <p className="text-xs text-gray-400 mt-1">{activity.time}</p>
+            <h2 className="text-lg font-semibold mb-4">New Applications</h2>
+            <div className="space-y-6">
+              {applications.length === 0 ? (
+                <p className="text-gray-500">No recent applications</p>
+              ) : (
+                applications.map((applicant) => (
+                  <div key={applicant.id} className="flex items-start justify-between space-x-4">
+                    {/* Avatar */}
+                    <div className="w-16 h-16 rounded-full bg-gray-200 overflow-hidden flex items-center justify-center">
+                      {applicant.avatar ? (
+                        <img
+                          src={`${MEDIA_URL.replace(/\/$/, "")}/${applicant.avatar.replace(/^\//, "")}`}
+                          alt={applicant.name}
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        <span className="text-2xl font-bold text-gray-500">
+                          {applicant.name?.charAt(0).toUpperCase()}
+                        </span>
+                      )}
+                    </div>
+
+                    {/* Info */}
+                    <div className="flex-1">
+                      <p className="font-medium">{applicant.name}</p>
+                      <div className="flex items-center text-sm text-gray-500">
+                        <Mail size={14} className="mr-1" />
+                        <span>{applicant.email}</span>
+                        <span className="mx-2">•</span>
+                        <span>{applicant.position}</span>
+                      </div>
+                    </div>
+
+                    {/* Actions */}
+                    <div className="flex items-center gap-2">
+                      {applicant.resume ? (
+                        <a
+                          href={`${MEDIA_URL.replace(/\/$/, "")}/${applicant.resume
+                            .replace(/\\/g, "/")
+                            .replace(/^.*\/uploads/, "uploads")}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
+                          <button className="flex items-center text-white bg-primary px-3 py-1 rounded hover:bg-primary/90 text-sm">
+                            <Eye size={14} className="mr-1" />
+                            Resume
+                          </button>
+                        </a>
+                      ) : (
+                        <span className="text-gray-500 text-xs">No resume</span>
+                      )}
+                    </div>
                   </div>
-                </div>
-              ))}
+                ))
+              )}
             </div>
           </div>
 
-          {/* New Applications */}
-          <div className="bg-white rounded-lg shadow-sm p-6">
-            <h2 className="text-lg font-semibold mb-4">New Application</h2>
-            <div className="space-y-4">
-              {applications.map((application: Application) => (
-                <div key={application.id} className="flex items-center justify-between">
-                  <div className="flex items-center space-x-3">
-                    <img
-                      src={application.avatar}
-                      alt={application.name}
-                      className="w-10 h-10 rounded-full"
-                    />
-                    <div>
-                      <p className="font-medium">{application.name}</p>
-                      <div className="flex items-center text-sm text-gray-500">
-                        <Clock size={14} className="mr-1" />
-                        <span>{application.location}</span>
-                        <span className="mx-2">•</span>
-                        <span>{application.position}</span>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <button className="px-4 py-2 bg-primary text-white rounded-md hover:bg-primary/90">
-                      Download Resume
-                    </button>
-                    <button className="px-4 py-2 border border-gray-300 rounded-md hover:bg-gray-50">
-                      View Profile
-                    </button>
-                    <button className="p-2 text-gray-400 hover:text-gray-600">
-                      <Clock size={20} />
-                    </button>
-                  </div>
-                </div>
-              ))}
-            </div>
+          {/* Recent Activities */}
+          <div className="bg-white rounded-lg shadow-sm p-6 h-fit">
+            <h2 className="text-lg font-semibold mb-4">Recent Activities</h2>
+            <p className="text-gray-500 text-sm">No recent activities</p>
           </div>
         </div>
       </div>

@@ -176,3 +176,21 @@ export const fetchAppliedJobs = async (): Promise<Job[]> => {
 
   return response.data;
 };
+
+// Fetch dashboard stats
+export const fetchDashboardStats = async (): Promise<{
+  totalApplications: number;
+  pending: number;
+  reviewed: number;
+  accepted: number;
+  rejected: number;
+}> => {
+  const token = localStorage.getItem("token");
+  if (!token) throw new Error("Not authenticated");
+
+  const response = await axios.get(`${API_BASE_URL}/api/jobseeker/dashboard-stats`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+
+  return response.data;
+};
