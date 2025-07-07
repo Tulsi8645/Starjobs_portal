@@ -86,7 +86,23 @@ const UserDashboard = () => {
               {appliedJobs.map((job) => (
                 <div key={job._id} className="flex items-center justify-between border-b pb-4">
                   <div>
-                    <h3 className="font-medium">{job.title}</h3>
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <h3 className="font-medium">{job.title}</h3>
+                      <span
+                        className={`text-xs font-semibold px-2 py-1 rounded
+                              ${job.applicationStatus === "Accepted"
+                            ? "bg-green-100 text-green-800"
+                            : job.applicationStatus === "Reviewed"
+                              ? "bg-yellow-100 text-yellow-800"
+                              : job.applicationStatus === "Rejected"
+                                ? "bg-red-100 text-red-800"
+                                : "bg-gray-100 text-gray-800"
+                          }`}
+                      >
+                        {job.applicationStatus}
+                      </span>
+                    </div>
+
                     <div className="flex items-center text-sm text-gray-500 mt-1">
                       <MapPin size={14} className="mr-1" />
                       <span>{job.location}</span>
@@ -94,19 +110,7 @@ const UserDashboard = () => {
                       <Clock size={14} className="mr-1" />
                       <span>{job.type}</span>
                     </div>
-                    <span
-                      className={`text-xs font-semibold px-2 py-1 rounded
-    ${job.applicationStatus === "Accepted"
-                          ? "bg-green-100 text-green-800"
-                          : job.applicationStatus === "Reviewed"
-                            ? "bg-yellow-100 text-yellow-800"
-                            : job.applicationStatus === "Rejected"
-                              ? "bg-red-100 text-red-800"
-                              : "bg-gray-100 text-gray-800"
-                        }`}
-                    >
-                      {job.applicationStatus}
-                    </span>
+                   
 
                   </div>
                   <button

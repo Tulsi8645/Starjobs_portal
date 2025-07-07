@@ -170,7 +170,7 @@ export const fetchAppliedJobs = async (): Promise<Job[]> => {
   const token = localStorage.getItem("token");
   if (!token) throw new Error("Not authenticated");
 
-  const response = await axios.get(`${API_BASE_URL}/api/jobs/applied-jobs`, {
+  const response = await axios.get(`${API_BASE_URL}/api/jobseeker/applied-jobs`, {
     headers: { Authorization: `Bearer ${token}` },
   });
 
