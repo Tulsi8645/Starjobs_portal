@@ -77,13 +77,13 @@ const Dashboard = () => {
           job.applicants.forEach((app: any) => {
             flatApps.push({
               id: app.applicationId,
-              name: app.applicant.name,
-              email: app.applicant.email,
-              avatar: app.applicant.profilePic,
-              position: job.jobTitle,
-              resume: app.resume,
+              name: app.applicant?.name ,
+              email: app.applicant?.email ,
+              avatar: app.applicant?.profilePic,
+              position: job.jobTitle || "",
+              resume: app.resume || "",
               appliedAt: app.appliedAt,
-            });
+            });  
           });
         });
 
@@ -147,10 +147,10 @@ const Dashboard = () => {
 
                     {/* Info */}
                     <div className="flex-1">
-                      <p className="font-medium">{applicant.name}</p>
+                      <p className="font-medium">{applicant.name || (<span className="italic text-gray-400">No name</span>)}</p>
                       <div className="flex items-center text-sm text-gray-500">
                         <Mail size={14} className="mr-1" />
-                        <span>{applicant.email}</span>
+                        <span>{applicant.email || (<span className="italic text-gray-400">No email</span>)}</span>
                         <span className="mx-2">•</span>
                         <span>{applicant.position}</span>
                       </div>
@@ -182,7 +182,7 @@ const Dashboard = () => {
           </div>
 
           {/* Recent Activities */}
-          <div className="bg-white rounded-lg shadow-sm p-6 h-fit">
+          <div className="bg-white rounded-lg shadow-sm p-6 h-full">
             <h2 className="text-lg font-semibold mb-4">Recent Activities</h2>
             <p className="text-gray-500 text-sm">No recent activities</p>
           </div>

@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link, useLocation, Outlet, useNavigate } from 'react-router-dom';
-import { LayoutDashboard, Users, FileText, Settings, LogOut } from 'lucide-react';
+import { LayoutDashboard, Users, FileText, HammerIcon,  Settings, LogOut } from 'lucide-react';
 import logo from '../../assets/star 1.svg';
 
 const AdminLayout = () => {
@@ -11,7 +11,8 @@ const AdminLayout = () => {
   const menuItems = [
     { path: '/admin/dashboard', icon: <LayoutDashboard size={20} />, label: 'DASHBOARD' },
     { path: '/admin/users', icon: <Users size={20} />, label: 'USER MANAGEMENT' },
-    { path: '/admin/reports', icon: <FileText size={20} />, label: 'Reports Management' },
+    { path: '/admin/employers', icon: <FileText size={20} />, label: 'Employer Management' },
+    { path: '/admin/jobs', icon: <HammerIcon size={20} />, label: 'Job Management' },
     { path: '/admin/settings', icon: <Settings size={20} />, label: 'SETTINGS' }
   ];
 

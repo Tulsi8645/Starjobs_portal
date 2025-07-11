@@ -25,10 +25,13 @@ import UserSettings from './components/jobseeker/user/settings';
 import AdminLayout from './components/admin/AdminLayout';
 import AdminDashboard from './components/admin/AdminDashboard';
 import UserManagement from './components/admin/UserManagement';
-import ReportsManagement from './components/admin/ReportsManagement';
+import EmployerManagement from './components/admin/EmployerManagement';
+import EmployerApplicants from './components/admin/EmployerApplicants';
 import Settings from './components/admin/Settings';
 import DashboardLayout from './components/employer/dashboard/DashboardLayout';
 import ApplyPage from './components/jobseeker/apply';
+import UsersProfile from './components/admin/UsersProfile';
+import JobManagement from './components/admin/JobManagement';
 
 function AppWrapper() {
   const location = useLocation();
@@ -49,7 +52,7 @@ function AppWrapper() {
     '/admin',
     '/admin/dashboard',
     '/admin/users',
-    '/admin/reports',
+    '/admin/employer/applicants',
     '/admin/settings',
   ];
 
@@ -102,7 +105,10 @@ function AppWrapper() {
           <Route path="/admin" element={<AdminLayout />}>
             <Route path="dashboard" element={<AdminDashboard />} />
             <Route path="users" element={<UserManagement />} />
-            <Route path="reports" element={<ReportsManagement />} />
+            <Route path="userprofile/:id" element={<UsersProfile />} />
+            <Route path="employers" element={<EmployerManagement />} />
+            <Route path="jobs" element={<JobManagement />} />
+            <Route path="employer/:employerId/applicants" element={<EmployerApplicants />} />
             <Route path="settings" element={<Settings />} />
           </Route>
         </Routes>

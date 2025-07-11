@@ -1,109 +1,75 @@
-import { useState } from 'react';
-import { Search, UserPlus, FileText, Eye, Trash2, Bell } from 'lucide-react';
+import { useEffect, useState } from "react";
+import { Search, UserPlus, FileText, Eye, Trash2, Pencil } from "lucide-react";
+import { getAllUsers, deleteUser } from "./adminApi/api";
+import { useNavigate } from "react-router-dom";
+import { AxiosError } from "axios";
+
+interface User {
+  _id: string;
+  name: string;
+  email: string;
+  role: "employer" | "jobseeker" | "admin";
+  status?: string;
+  createdAt: string;
+  avatar?: string;
+}
+
+const MEDIA_URL = import.meta.env.VITE_MEDIA_URL || "";
 
 const UserManagement = () => {
-  const [activeTab, setActiveTab] = useState('employer');
+  const navigate = useNavigate();
+  const [users, setUsers] = useState<User[]>([]);
+  const [activeTab, setActiveTab] = useState<"employer" | "jobseeker">("employer");
+  const [search, setSearch] = useState("");
 
-  const users = [
-    {
-      id: 1,
-      name: 'Sitasma Karki',
-      email: 'karkisiwani298@gmail.com',
-      type: 'Employer',
-      status: 'Active',
-      joinedDate: '2024 Jan 2',
-      avatar: 'https://images.pexels.com/photos/415829/pexels-photo-415829.jpeg?auto=compress&cs=tinysrgb&w=32&h=32&dpr=1'
-    },
-    {
-      id: 2,
-      name: 'Riya Neupane',
-      email: 'riya234@gmail.com',
-      type: 'Employer',
-      status: 'Pending',
-      joinedDate: '2024 Jan 2',
-      avatar: 'https://images.pexels.com/photos/415829/pexels-photo-415829.jpeg?auto=compress&cs=tinysrgb&w=32&h=32&dpr=1'
-    },
-    // Add more users to demonstrate scrolling
-    {
-      id: 3,
-      name: 'John Doe',
-      email: 'john.doe@example.com',
-      type: 'Job Seeker',
-      status: 'Active',
-      joinedDate: '2024 Feb 15',
-      avatar: 'https://via.placeholder.com/32'
-    },
-    {
-      id: 4,
-      name: 'Jane Smith',
-      email: 'jane.smith@example.com',
-      type: 'Employer',
-      status: 'Active',
-      joinedDate: '2024 Mar 1',
-      avatar: 'https://via.placeholder.com/32'
-    },
-    {
-      id: 5,
-      name: 'Peter Jones',
-      email: 'peter.jones@example.com',
-      type: 'Job Seeker',
-      status: 'Pending',
-      joinedDate: '2024 Mar 20',
-      avatar: 'https://via.placeholder.com/32'
-    },
-    {
-      id: 6,
-      name: 'Alice Brown',
-      email: 'alice.brown@example.com',
-      type: 'Employer',
-      status: 'Active',
-      joinedDate: '2024 Apr 5',
-      avatar: 'https://via.placeholder.com/32'
-    },
-  ];
+  const fetchUsers = async () => {
+    try {
+      const data = await getAllUsers();
+      setUsers(data);
+    } catch (err) {
+      const error = err as AxiosError;
+      console.error("Failed to fetch users:", error.message);
+    }
+  };
+
+  const handleDelete = async (userId: string) => {
+    if (!window.confirm("Are you sure you want to delete this user?")) return;
+    try {
+      await deleteUser(userId);
+      setUsers((prev) => prev.filter((user) => user._id !== userId));
+    } catch (err) {
+      const error = err as AxiosError;
+      alert(error.response?.data || "Failed to delete user.");
+    }
+  };
+
+  const getAvatar = (user: User): string | undefined => {
+    // @ts-ignore
+    return user.avatar || (user.role === "employer" ? (user as any).companyLogo : (user as any).profilePic);
+  };
+
+  const filteredUsers = users.filter(
+    (user) =>
+      user.role === activeTab &&
+      (user.name.toLowerCase().includes(search.toLowerCase()) ||
+        user.email.toLowerCase().includes(search.toLowerCase()))
+  );
+
+  const adminUsers = users.filter((user) => user.role === "admin");
+
+  useEffect(() => {
+    fetchUsers();
+  }, []);
 
   return (
-    <div className="p-6">
-      <div className="flex justify-between items-center mb-6 "> 
+    <div className="overflow-auto p-6" style={{ maxHeight: "calc(100vh - 50px)" }}>
+      <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-semibold">User Management</h1>
-        <div className="flex items-center space-x-4">
-          <div className="relative">
-            <button className="p-2 relative">
-              <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs w-4 h-4 rounded-full flex items-center justify-center">
-                2
-              </span>
-              <Bell size={20} />
-            </button>
-          </div>
-          <div className="flex items-center space-x-2">
-            <img
-              src="https://images.pexels.com/photos/415829/pexels-photo-415829.jpeg?auto=compress&cs=tinysrgb&w=32&h=32&dpr=1"
-              alt="Admin"
-              className="w-8 h-8 rounded-full"
-            />
-            <span>Riya Neupane Admin</span>
-          </div>
-        </div>
       </div>
 
       <div className="bg-white rounded-lg shadow-sm p-6">
-        <div className="flex justify-between items-center mb-6 bg-white pt-6"> 
-          <div className="flex items-center space-x-4">
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
-              <input
-                type="text"
-                placeholder="Search Users..."
-                className="pl-10 pr-4 py-2 border rounded-lg w-64"
-              />
-            </div>
-            <select className="px-4 py-2 border rounded-lg">
-              <option>All Users</option>
-            </select>
-            <select className="px-4 py-2 border rounded-lg">
-              <option>All Status</option>
-            </select>
-          </div>
+        {/* Toolbar */}
+        <div className="flex justify-end items-center mb-6">
           <div className="flex items-center space-x-4">
             <button className="px-4 py-2 bg-primary text-white rounded-lg flex items-center">
               <UserPlus size={20} className="mr-2" />
@@ -116,101 +82,156 @@ const UserManagement = () => {
           </div>
         </div>
 
+        {/* Admin Table */}
+        {adminUsers.length > 0 && (
+          <div className="mb-8">
+            <h2 className="text-lg font-semibold mb-2">Admin List</h2>
+            <div className="overflow-auto">
+              <table className="w-full">
+                <thead>
+                  <tr className="bg-primary text-white">
+                    <th className="px-6 py-3 text-left">USER</th>
+                    <th className="px-6 py-3 text-left">EMAIL</th>
+                    <th className="px-6 py-3 text-left">ROLE</th>
+                    <th className="px-6 py-3 text-left">JOINED</th>
+                    <th className="px-6 py-3 text-left">ACTIONS</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {adminUsers.map((user) => (
+                    <tr key={user._id} className="border-b">
+                      <td className="px-6 py-4 font-medium">{user.name}</td>
+                      <td className="px-6 py-4 text-gray-600">{user.email}</td>
+                      <td className="px-6 py-4 capitalize">
+                        <span className="px-3 py-1 bg-primary/10 text-primary rounded-full">
+                          {user.role}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4">
+                        {new Date(user.createdAt).toLocaleDateString()}
+                      </td>
+                      <td className="px-6 py-4 space-x-2">
+                        <button
+                          className="text-gray-400 hover:text-blue-600"
+                          onClick={() => navigate(`/admin/useredit/${user._id}`)}
+                        >
+                          <Pencil size={20} />
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
+        <div className="flex items-center space-x-4">
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
+            <input
+              type="text"
+              placeholder="Search Users..."
+              className="pl-10 pr-4 py-2 border rounded-lg w-64"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+            />
+          </div>
+        </div>
+        {/* Tabs */}
         <div className="mb-6 sticky top-16 bg-white pt-6">
           <button
-            className={`mr-4 pb-2 ${
-              activeTab === 'employer'
-                ? 'text-primary border-b-2 border-primary'
-                : 'text-gray-500'
-            }`}
-            onClick={() => setActiveTab('employer')}
+            className={`mr-4 pb-2 ${activeTab === "employer"
+              ? "text-primary border-b-2 border-primary"
+              : "text-gray-500"
+              }`}
+            onClick={() => setActiveTab("employer")}
           >
             Employer List
           </button>
           <button
-            className={`pb-2 ${
-              activeTab === 'jobseeker'
-                ? 'text-primary border-b-2 border-primary'
-                : 'text-gray-500'
-            }`}
-            onClick={() => setActiveTab('jobseeker')}
+            className={`pb-2 ${activeTab === "jobseeker"
+              ? "text-primary border-b-2 border-primary"
+              : "text-gray-500"
+              }`}
+            onClick={() => setActiveTab("jobseeker")}
           >
             Job Seeker List
           </button>
         </div>
 
-        <div className="overflow-auto" style={{ maxHeight: '220px' }}> {/* Scrollable table container */}
+        {/* User Table */}
+        <div className="overflow-auto" style={{ maxHeight: "300px" }}>
           <table className="w-full">
             <thead>
-              <tr className="bg-primary text-white sticky top-0"> {/* Sticky table header */}
-                <th className="px-6 py-3 text-left w-8">
-                  <input type="checkbox" className="rounded" />
-                </th>
+              <tr className="bg-primary text-white sticky top-0">
                 <th className="px-6 py-3 text-left">USER</th>
-                <th className="px-6 py-3 text-left">TYPE</th>
-                <th className="px-6 py-3 text-left">STATUS</th>
-                <th className="px-6 py-3 text-left">JOINED DATE</th>
+                <th className="px-6 py-3 text-left">ROLE</th>
+                <th className="px-6 py-3 text-left">JOINED</th>
                 <th className="px-6 py-3 text-left">ACTIONS</th>
               </tr>
             </thead>
             <tbody>
-              {users.map((user) => (
-                <tr key={user.id} className="border-b">
-                  <td className="px-6 py-4">
-                    <input type="checkbox" className="rounded" />
-                  </td>
+              {filteredUsers.map((user) => (
+                <tr key={user._id} className="border-b">
                   <td className="px-6 py-4">
                     <div className="flex items-center">
-                      <img
-                        src={user.avatar}
-                        alt={user.name}
-                        className="w-8 h-8 rounded-full mr-3"
-                      />
+                      <div className="w-8 h-8 rounded-full overflow-hidden bg-gray-200 flex items-center justify-center mr-3">
+                        {getAvatar(user) ? (
+                          <img
+                            src={`${MEDIA_URL.replace(/\/$/, "")}/${getAvatar(user)!.replace(/^\//, "")}`}
+                            alt={user.name}
+                            className="w-full h-full object-cover"
+                          />
+                        ) : (
+                          <span className="text-sm font-bold text-gray-600">
+                            {user.name?.charAt(0).toUpperCase()}
+                          </span>
+                        )}
+                      </div>
                       <div>
                         <div className="font-medium">{user.name}</div>
                         <div className="text-sm text-gray-500">{user.email}</div>
                       </div>
                     </div>
                   </td>
-                  <td className="px-6 py-4">
+                  <td className="px-6 py-4 capitalize">
                     <span className="px-3 py-1 bg-primary/10 text-primary rounded-full">
-                      {user.type}
+                      {user.role}
                     </span>
                   </td>
                   <td className="px-6 py-4">
-                    <span
-                      className={`px-3 py-1 rounded-full ${
-                        user.status === 'Active'
-                          ? 'bg-green-100 text-green-800'
-                          : 'bg-yellow-100 text-yellow-800'
-                      }`}
+                    {new Date(user.createdAt).toLocaleDateString()}
+                  </td>
+                  <td className="px-6 py-4 space-x-2">
+                    <button
+                      className="text-gray-400 hover:text-gray-600"
+                      onClick={() => navigate(`/admin/userprofile/${user._id}`)}
                     >
-                      {user.status}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4">{user.joinedDate}</td>
-                  <td className="px-6 py-4">
-                    <button className="text-gray-400 hover:text-gray-600">
                       <Eye size={20} />
                     </button>
-                    <button className="text-gray-400 hover:text-gray-600 ml-2">
+                    <button
+                      className="text-gray-400 hover:text-red-600"
+                      onClick={() => handleDelete(user._id)}
+                    >
                       <Trash2 size={20} />
                     </button>
                   </td>
                 </tr>
               ))}
+              {filteredUsers.length === 0 && (
+                <tr>
+                  <td colSpan={4} className="text-center py-4 text-gray-400">
+                    No users found.
+                  </td>
+                </tr>
+              )}
             </tbody>
           </table>
         </div>
 
-        <div className="flex justify-between items-center mt-4">
-          <div className="text-sm text-gray-500">
-            Showing 1 to {users.length} of {users.length} results
-          </div>
-          <div className="flex items-center space-x-2">
-            <button className="px-3 py-1 border rounded" disabled>Previous</button>
-            <button className="px-3 py-1 border rounded" disabled>Next</button>
-          </div>
+        {/* Footer */}
+        <div className="flex justify-between items-center mt-4 text-sm text-gray-500">
+          Showing {filteredUsers.length} user(s)
         </div>
       </div>
     </div>

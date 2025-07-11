@@ -10,7 +10,7 @@ interface Applicant {
     applicant: {
         name: string;
         email: string;
-    };
+    } | null;
     coverLetter: string;
     resume: string;
     status: string;
@@ -103,8 +103,8 @@ const JobApplicants = () => {
                         <tbody>
                             {data.applicants.map((applicant) => (
                                 <tr key={applicant.applicationId} className="hover:bg-gray-50">
-                                    <td className="p-3 border">{applicant.applicant.name}</td>
-                                    <td className="p-3 border">{applicant.applicant.email}</td>
+                                    <td className="p-3 border">{applicant.applicant?.name || (<span className="italic text-gray-400">No name</span>)}</td>
+                                    <td className="p-3 border">{applicant.applicant?.email || (<span className="italic text-gray-400">No email</span>)}</td>
                                     <td className="p-3 border">
                                         <span
                                             className={`px-2 py-1 rounded text-xs ${statusColors[applicant.status as keyof typeof statusColors] || statusColors.Default

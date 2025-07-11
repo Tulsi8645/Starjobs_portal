@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
-import { getAllApplicantsForEmployerJobs, updateApplicationStatus } from "../employerApi/api";
+import { useParams } from "react-router-dom";
+import { getAllApplicantsForEmployerJobs, updateApplicationStatus } from "./adminApi/api";
 import { Eye } from "lucide-react";
 
 const MEDIA_URL = import.meta.env.VITE_MEDIA_URL || "";
@@ -22,16 +23,19 @@ interface JobWithApplicants {
     applicants: Applicant[];
 }
 
-const Applicants = () => {
+const EmployerApplicants = () => {
+    const { employerId } = useParams<{ employerId: string }>();
     const [data, setData] = useState<JobWithApplicants[]>([]);
     const [loading, setLoading] = useState(true);
     const [selectedCoverLetter, setSelectedCoverLetter] = useState<string | null>(null);
 
-
     useEffect(() => {
+        if (!employerId) return;
+
         const fetchApplicants = async () => {
             try {
-                const result = await getAllApplicantsForEmployerJobs();
+                setLoading(true);
+                const result = await getAllApplicantsForEmployerJobs(employerId);
                 setData(result);
             } catch (err) {
                 console.error("Error fetching applicants:", err);
@@ -41,7 +45,7 @@ const Applicants = () => {
         };
 
         fetchApplicants();
-    }, []);
+    }, [employerId]);
 
     const handleStatusChange = async (applicationId: string, newStatus: string) => {
         try {
@@ -54,20 +58,25 @@ const Applicants = () => {
                     ),
                 }))
             );
-            // Example navigation after status update (optional)
-            // navigate("/employer/dashboard/applicants", { replace: true });
         } catch (err) {
             console.error("Failed to update status:", err);
         }
     };
 
+    if (!employerId) {
+        return <p className="p-4 text-red-600">Employer ID not provided in URL.</p>;
+    }
+
     if (loading) return <p className="p-4">Loading applicants...</p>;
 
     return (
-        <div className="min-h-screen overflow-auto p-6" style={{ maxHeight: "calc(100vh - 50px)" }}>
+        <div
+            className="min-h-screen overflow-auto p-6"
+            style={{ maxHeight: "calc(100vh - 50px)" }}
+        >
             <h1 className="text-2xl font-semibold mb-4">All Applicants</h1>
             {data.length === 0 ? (
-                <p>No applicants found for your jobs.</p>
+                <p>No applicants found for this employer's jobs.</p>
             ) : (
                 data.map((job) => (
                     <div key={job.jobId} className="mb-8 bg-white p-4 rounded shadow-sm">
@@ -186,4 +195,4 @@ const Applicants = () => {
     );
 };
 
-export default Applicants;
+export default EmployerApplicants;

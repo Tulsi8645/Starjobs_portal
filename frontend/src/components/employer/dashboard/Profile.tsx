@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Linkedin, Facebook, Twitter, Building2, Phone, Mail, MapPin, CalendarDays, Users, BadgeInfo } from "lucide-react";
+import {Linkedin,Facebook,Twitter,Building2,Phone,Mail,MapPin,CalendarDays,Users,BadgeInfo,BadgeCheck,XCircle} from "lucide-react";
 import { getEmployerProfile } from "../employerApi/api";
 
 const MEDIA_URL = import.meta.env.VITE_MEDIA_URL || "";
@@ -49,7 +49,6 @@ const Profile = () => {
               </div>
               <h2 className="text-2xl font-semibold">{profile.name}</h2>
               <p className="text-primary">{profile.industryType}</p>
-              <p className="text-sm text-gray-500 mt-2">{profile.description}</p>
               <div className="flex justify-center space-x-4 mt-4">
                 <a href="#" className="text-gray-500 hover:text-blue-600"><Linkedin size={20} /></a>
                 <a href="#" className="text-gray-500 hover:text-blue-500"><Facebook size={20} /></a>
@@ -58,12 +57,12 @@ const Profile = () => {
             </div>
 
             {/* Right Section */}
-            <div className="md:col-span-2 space-y-6">
+            <div className="md:col-span-2 flex flex-col justify-between space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-sm text-gray-700">
                 <div>
                   <div className="flex items-center mb-1 text-gray-500">
                     <Mail size={16} className="mr-2 text-primary" />
-                    <span className="font-semibold">Email</span>
+                    <span className="font-semibold text-base">Email</span>
                   </div>
                   <p className="text-primary">{profile.email}</p>
                 </div>
@@ -71,7 +70,7 @@ const Profile = () => {
                 <div>
                   <div className="flex items-center mb-1 text-gray-500">
                     <MapPin size={16} className="mr-2 text-primary" />
-                    <span className="font-semibold">Company Address</span>
+                    <span className="font-semibold text-base">Company Address</span>
                   </div>
                   <p className="text-primary">{profile.address || "Not available"}</p>
                 </div>
@@ -79,7 +78,7 @@ const Profile = () => {
                 <div>
                   <div className="flex items-center mb-1 text-gray-500">
                     <Phone size={16} className="mr-2 text-primary" />
-                    <span className="font-semibold">Telephone</span>
+                    <span className="font-semibold text-base">Telephone</span>
                   </div>
                   <p className="text-primary">{profile.telephone || "Not available"}</p>
                 </div>
@@ -87,7 +86,7 @@ const Profile = () => {
                 <div>
                   <div className="flex items-center mb-1 text-gray-500">
                     <BadgeInfo size={16} className="mr-2 text-primary" />
-                    <span className="font-semibold">PAN Number</span>
+                    <span className="font-semibold text-base">PAN Number</span>
                   </div>
                   <p className="text-primary">{profile.panNumber || "Not available"}</p>
                 </div>
@@ -95,7 +94,7 @@ const Profile = () => {
                 <div>
                   <div className="flex items-center mb-1 text-gray-500">
                     <Users size={16} className="mr-2 text-primary" />
-                    <span className="font-semibold">Company Size</span>
+                    <span className="font-semibold text-base">Company Size</span>
                   </div>
                   <p className="text-primary">{profile.companySize || "Not available"}</p>
                 </div>
@@ -103,7 +102,7 @@ const Profile = () => {
                 <div>
                   <div className="flex items-center mb-1 text-gray-500">
                     <CalendarDays size={16} className="mr-2 text-primary" />
-                    <span className="font-semibold">Established Date</span>
+                    <span className="font-semibold text-base">Established Date</span>
                   </div>
                   <p className="text-primary">
                     {profile.establishedDate
@@ -115,14 +114,35 @@ const Profile = () => {
                 <div className="md:col-span-2">
                   <div className="flex items-center mb-1 text-gray-500">
                     <Building2 size={16} className="mr-2 text-primary" />
-                    <span className="font-semibold">About Company</span>
+                    <span className="font-semibold text-base">About Company</span>
                   </div>
                   <p className="text-primary">{profile.description || "Not available"}</p>
                 </div>
               </div>
 
+              {/* Bottom Right Verified Status */}
+              <div className="flex justify-end mt-6">
+                <div
+                  className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-sm font-medium
+                  ${profile.isVerified ? "bg-green-100 text-green-600" : "bg-gray-500 text-white"}
+                  `}
+                >
+                  {profile.isVerified ? (
+                    <>
+                      <BadgeCheck className="w-4 h-4" />
+                      Verified
+                    </>
+                  ) : (
+                    <>
+                      <XCircle className="w-4 h-4" />
+                      Not Verified
+                    </>
+                  )}
+                </div>
+              </div>
             </div>
           </div>
+
         </div>
       </div>
     </div>

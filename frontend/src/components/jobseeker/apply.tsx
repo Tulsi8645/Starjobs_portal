@@ -59,7 +59,7 @@ const ApplyPage: React.FC = () => {
   if (!job) return <div>Loading job details...</div>;
 
   return (
-    <div className="max-w-xl mx-auto mt-10 p-6 bg-white shadow rounded">
+    <div className="max-w-xl mx-auto mt-10 mb-10 p-6 bg-white shadow rounded">
       <h1 className="text-2xl font-bold mb-4">Apply to {job.title}</h1>
       <form onSubmit={handleSubmit} encType="multipart/form-data">
         <label className="block mb-2">

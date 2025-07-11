@@ -1,15 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import { Menu, Home,  BriefcaseIcon, Bell, Info } from 'lucide-react';
+import { Menu, Home, BriefcaseIcon, Bell, Info } from 'lucide-react';
+import { Link, useLocation } from 'react-router-dom';
 import Sidebar from './Sidebar';
 import StarLogo from '../../assets/star 1.svg';
-import { useLocation } from 'react-router-dom';
 
 const Header: React.FC = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(() => !!localStorage.getItem('token'));
   const location = useLocation();
 
-  // run once on mount
+
   useEffect(() => {
     const checkAuth = () => setIsLoggedIn(!!localStorage.getItem('token'));
     window.addEventListener('authChange', checkAuth);
@@ -17,17 +17,14 @@ const Header: React.FC = () => {
   }, []);
 
   const toggleSidebar = () => {
-    setIsSidebarOpen(open => !open);
+    setIsSidebarOpen((open) => !open);
   };
-
-
 
   const navItems = [
     { name: 'Home', icon: <Home size={22} />, path: '/' },
     { name: 'Job Listings', icon: <BriefcaseIcon size={22} />, path: '/jobs' },
     { name: 'About Us', icon: <Info size={22} />, path: '/about' },
     { name: 'Notifications', icon: <Bell size={22} />, path: '/notifications' },
-
   ];
 
   return (
@@ -35,7 +32,9 @@ const Header: React.FC = () => {
       <div className="container mx-auto px-4 py-3 flex justify-between items-center">
         {/* Logo */}
         <div className="flex items-center">
-          <img src={StarLogo} alt="Logo" className="h-14 w-auto" />
+          <Link to="/">
+            <img src={StarLogo} alt="Logo" className="h-14 w-auto" />
+          </Link>
         </div>
 
         {/* Desktop Nav */}
@@ -43,18 +42,15 @@ const Header: React.FC = () => {
           {navItems.map((item) => {
             const isActive = location.pathname === item.path;
             return (
-              <a
+              <Link
                 key={item.name}
-                href={item.path}
-                className={`flex items-center px-3 py-1 rounded-md text-md font-medium transition duration-200 ${
-                  isActive
-                    ? 'bg-primary text-white'
-                    : 'text-brown hover:text-primary'
-                }`}
+                to={item.path}
+                className={`flex items-center px-3 py-1 rounded-md text-md font-medium transition duration-200 ${isActive ? 'bg-primary text-white' : 'text-brown hover:text-primary'
+                  }`}
               >
                 <span className="mr-1">{item.icon}</span>
                 {item.name}
-              </a>
+              </Link>
             );
           })}
         </nav>
@@ -63,15 +59,15 @@ const Header: React.FC = () => {
         <div className="flex items-center space-x-3">
           {!isLoggedIn ? (
             <>
-              <a href="/login" className="text-brown hover:text-primary text-sm">
+              <Link to="/login" className="text-brown hover:text-primary text-md">
                 Login
-              </a>
-              <a
-                href="/signup"
-                className="bg-brown text-white bg-primary px-4 py-1.5 rounded-md text-sm font-medium hover:bg-primary"
+              </Link>
+              <Link
+                to="/signup"
+                className="bg-brown text-white bg-primary px-4 py-1.5 rounded-md text-md font-medium hover:bg-primary"
               >
                 Register
-              </a>
+              </Link>
             </>
           ) : (
             <button

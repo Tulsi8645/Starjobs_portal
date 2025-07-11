@@ -164,7 +164,7 @@ const UserProfile = () => {
                   </button>
                 </a>
               ) : (
-                <div className="absolute bottom-0 right-0 bg-gray-600 flex items-center px-4 py-1 rounded-md">
+                <div className="absolute bottom-0 right-0 bg-gray-500 flex items-center px-4 py-1 rounded-md">
                   <p className="text-white py-2">No resume uploaded</p>
                 </div>
               )}
