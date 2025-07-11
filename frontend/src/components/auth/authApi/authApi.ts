@@ -1,11 +1,11 @@
 import axios from 'axios';
 
-const API_BASE_URL = 'http://localhost:8000'; // Your backend URL
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 export const registerEmployer = async (formData: FormData) => {
   const response = await axios.post(`${API_BASE_URL}/api/users/register`, formData, {
     headers: {
-      'Content-Type': 'multipart/form-data', // Essential for sending files
+      'Content-Type': 'multipart/form-data', 
     },
   });
   return response.data;
@@ -16,7 +16,7 @@ export const registerJobseeker = async (formData: FormData) => {
   try {
     const response = await axios.post(`${API_BASE_URL}/api/users/register`, formData, {
       headers: {
-        'Content-Type': 'multipart/form-data', // Essential for file uploads
+        'Content-Type': 'multipart/form-data',
       },
     });
     return response.data;
