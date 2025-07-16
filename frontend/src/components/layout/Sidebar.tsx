@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import {Link, useNavigate } from 'react-router-dom';
 import {
   X,
   User,
@@ -68,13 +68,14 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
                     <span className="font-medium">{item.name}</span>
                   </button>
                 ) : (
-                  <a
-                    href={item.path}
-                    className="flex items-center p-3 text-gray-600 hover:text-primary hover:bg-secondary rounded-lg transition-colors duration-200"
-                  >
-                    <span className="mr-3 text-primary">{item.icon}</span>
-                    <span className="font-medium">{item.name}</span>
-                  </a>
+                    <Link
+                      to={item.path}
+                      onClick={onClose}
+                      className="flex items-center p-3 text-gray-600 hover:text-primary hover:bg-secondary rounded-lg transition-colors duration-200"
+                    >
+                      <span className="mr-3 text-primary">{item.icon}</span>
+                      <span className="font-medium">{item.name}</span>
+                    </Link>
                 )}
               </li>
             ))}
