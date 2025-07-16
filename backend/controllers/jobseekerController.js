@@ -1,7 +1,10 @@
 const User = require("../models/User");
+const Jobseeker = require("../models/Jobseeker");
 const Job = require("../models/Job");
 const Application = require("../models/Application");
 const mongoose = require("mongoose");
+const fs = require("fs");
+const path = require("path");
 
 // Get Jobseeker Profile
 const getJobseekerProfile = async (req, res) => {
@@ -14,6 +17,53 @@ const getJobseekerProfile = async (req, res) => {
     res.json(jobseeker);
   } catch (error) {
     console.error("Error in getJobseekerProfile:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+
+// Helper to delete old files and update Jobseeker Profile
+const deleteFile = (subfolder, filename) => {
+  const filePath = path.join(__dirname, `../uploads/${subfolder}/${filename}`);
+  fs.unlink(filePath, (err) => {
+    if (err) console.error(`Failed to delete file: ${filePath}`, err.message);
+  });
+};
+
+const updateJobseekerProfile = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const jobseeker = await Jobseeker.findById(userId);
+
+    if (!jobseeker || jobseeker.role !== "jobseeker") {
+      return res.status(404).json({ message: "Jobseeker not found" });
+    }
+
+    // Destructure other fields from req.body
+    const { name, skills, qualifications, experiences } = req.body;
+
+    if (name) jobseeker.name = name;
+    if (skills) jobseeker.skills = Array.isArray(skills) ? skills : skills.split(",");
+    if (qualifications) jobseeker.qualifications = JSON.parse(qualifications);
+    if (experiences) jobseeker.experiences = JSON.parse(experiences);
+
+    // Handle profilePic file
+    if (req.files?.profilePic) {
+      if (jobseeker.profilePic) deleteFile("profile_pics", jobseeker.profilePic);
+      jobseeker.profilePic = req.files.profilePic[0].filename;
+    }
+
+    // Handle resume file
+    if (req.files?.resume) {
+      if (jobseeker.resume) deleteFile("resumes", jobseeker.resume);
+      jobseeker.resume = req.files.resume[0].filename;
+    }
+
+    await jobseeker.save();
+
+    res.json({ message: "Profile updated successfully", jobseeker });
+  } catch (error) {
+    console.error("Error in updateJobseekerProfile:", error);
     res.status(500).json({ message: "Server error" });
   }
 };
@@ -101,4 +151,4 @@ const getDashboardStats = async (req, res) => {
   }
 };
 
-module.exports = { getJobseekerProfile, getAppliedJobs, getDashboardStats };
+module.exports = { getJobseekerProfile, updateJobseekerProfile, getAppliedJobs, getDashboardStats };

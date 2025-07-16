@@ -3,6 +3,8 @@ const User = require("../models/User");
 const Jobseeker = require("../models/Jobseeker");
 const Employer = require("../models/Employer");
 const Application = require("../models/Application");
+const fs = require("fs");
+const path = require("path");
 
 // Get Admin Profile
 const getAdminProfile = async (req, res) => {
@@ -168,6 +170,19 @@ const getAllUsers = async (req, res) => {
   }
 };
 
+
+
+// Update any User,
+
+const deleteOldFile = (filename, folder) => {
+  if (!filename) return;
+  const filePath = path.join(__dirname, "..", "uploads", folder, filename);
+  if (fs.existsSync(filePath)) {
+    fs.unlinkSync(filePath);
+  }
+};
+
+
 // Delete User
 const deleteUser = async (req, res) => {
   const userId = req.params.id;
@@ -233,6 +248,54 @@ const getAllJobs = async (req, res) => {
   }
 };
 
+// Edit Job as an Admin
+const editJob = async (req, res) => {
+   const { id: jobId } = req.params;
+  const user = req.user;
+
+  try {
+    const job = await Job.findById(jobId);
+
+    if (!job) {
+      return res.status(404).json({ message: "Job not found" });
+    }
+
+    const isAdmin = user.role === "admin";
+
+    if (!isAdmin) {
+      return res
+        .status(403)
+        .json({ message: "Not authorized to edit this job" });
+    }
+
+    const updatableFields = [
+      "title",
+      "location",
+      "jobtype",
+      "salary",
+      "experience",
+      "jobcategory",
+      "level",
+      "deadline",
+      "openings",
+      "istrending",
+      "status",
+      "description",
+    ];
+
+    updatableFields.forEach((field) => {
+      if (req.body[field] !== undefined) {
+        job[field] = req.body[field];
+      }
+    });
+
+    await job.save();
+    res.json(job);
+  } catch (error) {
+    console.error("Error editing job:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+};
 
 
 // Delete a Job
@@ -253,4 +316,4 @@ const deleteJob = async (req, res) => {
 };
 
 
-module.exports = {getAdminProfile, getAdminStats, verifyEmployer, getAllApplicantsForEmployerJobs, updateApplication, getAllUsers, deleteUser, getAllJobs, deleteJob};
+module.exports = {getAdminProfile, getAdminStats, verifyEmployer, getAllApplicantsForEmployerJobs, updateApplication, getAllUsers, deleteUser, getAllJobs,editJob, deleteJob};

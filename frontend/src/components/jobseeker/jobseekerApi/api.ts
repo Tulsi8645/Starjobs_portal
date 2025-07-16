@@ -138,6 +138,20 @@ export const getJobseekerProfile = async () => {
   return response.data;
 };
 
+export const updateJobseekerProfile = async (formData: FormData) => {
+  const token = localStorage.getItem("token");
+  if (!token) throw new Error("Not authenticated");
+
+  const response = await axios.put(`${API_BASE_URL}/api/jobseeker/profile`, formData, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "multipart/form-data",
+    },
+  });
+
+  return response.data;
+};
+
 
 // Toggle save/unsave job
 export const toggleSaveJob = async (jobId: string): Promise<{ message: string; saved: boolean }> => {

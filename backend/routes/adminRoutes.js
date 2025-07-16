@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const { authenticate, authorizeAdmin } = require("../middleware/authMiddleware");
-const {getAdminProfile, getAdminStats, verifyEmployer, getAllApplicantsForEmployerJobs,updateApplication, getAllUsers, deleteUser, getAllJobs, deleteJob} = require("../controllers/adminController");
+const {getAdminProfile, getAdminStats, verifyEmployer, getAllApplicantsForEmployerJobs,updateApplication, getAllUsers, deleteUser, getAllJobs,editJob, deleteJob} = require("../controllers/adminController");
 
 
 // Get employer profile
@@ -22,11 +22,15 @@ router.patch("/applications/:applicationId/status",authenticate, authorizeAdmin,
 // Get all users
 router.get("/users", authenticate, authorizeAdmin, getAllUsers);
 
+
 // Delete user
 router.delete("/user/:id", authenticate, authorizeAdmin, deleteUser);
 
 // Get all jobs
 router.get("/jobs", authenticate, authorizeAdmin, getAllJobs);
+
+// Edit job
+router.put("/job/:id", authenticate, authorizeAdmin, editJob);
 
 // Delete job
 router.delete("/job/:id", authenticate, authorizeAdmin, deleteJob);

@@ -293,7 +293,6 @@ const dislikeJob = async (req, res) => {
 };
 
 
-
 // Save/Unsave job
 const saveJob = async (req, res) => {
   const userId = req.user._id;

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Search, UserPlus, FileText, Eye, Trash2, Pencil } from "lucide-react";
+import { Search, FileText, Eye, Trash2, } from "lucide-react";
 import { getAllUsers, deleteUser } from "./adminApi/api";
 import { useNavigate } from "react-router-dom";
 import { AxiosError } from "axios";
@@ -12,6 +12,9 @@ interface User {
   status?: string;
   createdAt: string;
   avatar?: string;
+  profilePic?: string;
+  companyLogo?: string;
+  resume?: string;
 }
 
 const MEDIA_URL = import.meta.env.VITE_MEDIA_URL || "";
@@ -44,9 +47,33 @@ const UserManagement = () => {
   };
 
   const getAvatar = (user: User): string | undefined => {
-    // @ts-ignore
-    return user.avatar || (user.role === "employer" ? (user as any).companyLogo : (user as any).profilePic);
+    const raw =
+      user.avatar ||
+      (user.role === "employer" ? (user as any).companyLogo : (user as any).profilePic);
+
+    return raw && raw.trim() !== "" ? raw : undefined;
   };
+  const renderAvatar = (user: User) => {
+    const avatarUrl = getAvatar(user);
+    if (avatarUrl) {
+      return (
+        <img
+          src={`${MEDIA_URL.replace(/\/$/, "")}/${avatarUrl.replace(/^\//, "")}`}
+          alt={user.name}
+          className="w-full h-full object-cover"
+        />
+      );
+    }
+
+    // Fallback avatar
+    return (
+      <div className="w-full h-full bg-gray-200 rounded-full flex items-center justify-center relative">
+        <div className="w-3 h-3 bg-gray-400 rounded-full"></div> {/* head */}
+        <div className="w-4 h-1 bg-gray-400 rounded-full absolute bottom-1"></div> {/* shoulders */}
+      </div>
+    );
+  };
+
 
   const filteredUsers = users.filter(
     (user) =>
@@ -54,8 +81,6 @@ const UserManagement = () => {
       (user.name.toLowerCase().includes(search.toLowerCase()) ||
         user.email.toLowerCase().includes(search.toLowerCase()))
   );
-
-  const adminUsers = users.filter((user) => user.role === "admin");
 
   useEffect(() => {
     fetchUsers();
@@ -72,60 +97,14 @@ const UserManagement = () => {
         <div className="flex justify-end items-center mb-6">
           <div className="flex items-center space-x-4">
             <button className="px-4 py-2 bg-primary text-white rounded-lg flex items-center">
-              <UserPlus size={20} className="mr-2" />
-              Add Users
-            </button>
-            <button className="px-4 py-2 border rounded-lg flex items-center">
               <FileText size={20} className="mr-2" />
               Export
             </button>
           </div>
         </div>
 
-        {/* Admin Table */}
-        {adminUsers.length > 0 && (
-          <div className="mb-8">
-            <h2 className="text-lg font-semibold mb-2">Admin List</h2>
-            <div className="overflow-auto">
-              <table className="w-full">
-                <thead>
-                  <tr className="bg-primary text-white">
-                    <th className="px-6 py-3 text-left">USER</th>
-                    <th className="px-6 py-3 text-left">EMAIL</th>
-                    <th className="px-6 py-3 text-left">ROLE</th>
-                    <th className="px-6 py-3 text-left">JOINED</th>
-                    <th className="px-6 py-3 text-left">ACTIONS</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {adminUsers.map((user) => (
-                    <tr key={user._id} className="border-b">
-                      <td className="px-6 py-4 font-medium">{user.name}</td>
-                      <td className="px-6 py-4 text-gray-600">{user.email}</td>
-                      <td className="px-6 py-4 capitalize">
-                        <span className="px-3 py-1 bg-primary/10 text-primary rounded-full">
-                          {user.role}
-                        </span>
-                      </td>
-                      <td className="px-6 py-4">
-                        {new Date(user.createdAt).toLocaleDateString()}
-                      </td>
-                      <td className="px-6 py-4 space-x-2">
-                        <button
-                          className="text-gray-400 hover:text-blue-600"
-                          onClick={() => navigate(`/admin/useredit/${user._id}`)}
-                        >
-                          <Pencil size={20} />
-                        </button>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
-        )}
-        <div className="flex items-center space-x-4">
+        {/* Search Bar */}
+        <div className="flex items-center space-x-4 mb-4">
           <div className="relative">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
             <input
@@ -137,6 +116,7 @@ const UserManagement = () => {
             />
           </div>
         </div>
+
         {/* Tabs */}
         <div className="mb-6 sticky top-16 bg-white pt-6">
           <button
@@ -176,17 +156,7 @@ const UserManagement = () => {
                   <td className="px-6 py-4">
                     <div className="flex items-center">
                       <div className="w-8 h-8 rounded-full overflow-hidden bg-gray-200 flex items-center justify-center mr-3">
-                        {getAvatar(user) ? (
-                          <img
-                            src={`${MEDIA_URL.replace(/\/$/, "")}/${getAvatar(user)!.replace(/^\//, "")}`}
-                            alt={user.name}
-                            className="w-full h-full object-cover"
-                          />
-                        ) : (
-                          <span className="text-sm font-bold text-gray-600">
-                            {user.name?.charAt(0).toUpperCase()}
-                          </span>
-                        )}
+                        {renderAvatar(user)}
                       </div>
                       <div>
                         <div className="font-medium">{user.name}</div>
@@ -202,13 +172,33 @@ const UserManagement = () => {
                   <td className="px-6 py-4">
                     {new Date(user.createdAt).toLocaleDateString()}
                   </td>
-                  <td className="px-6 py-4 space-x-2">
+                  <td className="px-6 py-4 space-x-2 flex items-center">
                     <button
-                      className="text-gray-400 hover:text-gray-600"
+                      className="text-primary "
                       onClick={() => navigate(`/admin/userprofile/${user._id}`)}
                     >
                       <Eye size={20} />
                     </button>
+                    
+
+                    {/* Resume logic for jobseekers */}
+                    {user.role === "jobseeker" && (
+                      user.resume ? (
+                        <a
+                          href={`${MEDIA_URL.replace(/\/$/, "")}/${user.resume.replace(/^\//, "")}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center text-primary hover:underline"
+                        >
+                          <FileText size={16} className="ml-2" />
+                        </a>
+                      ) : (
+                        <span className="inline-flex items-center text-gray-400 ">
+                            <FileText size={16} className="ml-2" />
+                        </span>
+                      )
+                    )}
+
                     <button
                       className="text-gray-400 hover:text-red-600"
                       onClick={() => handleDelete(user._id)}

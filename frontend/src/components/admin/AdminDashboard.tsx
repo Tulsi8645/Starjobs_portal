@@ -55,7 +55,7 @@ interface RevenueDataPoint {
   revenue: number;
 }
 
-type TimeFrame = "Week" | "Month" | "Year";
+type TimeFrame = "Year" | "Month" | "Week";
 
 const MEDIA_URL = import.meta.env.VITE_MEDIA_URL || "";
 
@@ -149,7 +149,7 @@ const AdminDashboard = () => {
     const now = new Date();
     let startDate: Date;
     switch (frame) {
-      case "Week":
+      case "Year":
         const day = now.getDay();
         const diff = now.getDate() - day + (day === 0 ? -6 : 1);
         startDate = new Date(now.setDate(diff));
@@ -161,7 +161,7 @@ const AdminDashboard = () => {
         startDate = new Date(now.getFullYear(), now.getMonth(), 1);
         const endMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0);
         return data.filter(d => d.date >= startDate && d.date <= endMonth);
-      case "Year":
+      case "Week":
         startDate = new Date(now.getFullYear(), 0, 1);
         const endYear = new Date(now.getFullYear(), 11, 31);
         return data.filter(d => d.date >= startDate && d.date <= endYear);

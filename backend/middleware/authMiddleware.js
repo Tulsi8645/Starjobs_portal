@@ -2,33 +2,37 @@ const jwt = require("jsonwebtoken");
 const User = require("../models/User");
 
 // Middleware to authenticate user
+
 const authenticate = async (req, res, next) => {
-  let token;
+  const authHeader = req.headers.authorization;
 
-  if (
-    req.headers.authorization &&
-    req.headers.authorization.startsWith("Bearer")
-  ) {
-    try {
-      token = req.headers.authorization.split(" ")[1];
+  if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    return res.status(401).json({ message: "Not authorized, no token" });
+  }
 
-      // Decode token
-      const decoded = jwt.verify(token, process.env.JWT_SECRET);
-      req.user = await User.findById(decoded.id).select("-password");
+  const token = authHeader.split(" ")[1];
 
-      if (!req.user) {
-        return res
-          .status(401)
-          .json({ message: "Not authorized, no user found" });
-      }
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    req.user = await User.findById(decoded.id).select("-password");
 
-      next();
-    } catch (error) {
-      console.error("Error in authenticate middleware:", error);
-      res.status(401).json({ message: "Not authorized, token failed" });
+    if (!req.user) {
+      return res
+        .status(401)
+        .json({ message: "Not authorized, user not found" });
     }
-  } else {
-    res.status(401).json({ message: "Not authorized, no token" });
+
+    next();
+  } catch (error) {
+    // Handle specific JWT errors
+    if (error.name === "TokenExpiredError") {
+      return res.status(401).json({ message: "Token expired" });
+    } else if (error.name === "JsonWebTokenError") {
+      return res.status(401).json({ message: "Token malformed" });
+    } else {
+      console.error("Unexpected auth error:", error);
+      return res.status(500).json({ message: "Authentication error" });
+    }
   }
 };
 

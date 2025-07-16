@@ -147,8 +147,6 @@ const registerUser = async (req, res) => {
 };
 
 
-
-
 // Login User
 const loginUser = async (req, res) => {
   const { email, password } = req.body;
