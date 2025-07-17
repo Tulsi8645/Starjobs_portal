@@ -4,9 +4,9 @@ import Footer from './components/layout/Footer';
 import Login from './components/auth/Login';
 import Signup from './components/auth/Signup';
 import VerifyOtp from './components/auth/verifyOtp';
+import ForgotResetPassword from './components/auth/forget-password';
 import JobseekerSignup from './components/auth/jobseekerSignup';
 import EmployerSignup from './components/auth/employerSignup';
-import Notifications from './components/employer/dashboard/Notifications';
 import Profile from './components/employer/dashboard/Profile';
 import Dashboard from './components/employer/dashboard/Dashboard';
 import Insight from './components/employer/dashboard/Insight';
@@ -70,6 +70,7 @@ function AppWrapper() {
           <Route path="/signup" element={<Signup />} />
           <Route path="/signup/verify-otp" element={<VerifyOtp />} />
           <Route path="/login" element={<Login />} />
+          <Route path="/forgot-password" element={<ForgotResetPassword />} />
           <Route path="/signup/jobseeker" element={<JobseekerSignup />} />
           <Route path="/signup/employer" element={<EmployerSignup />} />
 
@@ -79,7 +80,6 @@ function AppWrapper() {
           {/* jobseeker routes */}
           <Route path="/jobs" element={<AllJobListing />} />
           <Route path="/job/:id" element={<JobDetailPage />} />
-          <Route path="/notifications" element={<Notifications />} />
           <Route path="/jobs/:jobId/apply" element={<ApplyPage />} />
 
           {/* jobseeker dashboard */}

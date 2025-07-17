@@ -1,10 +1,14 @@
 const express = require("express");
 const router = express.Router();
 const { authenticate, authorizeEmployer } = require("../middleware/authMiddleware");
-const { getEmployerProfile,createJob, editJob, updateApplication, deleteJob, getAppliedJobseekers, getEmployerJobs, getAllApplicantsForEmployerJobs} = require("../controllers/employerController");
+const userUpload = require('../middleware/userUploadMiddleware');
+const { getEmployerProfile, updateEmployerProfile, createJob, editJob, updateApplication, deleteJob, getAppliedJobseekers, getEmployerJobs, getAllApplicantsForEmployerJobs} = require("../controllers/employerController");
 
 // Get employer profile
 router.get("/profile", authenticate, getEmployerProfile);
+
+// Update employer profile
+router.put("/profile", authenticate,  userUpload, updateEmployerProfile);
 
 // Create job
 router.post("/jobs", authenticate, authorizeEmployer, createJob);

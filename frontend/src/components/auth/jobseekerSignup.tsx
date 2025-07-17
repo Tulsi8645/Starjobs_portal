@@ -13,7 +13,7 @@ interface FormData {
   password: string;
   confirmPassword: string;
   profilePic: File | null;
-  skills: string[]; // Changed to array for dynamic skill input
+  skills: string[]; 
   qualifications: { degree: string; institution: string; year: number | '' }[];
   experiences: { jobPosition: string; institution: string; duration: string }[];
   resume: File | null;

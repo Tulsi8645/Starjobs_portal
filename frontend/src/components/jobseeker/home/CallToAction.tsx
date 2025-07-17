@@ -20,7 +20,7 @@ const CallToAction: React.FC = () => {
           </div>
           
           <div className="md:w-1/2">
-            <img src={Keyboard} alt="Logo" className="h-auto w-auto" /> {/* Example using <img> tag */}
+            <img src={Keyboard} alt="Logo" className="h-auto w-auto" />
           </div>
         </div>
       </div>

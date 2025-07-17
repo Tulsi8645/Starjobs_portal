@@ -1,8 +1,10 @@
 // controllers/employerController.js
 const Job = require("../models/Job");
 const User = require("../models/User");
+const Employer = require("../models/Employer");
 const Application = require("../models/Application");
-
+const fs = require("fs");
+const path = require("path");
 
 // Get Employer Profile
 const getEmployerProfile = async (req, res) => {
@@ -20,6 +22,65 @@ const getEmployerProfile = async (req, res) => {
     res.status(500).json({ message: "Server error" });
   }
 };
+
+
+// Helper to delete old files and update Employer Profile
+const deleteFile = (subfolder, filename) => {
+  const filePath = path.join(__dirname, `../uploads/${subfolder}/${filename}`);
+  fs.unlink(filePath, (err) => {
+    if (err) console.error(`Failed to delete file: ${filePath}`, err.message);
+  });
+};
+
+const updateEmployerProfile = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const employer = await Employer.findById(userId);
+
+    if (!employer || employer.role !== "employer") {
+      return res.status(404).json({ message: "Employer not found" });
+    }
+
+    // Destructure and update fields if present
+    const {
+      name,
+      industryType,
+      address,
+      telephone,
+      panNumber,
+      companySize,
+      establishedDate,
+      description,
+    } = req.body;
+
+    if (name) employer.name = name;
+    if (industryType) employer.industryType = industryType;
+    if (address) employer.address = address;
+    if (telephone) employer.telephone = telephone;
+    if (panNumber) employer.panNumber = panNumber;
+    if (companySize) employer.companySize = companySize;
+    if (establishedDate) employer.establishedDate = establishedDate;
+    if (description) employer.description = description;
+
+    // Handle companyLogo upload
+    if (req.files?.companyLogo?.[0]) {
+      if (employer.companyLogo) {
+        const oldFilename = path.basename(employer.companyLogo);
+        deleteFile("company_logos", oldFilename);
+      }
+
+      employer.companyLogo = `/uploads/company_logos/${req.files.companyLogo[0].filename}`;
+    }
+
+    await employer.save();
+
+    res.status(200).json(employer);
+  } catch (error) {
+    console.error("Error in updateEmployerProfile:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
 
 // Create Job
 const createJob = async (req, res) => {
@@ -313,6 +374,7 @@ const getAllApplicantsForEmployerJobs = async (req, res) => {
 
 module.exports = {
   getEmployerProfile,
+  updateEmployerProfile,
   createJob,
   editJob,
   updateApplication,

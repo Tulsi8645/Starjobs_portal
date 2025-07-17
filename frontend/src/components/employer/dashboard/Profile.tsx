@@ -1,12 +1,28 @@
 import { useEffect, useState } from "react";
-import {Linkedin,Facebook,Twitter,Building2,Phone,Mail,MapPin,CalendarDays,Users,BadgeInfo,BadgeCheck,XCircle} from "lucide-react";
-import { getEmployerProfile } from "../employerApi/api";
+import {
+  Linkedin,
+  Facebook,
+  Twitter,
+  Building2,
+  Phone,
+  Mail,
+  MapPin,
+  CalendarDays,
+  Users,
+  BadgeInfo,
+  BadgeCheck,
+  XCircle,
+  Pencil
+} from "lucide-react";
+import { getEmployerProfile, updateEmployerProfile } from "../employerApi/api";
+import EditProfileModal from "./EditProfileModal";
 
 const MEDIA_URL = import.meta.env.VITE_MEDIA_URL || "";
 
 const Profile = () => {
   const [profile, setProfile] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [showEditModal, setShowEditModal] = useState(false);
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -29,9 +45,19 @@ const Profile = () => {
   return (
     <div className="bg-gray-50 p-20 overflow-auto" style={{ maxHeight: "calc(100vh - 50px)" }}>
       <div className="max-w-5xl mx-auto">
-        <div className="bg-white rounded-2xl shadow p-14">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div className="bg-white rounded-2xl shadow p-14 relative">
+          {/* Edit Icon */}
+          <div className="absolute top-6 right-6 z-10">
+            <button
+              onClick={() => setShowEditModal(true)}
+              className="text-gray-500 hover:text-primary"
+              title="Edit Profile"
+            >
+              <Pencil className="w-5 h-5" />
+            </button>
+          </div>
 
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {/* Left Section */}
             <div className="text-center">
               <div className="w-32 h-32 rounded-full mx-auto mb-4 bg-gray-200 overflow-hidden flex items-center justify-center">
@@ -142,8 +168,29 @@ const Profile = () => {
               </div>
             </div>
           </div>
-
         </div>
+
+        {/* Edit Modal */}
+        <EditProfileModal
+          show={showEditModal}
+          onClose={() => setShowEditModal(false)}
+          profile={profile}
+          onSave={async (updatedFields) => {
+            try {
+              const formData = new FormData();
+              for (const key in updatedFields) {
+                formData.append(key, updatedFields[key]);
+              }
+
+              const updated = await updateEmployerProfile(formData);
+              setProfile(updated); // Update local state with the fresh backend response
+              setShowEditModal(false);
+            } catch (error) {
+              console.error("Failed to update profile:", error);
+              // Optionally show an error toast or message here
+            }
+          }}
+        />
       </div>
     </div>
   );

@@ -76,7 +76,35 @@ export const loginUser = async (payload: LoginPayload) => {
   }
 };
 
+interface ForgotPasswordPayload {
+  email: string;
+}
 
+
+export const forgotPassword = async (payload: ForgotPasswordPayload) => {
+  try {
+    const response = await axios.post(`${API_BASE_URL}/api/users/forgot-password`, payload);
+    return response.data;
+  } catch (error: any) {
+    throw error.response?.data || error.message;
+  }
+};
+
+
+interface ResetPasswordPayload {
+  email: string;
+  otp: string;
+  newPassword: string;
+}
+
+export const resetPassword = async (payload: ResetPasswordPayload) => {
+  try {
+    const response = await axios.post(`${API_BASE_URL}/api/users/reset-password`, payload);
+    return response.data;
+  } catch (error: any) {
+    throw error.response?.data || error.message;
+  }
+};
 
 interface ChangePasswordPayload {
   currentPassword: string;

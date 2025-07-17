@@ -48,16 +48,16 @@ const updateJobseekerProfile = async (req, res) => {
     if (experiences) jobseeker.experiences = JSON.parse(experiences);
 
     // Handle profilePic file
-    if (req.files?.profilePic) {
-      if (jobseeker.profilePic) deleteFile("profile_pics", jobseeker.profilePic);
-      jobseeker.profilePic = req.files.profilePic[0].filename;
-    }
+      if (req.files?.profilePic) {
+        if (jobseeker.profilePic) deleteFile("profile_pics", jobseeker.profilePic);
+        jobseeker.profilePic = `/uploads/profile_pics/${req.files.profilePic[0].filename}`; 
+      }
 
     // Handle resume file
-    if (req.files?.resume) {
-      if (jobseeker.resume) deleteFile("resumes", jobseeker.resume);
-      jobseeker.resume = req.files.resume[0].filename;
-    }
+     if (req.files?.resume) {
+       if (jobseeker.resume) deleteFile("resumes", jobseeker.resume);
+       jobseeker.resume = `/uploads/resumes/${req.files.resume[0].filename}`; 
+     }
 
     await jobseeker.save();
 

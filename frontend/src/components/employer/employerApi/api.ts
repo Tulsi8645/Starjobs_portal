@@ -87,7 +87,19 @@ export const getEmployerProfile = async () => {
     return res.data;
   };
 
+export const updateEmployerProfile = async (formData: FormData) => {
+  const token = localStorage.getItem("token");
+  if (!token) throw new Error("Not authenticated");
 
+  const res = await axios.put(`${API_BASE_URL}/api/employer/profile`, formData, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "multipart/form-data",
+    },
+  });
+
+  return res.data;
+};
 
   export const getEmployerJobs = async () => {
     const token = localStorage.getItem("token");
