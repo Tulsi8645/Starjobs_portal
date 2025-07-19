@@ -101,7 +101,7 @@ export const updateEmployerProfile = async (formData: FormData) => {
   return res.data;
 };
 
-  export const getEmployerJobs = async () => {
+export const getEmployerJobs = async () => {
     const token = localStorage.getItem("token");
     if (!token) throw new Error("Not authenticated");
   
@@ -114,6 +114,18 @@ export const updateEmployerProfile = async (formData: FormData) => {
     return res.data;
   };  
 
+   export const getEmployerDashboardStats = async () => {
+    const token = localStorage.getItem("token");
+    if (!token) throw new Error("Not authenticated");
+  
+    const res = await axios.get(`${API_BASE_URL}/api/employer/dashboard-stats`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+  
+    return res.data;
+  };
 
   export const getJobApplicants = async (jobId: string) => {
     const token = localStorage.getItem("token");
@@ -165,17 +177,34 @@ export const updateApplicationStatus = async (applicationId: string, newStatus: 
   return res.data;
 };
 
-
-
-export const getAllApplicants = async () => {
+export const getAllApplicantsForEmployer = async (page = 1, limit = 5) => {
   const token = localStorage.getItem("token");
   if (!token) throw new Error("Not authenticated");
 
-  const res = await axios.get(`${API_BASE_URL}/api/employer/my-jobs/applicants`, {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  });
+  const res = await axios.get(
+    `${API_BASE_URL}/api/employer/my-jobs/applicants?page=${page}&limit=${limit}`,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+
+  return res.data; // { currentPage, hasMore, data: [...] }
+};
+
+export const getAllApplicants = async (page = 1, limit = 5) => {
+  const token = localStorage.getItem("token");
+  if (!token) throw new Error("Not authenticated");
+
+  const res = await axios.get(
+    `${API_BASE_URL}/api/employer/my-jobs/applicants?page=${page}&limit=${limit}`,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
 
   return res.data;
 };

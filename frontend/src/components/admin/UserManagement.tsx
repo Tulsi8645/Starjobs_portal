@@ -93,16 +93,7 @@ const UserManagement = () => {
       </div>
 
       <div className="bg-white rounded-lg shadow-sm p-6">
-        {/* Toolbar */}
-        <div className="flex justify-end items-center mb-6">
-          <div className="flex items-center space-x-4">
-            <button className="px-4 py-2 bg-primary text-white rounded-lg flex items-center">
-              <FileText size={20} className="mr-2" />
-              Export
-            </button>
-          </div>
-        </div>
-
+        <div className="flex justify-between">
         {/* Search Bar */}
         <div className="flex items-center space-x-4 mb-4">
           <div className="relative">
@@ -115,6 +106,17 @@ const UserManagement = () => {
               onChange={(e) => setSearch(e.target.value)}
             />
           </div>
+        </div>
+
+        {/* Toolbar */}
+        <div className="flex items-center mb-4">
+          <div className="flex items-center space-x-4">
+            <button className="px-4 py-2 bg-primary text-white rounded-lg flex items-center">
+              <FileText size={20} className="mr-2" />
+              Export
+            </button>
+          </div>
+        </div>
         </div>
 
         {/* Tabs */}

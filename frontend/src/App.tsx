@@ -32,6 +32,7 @@ import DashboardLayout from './components/employer/dashboard/DashboardLayout';
 import ApplyPage from './components/jobseeker/apply';
 import UsersProfile from './components/admin/UsersProfile';
 import JobManagement from './components/admin/JobManagement';
+import EmployerSettings from './components/employer/dashboard/Settings';
 
 function AppWrapper() {
   const location = useLocation();
@@ -97,6 +98,7 @@ function AppWrapper() {
             <Route path="insight" element={<Insight />} />
             <Route path="joblist" element={<JobList />} />
             <Route path="applicants" element={<Applicants />} />
+            <Route path="settings" element={<EmployerSettings />} />
             <Route path="jobs/:jobId/applicants" element={<JobApplicants />} />
             <Route path="postjob/:jobId?" element={<PostJob />} />
           </Route>

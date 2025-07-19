@@ -1,5 +1,5 @@
 import logo from '../../../assets/star 1.svg';
-import { Link, useLocation, Outlet, useNavigate } from 'react-router-dom';
+import { Link, useLocation, Outlet, useNavigate,  } from 'react-router-dom';
 import {
   LayoutDashboard,
   Users,
@@ -29,7 +29,8 @@ const DashboardLayout = () => {
     { path: '/employer/insight', icon: <FileText size={20} />, label: 'Insight' },
     { path: '/employer/joblist', icon: <Settings size={20} />, label: 'JOB LIST' },
     { path: '/employer/applicants', icon: <FilePlus size={20} />, label: 'APPLICANTS' },
-    { path: '/employer/postjob', icon: <PlusCircle size={20} />, label: 'POST JOB' }
+    { path: '/employer/postjob', icon: <PlusCircle size={20} />, label: 'POST JOB' },
+    { path: '/employer/settings', icon: <Settings size={20} />, label: 'Settings' }
   ];
 
   return (

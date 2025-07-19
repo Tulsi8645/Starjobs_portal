@@ -317,27 +317,79 @@ const getEmployerJobs = async (req, res) => {
 };
 
 
-// Get All Applicants for Employer Jobs
-const getAllApplicantsForEmployerJobs = async (req, res) => {
+// Employer Dashboard Stats
+const getEmployerDashboardStats = async (req, res) => {
   const employerId = req.user.id;
 
   try {
-    // Step 1: Get all jobs posted by this employer
+    // Find all jobs posted by this employer
+    const jobs = await Job.find({ employer: employerId }, "_id views");
+
+    const jobIds = jobs.map(job => job._id);
+
+    // Total Jobs
+    const totalJobs = jobs.length;
+
+    // Total Views (sum of all views arrays' lengths)
+    const totalViews = jobs.reduce((sum, job) => sum + (job.views?.length || 0), 0);
+
+    // Total Applications for this employer's jobs
+    const totalApplications = await Application.countDocuments({
+      job: { $in: jobIds },
+    });
+
+    // Pending Applications
+    const pendingApplications = await Application.countDocuments({
+      job: { $in: jobIds },
+      status: "Pending",
+    });
+
+    // Optional: Conversion rate
+    const conversionRate = totalViews > 0
+      ? ((totalApplications / totalViews) * 100).toFixed(2)
+      : "0";
+
+    res.status(200).json({
+      totalJobs,
+      totalViews,
+      totalApplications,
+      pendingApplications,
+      conversionRate: `${conversionRate}%`,
+    });
+  } catch (error) {
+    console.error("Employer dashboard stats error:", error);
+    res.status(500).json({ message: "Failed to get employer dashboard stats" });
+  }
+};
+
+// Get All Applicants for Employer Jobs (Infinite Scroll)
+const getAllApplicantsForEmployer = async (req, res) => {
+  const employerId = req.user.id;
+
+  // Get pagination parameters from query string
+  const page = parseInt(req.query.page) || 1;
+  const limit = parseInt(req.query.limit) || 5;
+  const skip = (page - 1) * limit;
+
+  try {
+    // Get all jobs posted by this employer
     const jobs = await Job.find({ employer: employerId }).select("_id title");
 
     if (!jobs || jobs.length === 0) {
       return res.status(404).json({ message: "No jobs found for this employer" });
     }
 
-    // Step 2: Collect all job IDs
     const jobIds = jobs.map((job) => job._id);
 
-    // Step 3: Find all applications for these jobs
+    // Fetch paginated applications
     const applications = await Application.find({ job: { $in: jobIds } })
-      .populate("applicant", "name profilePic email") // Include applicant details
-      .populate("job", "title"); // Optional: include job title
+      .populate("applicant", "name profilePic email")
+      .populate("job", "title")
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit);
 
-    // Step 4: Group applications by job
+    // Group applications by job
     const groupedApplications = {};
 
     applications.forEach((app) => {
@@ -361,15 +413,91 @@ const getAllApplicantsForEmployerJobs = async (req, res) => {
       });
     });
 
-    // Convert grouped object to array
     const result = Object.values(groupedApplications);
 
-    res.json(result);
+    // Check if more applications are available
+    const hasMore = applications.length === limit;
+
+    res.json({
+      currentPage: page,
+      hasMore,
+      data: result,
+    });
   } catch (error) {
     console.error("Error fetching applicants for employer jobs:", error);
     res.status(500).json({ message: "Server error" });
   }
 };
+
+// Get All Applicants for Employer Jobs
+const getAllApplicantsForEmployerJobs = async (req, res) => {
+  const employerId = req.user.id;
+
+  // Get pagination parameters from query string
+  const page = parseInt(req.query.page) || 1;
+  const limit = parseInt(req.query.limit) || 5;
+  const skip = (page - 1) * limit;
+
+  try {
+    // Get all jobs posted by this employer
+    const jobs = await Job.find({ employer: employerId }).select("_id title");
+
+    if (!jobs || jobs.length === 0) {
+      return res.status(404).json({ message: "No jobs found for this employer" });
+    }
+
+    const jobIds = jobs.map((job) => job._id);
+
+    // Count total number of applications for pagination info
+    const totalApplications = await Application.countDocuments({ job: { $in: jobIds } });
+
+    // Fetch paginated applications
+    const applications = await Application.find({ job: { $in: jobIds } })
+      .populate("applicant", "name profilePic email")
+      .populate("job", "title")
+      .sort({ createdAt: -1 }) // Optional: newest first
+      .skip(skip)
+      .limit(limit);
+
+    // Group applications by job
+    const groupedApplications = {};
+
+    applications.forEach((app) => {
+      const jobId = app.job._id.toString();
+
+      if (!groupedApplications[jobId]) {
+        groupedApplications[jobId] = {
+          jobTitle: app.job.title,
+          jobId: app.job._id,
+          applicants: [],
+        };
+      }
+
+      groupedApplications[jobId].applicants.push({
+        applicationId: app._id,
+        applicant: app.applicant,
+        coverLetter: app.coverLetter,
+        resume: app.resume,
+        status: app.status,
+        appliedAt: app.createdAt,
+      });
+    });
+
+    const result = Object.values(groupedApplications);
+
+    res.json({
+      currentPage: page,
+      totalPages: Math.ceil(totalApplications / limit),
+      totalApplications,
+      data: result,
+    });
+  } catch (error) {
+    console.error("Error fetching applicants for employer jobs:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+
 
 
 module.exports = {
@@ -381,5 +509,7 @@ module.exports = {
   deleteJob,
   getAppliedJobseekers,
   getEmployerJobs,
+  getEmployerDashboardStats,
+  getAllApplicantsForEmployer,
   getAllApplicantsForEmployerJobs
 };

@@ -1,5 +1,5 @@
-import { useEffect, useState } from "react";
-import { getAllApplicantsForEmployerJobs, updateApplicationStatus } from "../employerApi/api";
+import { useEffect, useState, useRef, useCallback } from "react";
+import { getAllApplicantsForEmployer, updateApplicationStatus } from "../employerApi/api";
 import { Eye } from "lucide-react";
 
 const MEDIA_URL = import.meta.env.VITE_MEDIA_URL || "";
@@ -24,24 +24,64 @@ interface JobWithApplicants {
 
 const Applicants = () => {
     const [data, setData] = useState<JobWithApplicants[]>([]);
-    const [loading, setLoading] = useState(true);
+    const [page, setPage] = useState(1);
+    const [hasMore, setHasMore] = useState(true);
+    const [loading, setLoading] = useState(false);
     const [selectedCoverLetter, setSelectedCoverLetter] = useState<string | null>(null);
+    const observerRef = useRef<HTMLDivElement | null>(null);
 
+    const fetchApplicants = useCallback(async () => {
+        if (!hasMore || loading) return;
+
+        setLoading(true);
+        try {
+            const res = await getAllApplicantsForEmployer(page);
+            setData((prev) => {
+                const merged = [...prev];
+
+                res.data.forEach((newJob: JobWithApplicants) => {
+                    const existingJobIndex = merged.findIndex((j) => j.jobId === newJob.jobId);
+                    if (existingJobIndex !== -1) {
+                        // Merge applicants without duplication
+                        const existingApplicants = merged[existingJobIndex].applicants.map((a) => a.applicationId);
+                        const newApplicants = newJob.applicants.filter((a) => !existingApplicants.includes(a.applicationId));
+                        merged[existingJobIndex].applicants.push(...newApplicants);
+                    } else {
+                        merged.push(newJob);
+                    }
+                });
+
+                return merged;
+            });
+
+            setHasMore(res.hasMore);
+            setPage((prev) => prev + 1);
+        } catch (err) {
+            console.error("Error fetching applicants:", err);
+        } finally {
+            setLoading(false);
+        }
+    }, [page, hasMore, loading]);
 
     useEffect(() => {
-        const fetchApplicants = async () => {
-            try {
-                const result = await getAllApplicantsForEmployerJobs();
-                setData(result);
-            } catch (err) {
-                console.error("Error fetching applicants:", err);
-            } finally {
-                setLoading(false);
-            }
-        };
-
         fetchApplicants();
     }, []);
+
+    useEffect(() => {
+        const observer = new IntersectionObserver((entries) => {
+            if (entries[0].isIntersecting && hasMore && !loading) {
+                fetchApplicants();
+            }
+        });
+
+        if (observerRef.current) {
+            observer.observe(observerRef.current);
+        }
+
+        return () => {
+            if (observerRef.current) observer.unobserve(observerRef.current);
+        };
+    }, [fetchApplicants, hasMore, loading]);
 
     const handleStatusChange = async (applicationId: string, newStatus: string) => {
         try {
@@ -54,19 +94,15 @@ const Applicants = () => {
                     ),
                 }))
             );
-            // Example navigation after status update (optional)
-            // navigate("/employer/dashboard/applicants", { replace: true });
         } catch (err) {
             console.error("Failed to update status:", err);
         }
     };
 
-    if (loading) return <p className="p-4">Loading applicants...</p>;
-
     return (
         <div className="min-h-screen overflow-auto p-6" style={{ maxHeight: "calc(100vh - 50px)" }}>
             <h1 className="text-2xl font-semibold mb-4">All Applicants</h1>
-            {data.length === 0 ? (
+            {data.length === 0 && !loading ? (
                 <p>No applicants found for your jobs.</p>
             ) : (
                 data.map((job) => (
@@ -88,35 +124,18 @@ const Applicants = () => {
                                 <tbody>
                                     {job.applicants.map((applicant) => (
                                         <tr key={applicant.applicationId} className="text-sm hover:bg-gray-50">
+                                            <td className="p-2 border">{applicant.applicant?.name || <span className="italic text-gray-400">No name</span>}</td>
+                                            <td className="p-2 border">{applicant.applicant?.email || <span className="italic text-gray-400">No email</span>}</td>
                                             <td className="p-2 border">
-                                                {applicant.applicant?.name || (
-                                                    <span className="italic text-gray-400">No name</span>
-                                                )}
-                                            </td>
-                                            <td className="p-2 border">
-                                                {applicant.applicant?.email || (
-                                                    <span className="italic text-gray-400">No email</span>
-                                                )}
-                                            </td>
-                                            <td className="p-2 border">
-                                                <span
-                                                    className={`px-2 py-1 text-sm rounded-md ${applicant.status === "Pending"
-                                                            ? "bg-yellow-200 text-black"
-                                                            : applicant.status === "Reviewed"
-                                                                ? "bg-blue-200 text-black"
-                                                                : applicant.status === "Accepted"
-                                                                    ? "bg-green-200 text-black"
-                                                                    : applicant.status === "Rejected"
-                                                                        ? "bg-red-200 text-black"
-                                                                        : "bg-gray-300 text-black"
-                                                        }`}
-                                                >
+                                                <span className={`px-2 py-1 text-sm rounded-md ${applicant.status === "Pending" ? "bg-yellow-200" :
+                                                        applicant.status === "Reviewed" ? "bg-blue-200" :
+                                                            applicant.status === "Accepted" ? "bg-green-200" :
+                                                                applicant.status === "Rejected" ? "bg-red-200" : "bg-gray-300"
+                                                    }`}>
                                                     {applicant.status}
                                                 </span>
                                             </td>
-                                            <td className="p-2 border">
-                                                {new Date(applicant.appliedAt).toLocaleDateString()}
-                                            </td>
+                                            <td className="p-2 border">{new Date(applicant.appliedAt).toLocaleDateString()}</td>
                                             <td className="p-2 border">
                                                 <button
                                                     onClick={() => setSelectedCoverLetter(applicant.coverLetter)}
@@ -128,9 +147,7 @@ const Applicants = () => {
                                             <td className="p-2 border">
                                                 {applicant.resume ? (
                                                     <a
-                                                        href={`${MEDIA_URL.replace(/\/$/, "")}/${applicant.resume
-                                                            .replace(/\\/g, "/")
-                                                            .replace(/^.*\/uploads/, "uploads")}`}
+                                                        href={`${MEDIA_URL.replace(/\/$/, "")}/${applicant.resume.replace(/\\/g, "/").replace(/^.*\/uploads/, "uploads")}`}
                                                         target="_blank"
                                                         rel="noopener noreferrer"
                                                     >
@@ -146,9 +163,7 @@ const Applicants = () => {
                                             <td className="p-2 border">
                                                 <select
                                                     value={applicant.status}
-                                                    onChange={(e) =>
-                                                        handleStatusChange(applicant.applicationId, e.target.value)
-                                                    }
+                                                    onChange={(e) => handleStatusChange(applicant.applicationId, e.target.value)}
                                                     className="border rounded px-2 py-1 text-sm w-full"
                                                 >
                                                     <option value="Pending">Pending</option>
@@ -166,7 +181,10 @@ const Applicants = () => {
                 ))
             )}
 
-            {/* Modal for Cover Letter */}
+            {loading && <p className="text-center text-sm py-4">Loading more...</p>}
+
+            <div ref={observerRef} className="h-10" />
+
             {selectedCoverLetter && (
                 <div className="fixed inset-0 z-50 bg-black bg-opacity-50 flex items-center justify-center">
                     <div className="bg-white p-6 rounded shadow-lg w-full max-w-lg">

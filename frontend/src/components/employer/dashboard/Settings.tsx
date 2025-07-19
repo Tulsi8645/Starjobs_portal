@@ -1,11 +1,11 @@
 import { useState, useEffect } from 'react';
 import { Eye, EyeOff } from 'lucide-react';
-import { getAdminProfile } from './adminApi/api';
-import { changePassword } from '../auth/authApi/authApi';
+import { getEmployerProfile } from '../employerApi/api';
+import { changePassword } from '../../auth/authApi/authApi';
 
 const MEDIA_URL = import.meta.env.VITE_MEDIA_URL || "";
 
-const UserSettings = () => {
+const EmployerSettings = () => {
   const [showOldPassword, setShowOldPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -15,7 +15,7 @@ const UserSettings = () => {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [loading, setLoading] = useState(false);
 
-  const [user, setUser] = useState<{ name: string; profilePic: string } | null>(null);
+  const [user, setUser] = useState<{ name: string; companyLogo: string } | null>(null);
   const [notifications, setNotifications] = useState({
     allNotifications: true,
     newInternship: true,
@@ -25,8 +25,8 @@ const UserSettings = () => {
   useEffect(() => {
     const fetchProfile = async () => {
       try {
-        const data = await getAdminProfile();
-        setUser({ name: data.name, profilePic: data.profilePic });
+        const data = await getEmployerProfile();
+        setUser({ name: data.name, companyLogo: data.companyLogo });
       } catch (err) {
         console.error('Error fetching user profile:', err);
       }
@@ -69,9 +69,9 @@ const UserSettings = () => {
           <div className="flex items-center justify-between mb-8">
             <h1 className="text-2xl font-bold">Settings</h1>
             <div className="flex items-center space-x-3">
-              {user?.profilePic ? (
+              {user?.companyLogo ? (
                 <img
-                  src={`${MEDIA_URL.replace(/\/$/, "")}/${user.profilePic.replace(/^\//, "")}`}
+                  src={`${MEDIA_URL.replace(/\/$/, "")}/${user.companyLogo.replace(/^\//, "")}`}
                   alt={user.name}
                   className="w-8 h-8 rounded-full object-cover"
                 />
@@ -171,8 +171,8 @@ const UserSettings = () => {
                     <span>
                       {{
                         allNotifications: 'All notifications',
-                        newInternship: 'Notify me on new employer registration',
-                        preferredJob: 'Notify me on new job posts',
+                        newInternship: 'Notify me on new internship post',
+                        preferredJob: 'Notify me on preferred job'
                       }[key as keyof typeof notifications]}
                     </span>
                     <button
@@ -190,10 +190,24 @@ const UserSettings = () => {
               </div>
             </div>
           </div>
+
+          {/* Danger Zone */}
+          <div className="mt-8 pt-8 border-t">
+            <h2 className="text-lg font-semibold text-red-600 mb-4">Danger Zone</h2>
+            <div>
+              <h3 className="font-medium mb-2">Deactivate Account</h3>
+              <p className="text-gray-600 mb-4">
+                Once you deactivate this account, there is no going back. Please be certain.
+              </p>
+              <button className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700">
+                Deactivate Account
+              </button>
+            </div>
+          </div>
         </div>
       </div>
     </div>
   );
 };
 
-export default UserSettings;
+export default EmployerSettings;

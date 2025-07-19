@@ -1,13 +1,8 @@
 import React, { useEffect, useState } from "react";
-import {
-  Eye,
-  Mail,
-  BarChart,
-  Briefcase,
-  UserCheck,
-} from "lucide-react";
-import { getAllApplicants } from "../employerApi/api";
-import { fetchDashboardStats } from "../insightsApi/api";
+import { Eye, Mail, BarChart, Briefcase, UserCheck} from "lucide-react";
+import { format } from 'date-fns';
+import { getAllApplicants, getEmployerDashboardStats } from "../employerApi/api";
+
 
 const MEDIA_URL = import.meta.env.VITE_MEDIA_URL || "";
 
@@ -31,11 +26,15 @@ interface Application {
 const Dashboard = () => {
   const [applications, setApplications] = useState<Application[]>([]);
   const [stats, setStats] = useState<Stat[]>([]);
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+
+  const limit = 5;
 
   useEffect(() => {
     const fetchStats = async () => {
       try {
-        const data = await fetchDashboardStats();
+        const data = await getEmployerDashboardStats();
         const dynamicStats: Stat[] = [
           {
             id: 1,
@@ -70,28 +69,26 @@ const Dashboard = () => {
 
     const fetchApplications = async () => {
       try {
-        const data = await getAllApplicants();
+        const data = await getAllApplicants(page, limit);
         const flatApps: Application[] = [];
 
-        data.forEach((job: any) => {
+        data.data.forEach((job: any) => {
           job.applicants.forEach((app: any) => {
             flatApps.push({
               id: app.applicationId,
-              name: app.applicant?.name ,
-              email: app.applicant?.email ,
+              name: app.applicant?.name,
+              email: app.applicant?.email,
               avatar: app.applicant?.profilePic,
               position: job.jobTitle || "",
               resume: app.resume || "",
               appliedAt: app.appliedAt,
-            });  
+            });
           });
         });
 
-        const latestFive = flatApps
-          .sort((a, b) => new Date(b.appliedAt).getTime() - new Date(a.appliedAt).getTime())
-          .slice(0, 5);
-
-        setApplications(latestFive);
+        // Optional: already sorted in backend
+        setApplications(flatApps);
+        setTotalPages(data.totalPages);
       } catch (err) {
         console.error("Failed to fetch applications:", err);
       }
@@ -99,7 +96,7 @@ const Dashboard = () => {
 
     fetchStats();
     fetchApplications();
-  }, []);
+  }, [page]);
 
   return (
     <div className="min-h-screen overflow-auto bg-gray-50 p-6" style={{ maxHeight: "calc(100vh - 50px)" }}>
@@ -126,7 +123,7 @@ const Dashboard = () => {
             <h2 className="text-lg font-semibold mb-4">New Applications</h2>
             <div className="space-y-6">
               {applications.length === 0 ? (
-                <p className="text-gray-500">No recent applications</p>
+                <p className="text-gray-500">No applications found</p>
               ) : (
                 applications.map((applicant) => (
                   <div key={applicant.id} className="flex items-start justify-between space-x-4">
@@ -146,11 +143,16 @@ const Dashboard = () => {
                     </div>
 
                     {/* Info */}
-                    <div className="flex-1">
-                      <p className="font-medium">{applicant.name || (<span className="italic text-gray-400">No name</span>)}</p>
+                    <div className="flex-1 gap-8">
+                      <div className="flex items-center gap-4 mb-2">
+                      <p className="font-medium">
+                        {applicant.name || <span className="italic text-gray-400">No name</span>}
+                      </p>
+                      <span className="text-sm text-gray-500">{format(new Date(applicant.appliedAt), 'yyyy/MM/dd')}</span>
+                      </div>
                       <div className="flex items-center text-sm text-gray-500">
                         <Mail size={14} className="mr-1" />
-                        <span>{applicant.email || (<span className="italic text-gray-400">No email</span>)}</span>
+                        <span>{applicant.email || <span className="italic text-gray-400">No email address</span>}</span>
                         <span className="mx-2">•</span>
                         <span>{applicant.position}</span>
                       </div>
@@ -179,6 +181,29 @@ const Dashboard = () => {
                 ))
               )}
             </div>
+
+            {/* Pagination Controls */}
+            {totalPages > 1 && (
+              <div className="flex justify-between items-center mt-6">
+                <button
+                  onClick={() => setPage((prev) => Math.max(prev - 1, 1))}
+                  disabled={page === 1}
+                  className="px-4 py-1 bg-gray-200 rounded hover:bg-gray-300 disabled:opacity-50"
+                >
+                  Previous
+                </button>
+                <span className="text-sm text-gray-600">
+                  Page {page} of {totalPages}
+                </span>
+                <button
+                  onClick={() => setPage((prev) => Math.min(prev + 1, totalPages))}
+                  disabled={page === totalPages}
+                  className="px-4 py-1 bg-gray-200 rounded hover:bg-gray-300 disabled:opacity-50"
+                >
+                  Next
+                </button>
+              </div>
+            )}
           </div>
 
           {/* Recent Activities */}

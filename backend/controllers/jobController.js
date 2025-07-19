@@ -101,7 +101,7 @@ const getRecentJobs = async (req, res) => {
 // Get job by ID
 const getJobById = async (req, res) => {
   const { id } = req.params;
-  const viewerIp = req.ip;
+  const viewerIp = req.headers['x-forwarded-for']?.split(',')[0] || req.socket.remoteAddress;
 
   try {
     const job = await Job.findById(id)
@@ -111,8 +111,13 @@ const getJobById = async (req, res) => {
       return res.status(404).json({ message: "Job not found" });
     }
 
-    // Track unique IP views
-    if (!job.views.some((view) => view.ip === viewerIp)) {
+    // Allow one view per IP per day
+    const hasViewedToday = job.views.some((view) =>
+      view.ip === viewerIp &&
+      new Date(view.date).toDateString() === new Date().toDateString()
+    );
+
+    if (!hasViewedToday) {
       job.views.push({ ip: viewerIp, date: new Date() });
       await job.save();
     }
@@ -128,6 +133,7 @@ const getJobById = async (req, res) => {
     res.status(500).json({ message: "Server error" });
   }
 };
+
 
 
 // Get job views per unique ip

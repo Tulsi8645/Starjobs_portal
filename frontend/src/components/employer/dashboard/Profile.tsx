@@ -183,7 +183,7 @@ const Profile = () => {
               }
 
               const updated = await updateEmployerProfile(formData);
-              setProfile(updated); // Update local state with the fresh backend response
+              setProfile(updated); 
               setShowEditModal(false);
             } catch (error) {
               console.error("Failed to update profile:", error);
