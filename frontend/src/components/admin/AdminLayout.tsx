@@ -29,9 +29,12 @@ const AdminLayout = () => {
         <aside className="w-64 bg-white border-r flex flex-col justify-between">
           <div>
             <div className="p-4 border-b">
-              <div className="flex items-center">
-                <img src={logo} alt="Logo" className="w-30 h-30 mr-2" />
+                <div className="flex items-center cursor-pointer"
+                  onClick={() => navigate('/')}
+                >
+                  <img src={logo} alt="Logo" className="w-30 h-30 mr-2" />
               </div>
+      
             </div>
             <nav className="p-4">
               {menuItems.map((item) => (

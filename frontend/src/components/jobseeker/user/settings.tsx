@@ -17,9 +17,9 @@ const UserSettings = () => {
 
   const [user, setUser] = useState<{ name: string; profilePic: string } | null>(null);
   const [notifications, setNotifications] = useState({
-    allNotifications: true,
-    newInternship: true,
-    preferredJob: true
+    allNotifications: false,
+    applicationStatus: false,
+ 
   });
 
   useEffect(() => {
@@ -166,13 +166,12 @@ const UserSettings = () => {
             <div>
               <h2 className="text-lg font-semibold mb-4">Notification Setting</h2>
               <div className="space-y-4">
-                {['allNotifications', 'newInternship', 'preferredJob'].map((key) => (
+                {['allNotifications', 'applicationStatus'].map((key) => (
                   <div className="flex items-center justify-between" key={key}>
                     <span>
                       {{
                         allNotifications: 'All notifications',
-                        newInternship: 'Notify me on new internship post',
-                        preferredJob: 'Notify me on preferred job'
+                        applicationStatus: 'Notify me on application status',
                       }[key as keyof typeof notifications]}
                     </span>
                     <button

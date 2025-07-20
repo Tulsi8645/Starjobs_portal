@@ -3,7 +3,6 @@ import { Eye, Mail, BarChart, Briefcase, UserCheck} from "lucide-react";
 import { format } from 'date-fns';
 import { getAllApplicants, getEmployerDashboardStats } from "../employerApi/api";
 
-
 const MEDIA_URL = import.meta.env.VITE_MEDIA_URL || "";
 
 interface Stat {

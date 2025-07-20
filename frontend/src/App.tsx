@@ -27,7 +27,7 @@ import AdminDashboard from './components/admin/AdminDashboard';
 import UserManagement from './components/admin/UserManagement';
 import EmployerManagement from './components/admin/EmployerManagement';
 import EmployerApplicants from './components/admin/EmployerApplicants';
-import Settings from './components/admin/Settings';
+import AdminSettings from './components/admin/Settings';
 import DashboardLayout from './components/employer/dashboard/DashboardLayout';
 import ApplyPage from './components/jobseeker/apply';
 import UsersProfile from './components/admin/UsersProfile';
@@ -111,7 +111,7 @@ function AppWrapper() {
             <Route path="employers" element={<EmployerManagement />} />
             <Route path="jobs" element={<JobManagement />} />
             <Route path="employer/:employerId/applicants" element={<EmployerApplicants />} />
-            <Route path="settings" element={<Settings />} />
+            <Route path="settings" element={<AdminSettings />} />
           </Route>
         </Routes>
       </div>

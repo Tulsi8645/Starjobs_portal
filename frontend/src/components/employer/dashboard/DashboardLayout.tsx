@@ -40,7 +40,7 @@ const DashboardLayout = () => {
         <div className="p-4 border-b">
           <div
             className="flex items-center cursor-pointer"
-            onClick={() => navigate('/employer/profile')}
+            onClick={() => navigate('/')}
           >
             <img src={logo} alt="Logo" className="w-30 h-30 mr-2" />
           </div>

@@ -2,7 +2,7 @@ import { MapPin, Clock, DollarSign, Users, PenSquare, MoreVertical } from "lucid
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { getEmployerJobs, patchJob } from "../employerApi/api";
-
+import { FaWhatsapp } from "react-icons/fa";
 interface Job {
   _id: string;
   title: string;
@@ -105,13 +105,22 @@ const JobList = () => {
           </div>
         </div>
 
-        <div className="flex justify-end mb-4">
-          <button
-            onClick={() => navigate("/employer/postjob")}
-            className="bg-primary text-white px-4 py-2 rounded-md hover:bg-primary/90"
-          >
-            Post Job
-          </button>
+        {/* contact star jobs */}
+
+        <div className="flex w-full justify-end mb-4">
+          <div className="bg-white rounded-lg shadow-sm p-6">
+            <h2 className="text-lg text-primary font-semibold">
+              Need to boost any Job Posts,&nbsp;
+              <a
+                href="https://wa.me/9849295360"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center text-green-600 hover:text-green-700"
+              >
+                <FaWhatsapp size={40} />
+              </a>
+            </h2>
+          </div>
         </div>
 
         <div className="space-y-4">

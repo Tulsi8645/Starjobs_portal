@@ -145,11 +145,11 @@ export const getEmployerJobs = async () => {
   
 
   
-export const getAllApplicantsForEmployerJobs = async () => {
+export const getAllApplicantsForEmployerJobs = async ( page = 1, limit = 10) => {
   const token = localStorage.getItem("token");
   if (!token) throw new Error("Not authenticated");
 
-  const res = await axios.get(`${API_BASE_URL}/api/employer/my-jobs/applicants`, {
+  const res = await axios.get(`${API_BASE_URL}/api/employer/my-jobs/applications?page=${page}&limit=${limit}`, {
     headers: {
       Authorization: `Bearer ${token}`,
     },
@@ -190,7 +190,7 @@ export const getAllApplicantsForEmployer = async (page = 1, limit = 5) => {
     }
   );
 
-  return res.data; // { currentPage, hasMore, data: [...] }
+  return res.data; 
 };
 
 export const getAllApplicants = async (page = 1, limit = 5) => {
