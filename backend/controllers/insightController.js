@@ -118,9 +118,126 @@ const getDashboardStats = async (req, res) => {
 
 
 
+
+// Job Stats by Date For Admin
+const getAllJobStatsByDate = async (req, res) => {
+  try {
+    // Daily Views
+    const dailyViews = await Job.aggregate([
+      { $unwind: "$views" },
+      {
+        $group: {
+          _id: {
+            day: { $dayOfMonth: "$views.date" },
+            month: { $month: "$views.date" },
+            year: { $year: "$views.date" },
+          },
+          totalViews: { $sum: 1 },
+        },
+      },
+      { $sort: { "_id.year": -1, "_id.month": -1, "_id.day": -1 } }
+    ]);
+
+    // Weekly Views
+    const weeklyViews = await Job.aggregate([
+      { $unwind: "$views" },
+      {
+        $group: {
+          _id: {
+            week: { $isoWeek: "$views.date" },
+            year: { $year: "$views.date" },
+          },
+          totalViews: { $sum: 1 },
+        },
+      },
+      { $sort: { "_id.year": -1, "_id.week": -1 } }
+    ]);
+
+    // Monthly Views
+    const monthlyViews = await Job.aggregate([
+      { $unwind: "$views" },
+      {
+        $group: {
+          _id: {
+            month: { $month: "$views.date" },
+            year: { $year: "$views.date" },
+          },
+          totalViews: { $sum: 1 },
+        },
+      },
+      { $sort: { "_id.year": -1, "_id.month": -1 } }
+    ]);
+
+    // Daily Applications
+    const dailyApplications = await Application.aggregate([
+      {
+        $group: {
+          _id: {
+            day: { $dayOfMonth: "$createdAt" },
+            month: { $month: "$createdAt" },
+            year: { $year: "$createdAt" },
+          },
+          totalApplications: { $sum: 1 },
+        },
+      },
+      { $sort: { "_id.year": -1, "_id.month": -1, "_id.day": -1 } }
+    ]);
+
+    // Weekly Applications
+    const weeklyApplications = await Application.aggregate([
+      {
+        $group: {
+          _id: {
+            week: { $isoWeek: "$createdAt" },
+            year: { $year: "$createdAt" },
+          },
+          totalApplications: { $sum: 1 },
+        },
+      },
+      { $sort: { "_id.year": -1, "_id.week": -1 } }
+    ]);
+
+    // Monthly Applications
+    const monthlyApplications = await Application.aggregate([
+      {
+        $group: {
+          _id: {
+            month: { $month: "$createdAt" },
+            year: { $year: "$createdAt" },
+          },
+          totalApplications: { $sum: 1 },
+        },
+      },
+      { $sort: { "_id.year": -1, "_id.month": -1 } }
+    ]);
+
+    res.status(200).json({
+      success: true,
+      data: {
+        views: {
+          daily: dailyViews,
+          weekly: weeklyViews,
+          monthly: monthlyViews,
+        },
+        applications: {
+          daily: dailyApplications,
+          weekly: weeklyApplications,
+          monthly: monthlyApplications,
+        },
+      },
+    });
+  } catch (error) {
+    console.error("Error in getAllJobStatsByDate:", error);
+    res.status(500).json({ success: false, message: "Server Error", error: error.message });
+  }
+};
+
+
+
 module.exports = {
   getJobStats,
   getJobConversionRates,
   getDashboardStats,
   getJobPostComparison,
+  getAllJobStatsByDate
 };

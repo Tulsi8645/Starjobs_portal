@@ -171,18 +171,6 @@ const getAllUsers = async (req, res) => {
 };
 
 
-
-// Update any User,
-
-const deleteOldFile = (filename, folder) => {
-  if (!filename) return;
-  const filePath = path.join(__dirname, "..", "uploads", folder, filename);
-  if (fs.existsSync(filePath)) {
-    fs.unlinkSync(filePath);
-  }
-};
-
-
 // Delete User
 const deleteUser = async (req, res) => {
   const userId = req.params.id;
@@ -314,6 +302,9 @@ const deleteJob = async (req, res) => {
     res.status(500).json({ message: "Server error" });
   }
 };
+
+
+
 
 
 module.exports = {getAdminProfile, getAdminStats, verifyEmployer, getAllApplicantsForEmployerJobs, updateApplication, getAllUsers, deleteUser, getAllJobs,editJob, deleteJob};

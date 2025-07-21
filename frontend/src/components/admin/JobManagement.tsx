@@ -151,7 +151,7 @@ const JobManagement = () => {
           <tbody>
             {jobs.length === 0 ? (
               <tr>
-                <td colSpan={18} className="text-center py-4 text-gray-400">
+                <td colSpan={18} className="text-center text-sm py-60 px-30 font-medium text-gray-400">
                   No jobs found.
                 </td>
               </tr>

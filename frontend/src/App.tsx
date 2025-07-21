@@ -33,6 +33,7 @@ import ApplyPage from './components/jobseeker/apply';
 import UsersProfile from './components/admin/UsersProfile';
 import JobManagement from './components/admin/JobManagement';
 import EmployerSettings from './components/employer/dashboard/Settings';
+import RevenueManagement from './components/admin/RevenueManagement';
 
 function AppWrapper() {
   const location = useLocation();
@@ -110,6 +111,7 @@ function AppWrapper() {
             <Route path="userprofile/:id" element={<UsersProfile />} />
             <Route path="employers" element={<EmployerManagement />} />
             <Route path="jobs" element={<JobManagement />} />
+            <Route path="revenue" element={<RevenueManagement />} />
             <Route path="employer/:employerId/applicants" element={<EmployerApplicants />} />
             <Route path="settings" element={<AdminSettings />} />
           </Route>

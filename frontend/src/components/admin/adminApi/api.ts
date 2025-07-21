@@ -47,6 +47,11 @@ export const getAdminStats = async () => {
   return res.data;
 };
 
+ 
+export const getAllJobStatsByDate = async () => {
+  const res = await axios.get(`${API_BASE_URL}/api/insights/all-job-stats`, authHeader);
+  return res.data;
+};
 
 export const getAllUsers = async () => {
     const res = await axios.get(`${API_BASE_URL}/api/admin/users`, authHeader);
