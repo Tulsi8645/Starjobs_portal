@@ -23,6 +23,27 @@ exports.getJobsByEmployer = async (req, res) => {
   }
 };
 
+
+// GET: Get all revenues
+exports.getAllRevenue = async (req, res) => {
+  try {
+    const revenues = await Revenue.find()
+      .populate({
+        path: "paidBy",
+        select: "name email", // populate employer details
+      })
+      .populate({
+        path: "paidFor",
+        select: "title", // populate job title
+      })
+      .sort({ createdAt: -1 });
+
+    res.status(200).json(revenues);
+  } catch (err) {
+    res.status(500).json({ message: "Error fetching revenue records", error: err.message });
+  }
+};
+
 // POST: Add revenue
 exports.addRevenue = async (req, res) => {
   try {

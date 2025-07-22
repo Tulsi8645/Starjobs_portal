@@ -126,3 +126,20 @@ export const deleteJob = async (jobId:any) => {
   };
 
 
+export const fetchRevenues = () =>
+  axios.get(`${API_BASE_URL}/api/revenue`, authHeader).then(res => res.data);
+
+export const fetchEmployers = () =>
+  axios.get(`${API_BASE_URL}/api/revenue/allemployers`, authHeader).then(res => res.data);
+
+export const fetchJobsByEmployer = (employerId: string) =>
+  axios.get(`${API_BASE_URL}/api/revenue/employer/${employerId}/jobs`, authHeader).then(res => res.data);
+
+export const addRevenue = (payload: any) =>
+  axios.post(`${API_BASE_URL}/api/revenue`, payload, authHeader).then(res => res.data);
+
+export const updateRevenue = (id: string, payload: any) =>
+  axios.put(`${API_BASE_URL}/api/revenue/${id}`, payload, authHeader).then(res => res.data);
+
+export const deleteRevenue = (id: string) =>
+  axios.delete(`${API_BASE_URL}/api/revenue/${id}`, authHeader).then(res => res.data);
