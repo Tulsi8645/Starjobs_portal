@@ -120,6 +120,18 @@ export const updateJob = async (jobId: string, updatedData: Partial<Job>) => {
   return res.data;
 };
 
+
+export const toggleTrendingStatus = async (jobId: string, istrending: boolean) => {
+  const res = await axios.patch(
+    `${API_BASE_URL}/api/admin/jobs/${jobId}/trending`,
+    { istrending },
+    authHeader
+  );
+  return res.data;
+};
+
+
+
 export const deleteJob = async (jobId:any) => {
     const res = await axios.delete(`${API_BASE_URL}/api/admin/job/${jobId}`, authHeader);
     return res.data;

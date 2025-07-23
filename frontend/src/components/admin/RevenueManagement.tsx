@@ -1,10 +1,19 @@
 import React, { useEffect, useState } from "react";
-import { Pencil, Trash2,} from "lucide-react";
-import {fetchRevenues,fetchEmployers,fetchJobsByEmployer,addRevenue,updateRevenue,deleteRevenue} from "./adminApi/api";
+import { Pencil, Trash2 } from "lucide-react";
+import {
+  fetchRevenues,
+  fetchEmployers,
+  fetchJobsByEmployer,
+  addRevenue,
+  updateRevenue,
+  deleteRevenue,
+  toggleTrendingStatus,
+} from "./adminApi/api";
 
 interface Revenue {
   _id: string;
   amount: number;
+  currency: string;
   paidBy: {
     _id: string;
     name: string;
@@ -12,6 +21,7 @@ interface Revenue {
   paidFor: {
     _id: string;
     title: string;
+    istrending: boolean;
   };
   remarks?: string;
   createdAt?: string;
@@ -20,8 +30,9 @@ interface Revenue {
 interface RevenueFormData {
   _id?: string;
   amount?: number;
+  currency?: string;
   paidBy?: string;
-  paidFor?: string; 
+  paidFor?: string;
   remarks?: string;
 }
 
@@ -35,6 +46,8 @@ interface Job {
   _id: string;
   title: string;
 }
+
+const currencies = ["USD", "EUR", "GBP", "INR", "AED", "NPR"];
 
 const RevenueManagement: React.FC = () => {
   const [revenues, setRevenues] = useState<Revenue[]>([]);
@@ -66,6 +79,7 @@ const RevenueManagement: React.FC = () => {
   const handleSubmit = async () => {
     const payload = {
       amount: formData.amount,
+      currency: formData.currency || "USD",
       paidBy: formData.paidBy,
       paidFor: formData.paidFor,
       remarks: formData.remarks,
@@ -85,6 +99,15 @@ const RevenueManagement: React.FC = () => {
     }
   };
 
+  const handleToggleTrending = async (jobId: string, currentStatus: boolean) => {
+    try {
+      await toggleTrendingStatus(jobId, !currentStatus);
+      fetchAllData();
+    } catch (error) {
+      console.error("Failed to toggle trending status", error);
+    }
+  };
+
   const handleDelete = async (id: string) => {
     if (confirm("Are you sure you want to delete this revenue?")) {
       await deleteRevenue(id);
@@ -95,15 +118,12 @@ const RevenueManagement: React.FC = () => {
   const openModal = async (revenue?: Revenue) => {
     if (revenue) {
       setEditMode(true);
-
-      // First fetch jobs for the selected employer
       const jobResponse = await fetchJobsByEmployer(revenue.paidBy._id);
       setJobs(jobResponse.jobs);
-
-      // Then set the form data
       setFormData({
         _id: revenue._id,
         amount: revenue.amount,
+        currency: revenue.currency || "USD",
         paidBy: revenue.paidBy._id,
         paidFor: revenue.paidFor._id,
         remarks: revenue.remarks,
@@ -115,7 +135,6 @@ const RevenueManagement: React.FC = () => {
     }
     setShowModal(true);
   };
-
 
   const formatDate = (dateString?: string) => {
     if (!dateString) return "-";
@@ -143,6 +162,7 @@ const RevenueManagement: React.FC = () => {
             <th className="p-2">Amount</th>
             <th className="p-2">Paid By</th>
             <th className="p-2">Paid For</th>
+            <th className="p-2">Trending</th>
             <th className="p-2">Remarks</th>
             <th className="p-2">Date</th>
             <th className="p-2">Actions</th>
@@ -151,12 +171,32 @@ const RevenueManagement: React.FC = () => {
         <tbody>
           {revenues.map((rev) => (
             <tr key={rev._id} className="border-t">
-              <td className="p-2">${rev.amount}</td>
+              <td className="p-2">
+                {rev.currency || "USD"} {rev.amount}
+              </td>
               <td className="p-2">{rev.paidBy?.name}</td>
               <td className="p-2">{rev.paidFor?.title}</td>
+              <td className="p-2">
+                <span
+                  className={`px-2 py-1 rounded-full text-xs font-semibold ${rev.paidFor?.istrending
+                    ? "bg-green-200 text-green-800"
+                    : "bg-gray-200 text-gray-700"
+                    }`}
+                >
+                  {rev.paidFor?.istrending ? "Trending" : "Basic Job"}
+                </span>
+              </td>
               <td className="p-2">{rev.remarks || "-"}</td>
               <td className="p-2">{formatDate(rev.createdAt)}</td>
-              <td className="p-2 flex gap-2">
+              <td className="p-2 flex gap-2 items-center">
+                <button
+                  className="bg-primary text-white px-3 py-1 rounded text-xs"
+                  onClick={() =>
+                    handleToggleTrending(rev.paidFor._id, rev.paidFor.istrending)
+                  }
+                >
+                  Toggle
+                </button>
                 <button
                   className="text-blue-600 hover:text-blue-800"
                   onClick={() => openModal(rev)}
@@ -172,7 +212,6 @@ const RevenueManagement: React.FC = () => {
                   <Trash2 size={18} />
                 </button>
               </td>
-
             </tr>
           ))}
         </tbody>
@@ -216,15 +255,37 @@ const RevenueManagement: React.FC = () => {
               ))}
             </select>
 
-            <label className="block mb-2">Amount</label>
-            <input
-              type="number"
-              className="w-full border px-2 py-1 mb-4"
-              value={formData.amount || ""}
-              onChange={(e) =>
-                setFormData({ ...formData, amount: Number(e.target.value) })
-              }
-            />
+            <div className="flex gap-4 mb-4">
+              <div className="w-1/2">
+                <label className="block mb-1">Amount</label>
+                <input
+                  type="number"
+                  className="w-full border px-2 py-1"
+                  value={formData.amount || ""}
+                  onChange={(e) =>
+                    setFormData({ ...formData, amount: Number(e.target.value) })
+                  }
+                />
+              </div>
+
+              <div className="w-1/2">
+                <label className="block mb-1">Currency</label>
+                <select
+                  value={formData.currency || "USD"}
+                  onChange={(e) =>
+                    setFormData({ ...formData, currency: e.target.value })
+                  }
+                  className="w-full border px-2 py-1"
+                >
+                  {currencies.map((cur) => (
+                    <option key={cur} value={cur}>
+                      {cur}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
+
 
             <label className="block mb-2">Remarks</label>
             <input

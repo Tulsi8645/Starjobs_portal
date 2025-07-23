@@ -23,18 +23,17 @@ exports.getJobsByEmployer = async (req, res) => {
   }
 };
 
-
 // GET: Get all revenues
 exports.getAllRevenue = async (req, res) => {
   try {
     const revenues = await Revenue.find()
       .populate({
         path: "paidBy",
-        select: "name email", // populate employer details
+        select: "name email",
       })
       .populate({
         path: "paidFor",
-        select: "title", // populate job title
+        select: "title istrending",
       })
       .sort({ createdAt: -1 });
 
@@ -47,7 +46,13 @@ exports.getAllRevenue = async (req, res) => {
 // POST: Add revenue
 exports.addRevenue = async (req, res) => {
   try {
-    const { amount, paidBy, paidFor, remarks } = req.body;
+    const { amount, currency, paidBy, paidFor, remarks } = req.body;
+
+    // Allow standard ISO currency codes
+    const allowedCurrencies = ["USD", "EUR", "GBP", "INR", "AED", "NPR"];
+    if (currency && !allowedCurrencies.includes(currency)) {
+      return res.status(400).json({ message: "Invalid currency selected" });
+    }
 
     const employer = await User.findById(paidBy);
     if (!employer || employer.role !== "employer") {
@@ -59,7 +64,7 @@ exports.addRevenue = async (req, res) => {
       return res.status(400).json({ message: "Job does not belong to selected employer" });
     }
 
-    const revenue = new Revenue({ amount, paidBy, paidFor, remarks });
+    const revenue = new Revenue({ amount, currency, paidBy, paidFor, remarks });
     await revenue.save();
 
     // Optionally mark job as trending
@@ -76,7 +81,13 @@ exports.addRevenue = async (req, res) => {
 exports.editRevenue = async (req, res) => {
   try {
     const revenueId = req.params.id;
-    const { amount, paidBy, paidFor, remarks } = req.body;
+    const { amount, currency, paidBy, paidFor, remarks } = req.body;
+
+    // Allow standard ISO currency codes
+    const allowedCurrencies = ["USD", "EUR", "GBP", "INR", "AED", "NPR"];
+    if (currency && !allowedCurrencies.includes(currency)) {
+      return res.status(400).json({ message: "Invalid currency selected" });
+    }
 
     const employer = await User.findById(paidBy);
     if (!employer || employer.role !== "employer") {
@@ -90,7 +101,7 @@ exports.editRevenue = async (req, res) => {
 
     const revenue = await Revenue.findByIdAndUpdate(
       revenueId,
-      { amount, paidBy, paidFor, remarks },
+      { amount, currency, paidBy, paidFor, remarks },
       { new: true }
     );
 

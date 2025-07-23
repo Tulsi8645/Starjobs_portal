@@ -8,6 +8,7 @@ const revenueSchema = new mongoose.Schema(
       ref: "User",
       required: true,
     },
+    currency: { type: String, default: "$" },
     paidFor: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Job",

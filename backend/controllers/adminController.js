@@ -304,7 +304,33 @@ const deleteJob = async (req, res) => {
 };
 
 
+// Update the 'istrending' field
+const toggleTrendingStatus = async (req, res) => {
+  const jobId = req.params.id;
+  const { istrending } = req.body;
+
+  if (typeof istrending !== "boolean") {
+    return res.status(400).json({ message: "'istrending' must be a boolean value." });
+  }
+
+  try {
+    const updatedJob = await Job.findByIdAndUpdate(
+      jobId,
+      { istrending },
+      { new: true, runValidators: true }
+    );
+
+    if (!updatedJob) {
+      return res.status(404).json({ message: "Job not found" });
+    }
+
+    res.json({ message: "Trending status updated", job: updatedJob });
+  } catch (error) {
+    console.error("Error updating trending status:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+};
 
 
 
-module.exports = {getAdminProfile, getAdminStats, verifyEmployer, getAllApplicantsForEmployerJobs, updateApplication, getAllUsers, deleteUser, getAllJobs,editJob, deleteJob};
+module.exports = {getAdminProfile, toggleTrendingStatus, getAdminStats, verifyEmployer, getAllApplicantsForEmployerJobs, updateApplication, getAllUsers, deleteUser, getAllJobs,editJob, deleteJob};
