@@ -30,10 +30,36 @@ export interface Job {
   };
 }
 
+
+interface FetchJobsParams {
+  page?: number;
+  limit?: number;
+  search?: string;
+  location?: string;
+  jobType?: string;
+  level?: string;
+}
+
 // Fetch all jobs with pagination
-export const fetchJobs = async ({ page = 1, limit = 10 }: { page?: number; limit?: number }) => {
+
+
+export const fetchJobs = async ({
+  page = 1,
+  limit = 6,
+  search = '',
+  location = '',
+  jobType = '',
+  level = '',
+}: FetchJobsParams) => {
   const response = await axios.get(`${API_BASE_URL}/api/jobs`, {
-    params: { page, limit },
+    params: {
+      page,
+      limit,
+      search,
+      location,
+      jobtype: jobType,
+      level,
+    },
   });
   return response.data;
 };

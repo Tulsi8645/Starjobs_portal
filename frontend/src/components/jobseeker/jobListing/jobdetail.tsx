@@ -122,7 +122,8 @@ const JobDetailPage = () => {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
 
           {/* Job Detail Section */}
-          <div className="lg:col-span-2 rounded-lg p-6 bg-white shadow">
+          <div className="lg:col-span-2 rounded-lg p-6">
+            <div className=' bg-white rounded-lg p-6 shadow'>
             <div className="flex items-start justify-between mb-4 border-b pb-4">
               <div className="flex items-start space-x-4">
                 {job.employer?.companyLogo ? (
@@ -192,7 +193,6 @@ const JobDetailPage = () => {
 
             {/* Description */}
             <div>
-              <h2 className="text-lg font-semibold text-gray-800 mb-2">Job Description</h2>
               <div
                 className="text-sm text-gray-600 leading-relaxed prose max-w-none"
                 dangerouslySetInnerHTML={{ __html: job.description }}
@@ -218,7 +218,10 @@ const JobDetailPage = () => {
                 </button>
               </div>
             </div>
+            </div>
           </div>
+          
+
 
           {/* Similar Jobs Section */}
           <div className="space-y-6">

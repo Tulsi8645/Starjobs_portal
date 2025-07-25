@@ -5,7 +5,7 @@ const Jobseeker = require("../models/Jobseeker");
 
 // Get All Jobs
 const getJobs = async (req, res) => {
-  const { page = 1, limit = 10, location, jobtype, level, status, search } = req.query;
+  const { page = 1, limit = 6, location, jobtype, level, status, search } = req.query;
   const userId = req.user?._id;
 
   try {
@@ -13,11 +13,18 @@ const getJobs = async (req, res) => {
     const skip = (page - 1) * limitNum;
 
     const filters = {};
-    if (location) filters.location = location;
+    if (location) {filters.location = { $regex: location, $options: "i" };}
     if (jobtype) filters.jobtype = jobtype;
     if (level) filters.level = level;
     if (status) filters.status = status;
-    if (search) filters.title = { $regex: search, $options: "i" };
+    if (search) {
+     const keywords = search.trim().split(/\s+/).map(word => word.toLowerCase());
+     filters.$or = [
+    { title: { $in: keywords.map(word => new RegExp(`^${word}`, 'i')) } },
+    { jobcategory: { $in: keywords.map(word => new RegExp(`^${word}`, 'i')) } }
+    ];
+  }
+
 
     const jobs = await Job.find(filters)
       .populate("employer", "name companyLogo")
@@ -45,12 +52,13 @@ const getJobs = async (req, res) => {
 };
 
 
+
 // Get latest 3 trending jobs
 const getTrendingJobs = async (req, res) => {
   try {
     const trendingJobs = await Job.find({ istrending: true })
       .sort({ createdAt: -1 }) // Latest first
-      .limit(3)
+      .limit(6)
       .populate("employer", "name companyLogo")
       .lean();
 

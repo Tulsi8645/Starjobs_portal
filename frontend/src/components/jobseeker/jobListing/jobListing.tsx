@@ -2,7 +2,7 @@ import { useQuery } from '@tanstack/react-query';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
-  Search as SearchIcon,
+  Search,
   MapPin,
   Clock,
   DollarSign,
@@ -10,41 +10,11 @@ import {
 } from 'lucide-react';
 import { fetchJobs, fetchSavedJobs, toggleSaveJob } from '../jobseekerApi/api';
 
-type Employer = {
-  _id: string;
-  name: string;
-  companyLogo?: string;
-};
-
-type Job = {
-  _id: string;
-  title: string;
-  location: string;
-  jobtype: string;
-  salary: string;
-  experience: string;
-  jobcategory: string;
-  level: string;
-  deadline: string;
-  openings: number;
-  istrending: boolean;
-  status: string;
-  description: string;
-  employer: Employer;
-  createdAt: string;
-};
-
-type JobResponse = {
-  jobs: Job[];
-  total: number;
-};
-
 const getTimeAgo = (dateString: string): string => {
   const diff = Date.now() - new Date(dateString).getTime();
   const minutes = Math.floor(diff / 60000);
   const hours = Math.floor(minutes / 60);
   const days = Math.floor(hours / 24);
-
   if (days > 0) return `${days} day${days > 1 ? 's' : ''} ago`;
   if (hours > 0) return `${hours} hour${hours > 1 ? 's' : ''} ago`;
   if (minutes > 0) return `${minutes} minute${minutes > 1 ? 's' : ''} ago`;
@@ -53,33 +23,44 @@ const getTimeAgo = (dateString: string): string => {
 
 const AllJobListing = () => {
   const navigate = useNavigate();
-  const [searchQuery, setSearchQuery] = useState('');
+  const [pendingSearchQuery, setPendingSearchQuery] = useState('');
+  const [pendingLocation, setPendingLocation] = useState('');
   const [filters, setFilters] = useState({
     location: '',
     jobType: '',
     datePosted: '',
     level: '',
   });
-  const MEDIA_URL = import.meta.env.VITE_MEDIA_URL;
+  const [searchQuery, setSearchQuery] = useState('');
   const [sortBy, setSortBy] = useState('newest');
   const [page, setPage] = useState(1);
-  const limit = 9;
+  const limit = 6;
+
+  const MEDIA_URL = import.meta.env.VITE_MEDIA_URL;
 
   const {
     data: savedJobs = [],
     refetch: refetchSavedJobs,
-  } = useQuery<Job[], Error>({
+  } = useQuery({
     queryKey: ['savedJobs'],
     queryFn: async () => {
       const result = await fetchSavedJobs();
-      return result as Job[];
+      return result;
     },
     staleTime: 0,
   });
 
-  const { data, isLoading, isError } = useQuery<JobResponse, Error>({
-    queryKey: ['jobs', page],
-    queryFn: () => fetchJobs({ page, limit }),
+  const { data, isLoading, isError } = useQuery({
+    queryKey: ['jobs', page, searchQuery, filters],
+    queryFn: () =>
+      fetchJobs({
+        page,
+        limit,
+        search: searchQuery,
+        location: filters.location,
+        jobType: filters.jobType,
+        level: filters.level,
+      }),
     staleTime: 60 * 1000,
     gcTime: 5 * 60 * 1000,
     refetchOnWindowFocus: false,
@@ -95,59 +76,61 @@ const AllJobListing = () => {
     }
   };
 
+  // Apply both search query and location filters at once
+  const applyFilters = () => {
+    setFilters((prev) => ({
+      ...prev,
+      location: pendingLocation.trim(),
+    }));
+    setSearchQuery(pendingSearchQuery.trim());
+    setPage(1);
+  };
+
+  // Clear or apply filters depending on current state
+  const handleSearchOrClear = () => {
+    if (searchQuery || filters.location) {
+      // Clear all filters
+      setSearchQuery('');
+      setPendingSearchQuery('');
+      setFilters({
+        location: '',
+        jobType: '',
+        datePosted: '',
+        level: '',
+      });
+      setPendingLocation('');
+      setPage(1);
+    } else if (pendingSearchQuery.trim() || pendingLocation.trim()) {
+      applyFilters();
+    }
+  };
+
+  // Trigger filter application on Enter key in inputs
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      applyFilters();
+    }
+  };
+
   const jobs = data?.jobs ?? [];
   const total = data?.total ?? 0;
   const totalPages = Math.ceil(total / limit);
 
-  const filteredJobs = jobs
-    .filter((job) => {
-      const matchesSearch =
-        job.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        job.employer?.name?.toLowerCase().includes(searchQuery.toLowerCase());
-
-      const matchesLocation =
-        filters.location === '' ||
-        job.location.toLowerCase().includes(filters.location.toLowerCase());
-
-      const matchesJobType =
-        filters.jobType === '' ||
-        job.jobtype.toLowerCase() === filters.jobType.toLowerCase();
-
-      const matchesLevel =
-        filters.level === '' || job.level === filters.level;
-
-      const createdAt = new Date(job.createdAt);
-      const now = new Date();
-      let matchesDate = true;
-
-      if (filters.datePosted === '24h') {
-        matchesDate = now.getTime() - createdAt.getTime() <= 24 * 60 * 60 * 1000;
-      } else if (filters.datePosted === '7d') {
-        matchesDate = now.getTime() - createdAt.getTime() <= 7 * 24 * 60 * 60 * 1000;
-      } else if (filters.datePosted === '30d') {
-        matchesDate = now.getTime() - createdAt.getTime() <= 30 * 24 * 60 * 60 * 1000;
-      }
-
-      return (
-        matchesSearch &&
-        matchesLocation &&
-        matchesJobType &&
-        matchesDate &&
-        matchesLevel
-      );
-    })
-    .sort((a, b) => {
-      if (sortBy === 'newest')
-        return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
-      if (sortBy === 'oldest')
-        return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
-      if (sortBy === 'salaryHigh') return parseInt(b.salary) - parseInt(a.salary);
-      if (sortBy === 'salaryLow') return parseInt(a.salary) - parseInt(b.salary);
-      return 0;
-    });
+  const sortedJobs = [...jobs].sort((a, b) => {
+    if (sortBy === 'newest')
+      return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+    if (sortBy === 'oldest')
+      return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
+    if (sortBy === 'salaryHigh') return parseInt(b.salary) - parseInt(a.salary);
+    if (sortBy === 'salaryLow') return parseInt(a.salary) - parseInt(b.salary);
+    return 0;
+  });
 
   if (isLoading) return <div className="p-8 text-center">Loading jobs...</div>;
-  if (isError) return <div className="p-8 text-center text-red-600">Failed to load jobs</div>;
+  if (isError)
+    return (
+      <div className="p-8 text-center text-red-600">Failed to load jobs</div>
+    );
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -158,15 +141,25 @@ const AllJobListing = () => {
             <div className="relative flex-1">
               <input
                 type="text"
-                placeholder="Search jobs or internships"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="Search by title or category"
+                value={pendingSearchQuery}
+                onChange={(e) => setPendingSearchQuery(e.target.value)}
+                onKeyDown={handleKeyDown}
                 className="w-full pl-10 pr-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
               />
-              <SearchIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
+              <Search
+                className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
+                size={20}
+              />
             </div>
-            <button className="bg-primary text-white px-6 py-3 rounded-lg hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-primary">
-              Search
+            <button
+              onClick={handleSearchOrClear}
+              className={`px-6 py-3 rounded-lg focus:outline-none focus:ring-2 ${searchQuery || filters.location
+                  ? 'bg-gray-200 text-gray-800 hover:bg-gray-300'
+                  : 'bg-primary text-white hover:bg-primary/90'
+                }`}
+            >
+              {searchQuery || filters.location ? 'Clear' : 'Search'}
             </button>
           </div>
         </div>
@@ -177,14 +170,18 @@ const AllJobListing = () => {
             <div className="flex items-center justify-between">
               <h2 className="text-lg font-bold">Filter</h2>
               <button
-                onClick={() =>
+                onClick={() => {
                   setFilters({
                     location: '',
                     jobType: '',
                     datePosted: '',
-                    level: ''
-                  })
-                }
+                    level: '',
+                  });
+                  setPendingLocation('');
+                  setSearchQuery('');
+                  setPendingSearchQuery('');
+                  setPage(1);
+                }}
                 className="text-md text-primary"
               >
                 Clear All
@@ -193,13 +190,21 @@ const AllJobListing = () => {
 
             <div>
               <label className="block text-sm font-medium mb-1">Location</label>
-              <input
-                type="text"
-                placeholder="City or postcode"
-                className="w-full p-2 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary"
-                value={filters.location}
-                onChange={(e) => setFilters((prev) => ({ ...prev, location: e.target.value }))}
-              />
+              <div className="relative">
+                <input
+                  type="text"
+                  placeholder="City or postcode"
+                  className="w-full p-2 pr-10 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary"
+                  value={pendingLocation}
+                  onChange={(e) => setPendingLocation(e.target.value)}
+                  onKeyDown={handleKeyDown}
+                />
+                <Search
+                  size={18}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 cursor-pointer"
+                  onClick={applyFilters}
+                />
+              </div>
             </div>
 
             <div>
@@ -207,37 +212,15 @@ const AllJobListing = () => {
               <select
                 className="w-full p-2 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary"
                 value={filters.jobType}
-                onChange={(e) => setFilters((prev) => ({ ...prev, jobType: e.target.value }))}
+                onChange={(e) =>
+                  setFilters((prev) => ({ ...prev, jobType: e.target.value }))
+                }
               >
                 <option value="">Choose a Job Type...</option>
                 <option value="Full-time">Full-time</option>
                 <option value="Part-time">Part-time</option>
                 <option value="Internship">Internship</option>
               </select>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium mb-2">Date Posted</label>
-              <div className="space-y-2">
-                {[
-                  { label: 'Last 24 hours', value: '24h' },
-                  { label: 'Last 7 days', value: '7d' },
-                  { label: 'Last 30 days', value: '30d' }
-                ].map(({ label, value }) => (
-                  <label key={value} className="flex items-center gap-2 text-sm">
-                    <input
-                      type="radio"
-                      name="datePosted"
-                      value={value}
-                      checked={filters.datePosted === value}
-                      onChange={(e) =>
-                        setFilters((prev) => ({ ...prev, datePosted: e.target.value }))
-                      }
-                    />
-                    {label}
-                  </label>
-                ))}
-              </div>
             </div>
 
             <div>
@@ -262,9 +245,10 @@ const AllJobListing = () => {
           </div>
 
           {/* Job Cards */}
+
           <div className="flex-1">
             <div className="flex justify-between items-center mb-6">
-              <p className="text-gray-600">Showing {filteredJobs.length} jobs</p>
+              <p className="text-gray-600">Showing {sortedJobs.length} jobs</p>
               <select
                 value={sortBy}
                 onChange={(e) => setSortBy(e.target.value)}
@@ -278,13 +262,19 @@ const AllJobListing = () => {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {filteredJobs.map((job) => (
-                <div key={job._id} className="bg-white rounded-lg shadow-sm p-6 hover:shadow-md transition-shadow">
+              {sortedJobs.map((job) => (
+                <div
+                  key={job._id}
+                  className="bg-white rounded-lg shadow-sm p-6 hover:shadow-md transition-shadow"
+                >
                   <div className="flex justify-between items-start mb-4">
                     <div className="flex gap-3 items-start">
                       {job.employer?.companyLogo && (
                         <img
-                          src={`${MEDIA_URL.replace(/\/$/, '')}/${job.employer.companyLogo.replace(/^\//, '')}`}
+                          src={`${MEDIA_URL.replace(/\/$/, '')}/${job.employer.companyLogo.replace(
+                            /^\//,
+                            ''
+                          )}`}
                           alt="Company Logo"
                           className="w-10 h-10 rounded object-cover"
                         />
@@ -304,9 +294,15 @@ const AllJobListing = () => {
                   </div>
 
                   <div className="text-sm text-gray-500 space-y-1">
-                    <div className="flex items-center"><MapPin className="mr-2" size={16} /> {job.location}</div>
-                    <div className="flex items-center"><Clock className="mr-2" size={16} /> {job.jobtype}</div>
-                    <div className="flex items-center"><DollarSign className="mr-2" size={16} /> {job.salary}</div>
+                    <div className="flex items-center">
+                      <MapPin className="mr-2" size={16} /> {job.location}
+                    </div>
+                    <div className="flex items-center">
+                      <Clock className="mr-2" size={16} /> {job.jobtype}
+                    </div>
+                    <div className="flex items-center">
+                      <DollarSign className="mr-2" size={16} /> {job.salary}
+                    </div>
                   </div>
 
                   <div className="mt-4 flex justify-between items-center text-sm text-gray-500">
@@ -330,7 +326,9 @@ const AllJobListing = () => {
               >
                 Previous
               </button>
-              <span className="px-4 py-2">{page} / {totalPages}</span>
+              <span className="px-4 py-2">
+                {page} / {totalPages}
+              </span>
               <button
                 onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
                 disabled={page === totalPages}
@@ -340,10 +338,11 @@ const AllJobListing = () => {
               </button>
             </div>
 
-            {filteredJobs.length === 0 && (
+            {sortedJobs.length === 0 && (
               <div className="text-center text-gray-500 mt-12">No jobs match your filters.</div>
             )}
           </div>
+          
         </div>
       </div>
     </div>
