@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import {
   Search,
   MapPin,
@@ -9,6 +9,7 @@ import {
   Bookmark,
 } from 'lucide-react';
 import { fetchJobs, fetchSavedJobs, toggleSaveJob } from '../jobseekerApi/api';
+
 
 const getTimeAgo = (dateString: string): string => {
   const diff = Date.now() - new Date(dateString).getTime();
@@ -23,7 +24,11 @@ const getTimeAgo = (dateString: string): string => {
 
 const AllJobListing = () => {
   const navigate = useNavigate();
-  const [pendingSearchQuery, setPendingSearchQuery] = useState('');
+  const [searchParams] = useSearchParams(); // ✅ move this inside the component
+  const initialQuery = searchParams.get('q') || '';
+
+  const [pendingSearchQuery, setPendingSearchQuery] = useState(initialQuery);
+  const [searchQuery, setSearchQuery] = useState(initialQuery);
   const [pendingLocation, setPendingLocation] = useState('');
   const [filters, setFilters] = useState({
     location: '',
@@ -31,7 +36,6 @@ const AllJobListing = () => {
     datePosted: '',
     level: '',
   });
-  const [searchQuery, setSearchQuery] = useState('');
   const [sortBy, setSortBy] = useState('newest');
   const [page, setPage] = useState(1);
   const limit = 6;

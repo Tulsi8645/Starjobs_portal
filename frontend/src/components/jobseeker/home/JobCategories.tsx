@@ -1,4 +1,6 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
+
 import Backend from '../../../assets/jobcategories/backend.svg';
 import Content from '../../../assets/jobcategories/content.svg';
 import Ui from '../../../assets/jobcategories/uiux.svg';
@@ -6,14 +8,12 @@ import Digital from '../../../assets/jobcategories/digital.svg';
 import Frontend from '../../../assets/jobcategories/frontend.svg';
 import Graphic from '../../../assets/jobcategories/graphic.svg';
 
-// Define the type if you're using TypeScript
 type CategoryType = {
   id: string;
   name: string;
   icon: string;
 };
 
-// Mapping icon names to actual imported icons
 const iconMap: { [key: string]: string } = {
   Backend,
   Content,
@@ -23,13 +23,14 @@ const iconMap: { [key: string]: string } = {
   Graphic,
 };
 
-// Helper to render the correct image/icon
 const getIconComponent = (iconName: string) => {
   const iconSrc = iconMap[iconName];
   return <img src={iconSrc} alt={iconName} className="w-12 h-12" />;
 };
 
 const JobCategories: React.FC = () => {
+  const navigate = useNavigate();
+
   const categories: CategoryType[] = [
     { id: '1', name: 'Backend Developer', icon: 'Backend' },
     { id: '2', name: 'Content Writing', icon: 'Content' },
@@ -38,6 +39,11 @@ const JobCategories: React.FC = () => {
     { id: '5', name: 'Frontend Developer', icon: 'Frontend' },
     { id: '6', name: 'Graphic Designing', icon: 'Graphic' },
   ];
+
+  const handleCategoryClick = (categoryName: string) => {
+    const query = encodeURIComponent(categoryName);
+    navigate(`/jobs?q=${query}`);
+  };
 
   return (
     <div className="bg-secondary py-12">
@@ -48,7 +54,8 @@ const JobCategories: React.FC = () => {
           {categories.map((category) => (
             <div
               key={category.id}
-              className="bg-white rounded-lg shadow-card p-4 text-center hover:shadow-card-hover transition-all duration-200 hover:-translate-y-1 aspect-square flex flex-col justify-center items-center w-full max-w-[150px]"
+              className="cursor-pointer bg-white rounded-lg shadow-card p-4 text-center hover:shadow-card-hover transition-all duration-200 hover:-translate-y-1 aspect-square flex flex-col justify-center items-center w-full max-w-[150px]"
+              onClick={() => handleCategoryClick(category.name)}
             >
               <div className="flex justify-center mb-4">
                 {getIconComponent(category.icon)}

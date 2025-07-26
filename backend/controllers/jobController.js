@@ -53,11 +53,11 @@ const getJobs = async (req, res) => {
 
 
 
-// Get latest 3 trending jobs
+// Get latest 6 trending jobs
 const getTrendingJobs = async (req, res) => {
   try {
     const trendingJobs = await Job.find({ istrending: true })
-      .sort({ createdAt: -1 }) // Latest first
+      .sort({ updatedAt: -1 }) // Latest first
       .limit(6)
       .populate("employer", "name companyLogo")
       .lean();

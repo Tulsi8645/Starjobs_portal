@@ -1,8 +1,34 @@
-import React from 'react';
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Search, SlidersHorizontal } from 'lucide-react';
 
 const Hero: React.FC = () => {
-  const staticPopularJobs = ['Frontend Developer', 'Backend Developer', 'UI/UX Designer', 'Data Analyst', 'DevOps Engineer'];
+  const navigate = useNavigate();
+  const [searchInput, setSearchInput] = useState('');
+  const staticPopularJobs = [
+    'Frontend Developer',
+    'Backend Developer',
+    'UI/UX Designer',
+    'Data Analyst',
+    'DevOps Engineer'
+  ];
+
+  const handleSearch = () => {
+    const trimmedQuery = searchInput.trim();
+    if (trimmedQuery) {
+      navigate(`/jobs?q=${encodeURIComponent(trimmedQuery)}`);
+    }
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      handleSearch();
+    }
+  };
+
+  const handlePopularJobClick = (job: string) => {
+    navigate(`/jobs?q=${encodeURIComponent(job)}`);
+  };
 
   return (
     <div className="bg-primary text-white py-16 md:py-20">
@@ -16,11 +42,17 @@ const Hero: React.FC = () => {
               <input
                 type="text"
                 placeholder="Search for jobs or internship"
+                value={searchInput}
+                onChange={(e) => setSearchInput(e.target.value)}
+                onKeyDown={handleKeyDown}
                 className="w-full p-3 pl-10 rounded-lg text-gray-800 focus:outline-none focus:ring-2 focus:ring-primary"
               />
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
             </div>
-            <button className="bg-secondary text-primary p-3 rounded-lg hover:bg-opacity-90 transition-colors duration-200">
+            <button
+              onClick={handleSearch}
+              className="bg-secondary text-primary p-3 rounded-lg hover:bg-opacity-90 transition-colors duration-200"
+            >
               <SlidersHorizontal size={20} />
             </button>
           </div>
@@ -28,13 +60,13 @@ const Hero: React.FC = () => {
           <div className="mt-4 flex flex-wrap justify-center gap-2">
             <span className="text-white/80 mr-2">Popular Jobs:</span>
             {staticPopularJobs.map((job, index) => (
-              <a
+              <button
                 key={index}
-                href={`/jobs?q=${encodeURIComponent(job)}`}
-                className="text-white hover:underline text-sm hover:text-white/90 transition-colors duration-200"
+                onClick={() => handlePopularJobClick(job)}
+                className="text-white hover:underline text-sm hover:text-white/90 transition-colors duration-200 bg-transparent border-none p-0"
               >
                 {job}{index < staticPopularJobs.length - 1 && ","}&nbsp;
-              </a>
+              </button>
             ))}
           </div>
         </div>

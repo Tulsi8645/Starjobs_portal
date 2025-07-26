@@ -34,6 +34,10 @@ import UsersProfile from './components/admin/UsersProfile';
 import JobManagement from './components/admin/JobManagement';
 import EmployerSettings from './components/employer/dashboard/Settings';
 import RevenueManagement from './components/admin/RevenueManagement';
+import Resume from './components/resumeBuilder/Resume';
+import WhiteTemplateEditor from './components/resumeBuilder/WhiteTemplateEditor';
+import GreenTemplateEditor from './components/resumeBuilder/GreenTemplateEditor';
+import BlueTemplateEditor from './components/resumeBuilder/BlueTemplateEditor';
 
 function AppWrapper() {
   const location = useLocation();
@@ -78,6 +82,13 @@ function AppWrapper() {
 
           {/* home routes */}
           <Route path="/" element={<HomePageJobSeeker />} />
+
+          {/* resume builder */}
+          <Route path="/resume" element={<Resume />} />
+          <Route path="/resume/white-sales" element={<WhiteTemplateEditor />} />
+          <Route path="/resume/green-simple" element={<GreenTemplateEditor />} />
+          <Route path="/resume/blue-professional" element={<BlueTemplateEditor />} />
+
 
           {/* jobseeker routes */}
           <Route path="/jobs" element={<AllJobListing />} />
