@@ -8,7 +8,7 @@ const {getAdminProfile, getAdminStats, verifyEmployer, getAllApplicantsForEmploy
 router.get("/profile", authenticate,authorizeAdmin, getAdminProfile);
 
 // Get admin stats
-router.get("/admin-stats", authenticate, authorizeAdmin, getAdminStats);
+router.get("/admin-stats", getAdminStats);
 
 // Verify employer
 router.patch("/verify-employer/:id", authenticate, authorizeAdmin, verifyEmployer);

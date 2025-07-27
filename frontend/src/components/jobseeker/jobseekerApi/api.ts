@@ -40,9 +40,16 @@ interface FetchJobsParams {
   level?: string;
 }
 
+
+
+export const getStats = async () => {
+  const res = await axios.get(`${API_BASE_URL}/api/admin/admin-stats`);
+  return res.data;
+};
+
+
+
 // Fetch all jobs with pagination
-
-
 export const fetchJobs = async ({
   page = 1,
   limit = 6,
