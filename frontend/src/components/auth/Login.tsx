@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Eye, EyeOff } from 'lucide-react';
+import { Eye } from 'lucide-react';
 import googleIcon from '../../assets/authImages/google.png';
 import Logo from '../../assets/star 1.svg';
-import { loginUser } from './authApi/authApi'; 
+import { loginUser } from './authApi/authApi';
 
 const Login: React.FC = () => {
   const navigate = useNavigate();
@@ -22,11 +22,9 @@ const Login: React.FC = () => {
     try {
       const response = await loginUser(formData);
 
-      // Save token to localStorage
       localStorage.setItem('token', response.token);
       window.dispatchEvent(new Event('authChange'));
 
-      // Redirect based on role
       const role = response.role;
       if (role === 'jobseeker') {
         navigate('/');
@@ -56,7 +54,7 @@ const Login: React.FC = () => {
   return (
     <div className="min-h-screen bg-secondary flex items-center justify-center ">
       <div className="max-w-4xl w-full bg-white rounded-lg shadow-card flex">
-        <div className="w-1/2  hidden md:block">
+        <div className="w-1/2 hidden md:block">
           <img
             src="https://images.pexels.com/photos/3184465/pexels-photo-3184465.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"
             alt="Team working together"
@@ -100,23 +98,25 @@ const Login: React.FC = () => {
                 <div className="relative">
                   <input
                     type={showPassword ? 'text' : 'password'}
-                    id="password"
-                    name="password"
                     value={formData.password}
                     onChange={handleChange}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
-                    placeholder="Enter your password"
-                    required
+                    name="password"
+                    placeholder="Enter password"
+                    className="w-full px-3 py-2 pr-10 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
                   />
-                  <button
-                    type="button"
-                    onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500"
-                    aria-label={showPassword ? 'Hide password' : 'Show password'}
-                  >
-                    {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
-                  </button>
+                  <div className="absolute inset-y-0 right-3 flex items-center pointer-events-none">
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="pointer-events-auto text-gray-500"
+                      aria-label="Toggle password visibility"
+                    >
+                      <Eye size={20} />
+                    </button>
+                  </div>
                 </div>
+
+
               </div>
 
               <div className="flex items-center justify-between">

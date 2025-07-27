@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Eye, EyeOff } from 'lucide-react';
+import { Eye } from 'lucide-react';
 import { getJobseekerProfile } from '../jobseekerApi/api';
 import { changePassword } from '../../auth/authApi/authApi';
 
@@ -19,7 +19,6 @@ const UserSettings = () => {
   const [notifications, setNotifications] = useState({
     allNotifications: false,
     applicationStatus: false,
- 
   });
 
   useEffect(() => {
@@ -105,7 +104,7 @@ const UserSettings = () => {
                       onClick={() => setShowOldPassword(!showOldPassword)}
                       className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400"
                     >
-                      {showOldPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                      <Eye size={20} />
                     </button>
                   </div>
                 </div>
@@ -126,7 +125,7 @@ const UserSettings = () => {
                       onClick={() => setShowNewPassword(!showNewPassword)}
                       className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400"
                     >
-                      {showNewPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                      <Eye size={20} />
                     </button>
                   </div>
                 </div>
@@ -147,7 +146,7 @@ const UserSettings = () => {
                       onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                       className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400"
                     >
-                      {showConfirmPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                      <Eye size={20} />
                     </button>
                   </div>
                 </div>

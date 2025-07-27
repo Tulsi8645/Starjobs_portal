@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Eye, EyeOff } from 'lucide-react';
+import { Eye } from 'lucide-react';
 import { getAdminProfile } from './adminApi/api';
 import { changePassword } from '../auth/authApi/authApi';
 
@@ -88,6 +88,7 @@ const AdminSettings = () => {
             <div>
               <h2 className="text-lg font-semibold mb-4">Change your Password</h2>
               <div className="space-y-4">
+                {/* Old Password */}
                 <div>
                   <label className="block text-sm text-gray-600 mb-1">
                     Enter your old password
@@ -103,12 +104,14 @@ const AdminSettings = () => {
                       type="button"
                       onClick={() => setShowOldPassword(!showOldPassword)}
                       className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400"
+                      aria-label="Toggle old password visibility"
                     >
-                      {showOldPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                      <Eye size={20} />
                     </button>
                   </div>
                 </div>
 
+                {/* New Password */}
                 <div>
                   <label className="block text-sm text-gray-600 mb-1">
                     Enter your new password
@@ -124,12 +127,14 @@ const AdminSettings = () => {
                       type="button"
                       onClick={() => setShowNewPassword(!showNewPassword)}
                       className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400"
+                      aria-label="Toggle new password visibility"
                     >
-                      {showNewPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                      <Eye size={20} />
                     </button>
                   </div>
                 </div>
 
+                {/* Confirm Password */}
                 <div>
                   <label className="block text-sm text-gray-600 mb-1">
                     Confirm your password
@@ -145,8 +150,9 @@ const AdminSettings = () => {
                       type="button"
                       onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                       className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400"
+                      aria-label="Toggle confirm password visibility"
                     >
-                      {showConfirmPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                      <Eye size={20} />
                     </button>
                   </div>
                 </div>
@@ -168,10 +174,10 @@ const AdminSettings = () => {
                 {['allNotifications', 'newEmployerRegistration'].map((key) => (
                   <div className="flex items-center justify-between" key={key}>
                     <span>
-                      {{
+                      {({
                         allNotifications: 'All notifications',
                         newEmployerRegistration: 'Notify me on new employer registration',
-                      }[key as keyof typeof notifications]}
+                      }[key as keyof typeof notifications])}
                     </span>
                     <button
                       onClick={() => handleNotificationChange(key as keyof typeof notifications)}

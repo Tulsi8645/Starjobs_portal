@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Eye, EyeOff } from 'lucide-react';
+import { Eye } from 'lucide-react';
 import { getEmployerProfile } from '../employerApi/api';
 import { changePassword } from '../../auth/authApi/authApi';
 
@@ -103,8 +103,9 @@ const EmployerSettings = () => {
                       type="button"
                       onClick={() => setShowOldPassword(!showOldPassword)}
                       className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400"
+                      aria-label="Toggle old password visibility"
                     >
-                      {showOldPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                      <Eye size={20} />
                     </button>
                   </div>
                 </div>
@@ -124,8 +125,9 @@ const EmployerSettings = () => {
                       type="button"
                       onClick={() => setShowNewPassword(!showNewPassword)}
                       className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400"
+                      aria-label="Toggle new password visibility"
                     >
-                      {showNewPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                      <Eye size={20} />
                     </button>
                   </div>
                 </div>
@@ -145,8 +147,9 @@ const EmployerSettings = () => {
                       type="button"
                       onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                       className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400"
+                      aria-label="Toggle confirm password visibility"
                     >
-                      {showConfirmPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                      <Eye size={20} />
                     </button>
                   </div>
                 </div>
