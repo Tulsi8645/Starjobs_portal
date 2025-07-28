@@ -32,11 +32,13 @@ const getAdminStats = async (req, res) => {
     const totalJobseekers = await User.countDocuments({ role: "jobseeker" });
     const totalEmployers = await User.countDocuments({ role: "employer" });
     const totalJobs = await Job.countDocuments();
+    const totalApplications = await Application.countDocuments(); 
 
     res.status(200).json({
       totalJobseekers,
       totalEmployers,
       totalJobs,
+      totalApplications,
     });
   } catch (error) {
     console.error("Error getting admin stats:", error);

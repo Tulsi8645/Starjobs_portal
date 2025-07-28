@@ -14,15 +14,23 @@ const Stats: React.FC = () => {
   return (
     <div className="bg-white py-10">
       <div className="container mx-auto px-4">
-        <div className="grid grid-cols-2 md:grid-cols-3 gap-6 text-center">
-          <div className="p-4">
-            <h3 className="text-3xl md:text-4xl font-bold text-primary mb-1">{stats?.totalJobs}</h3>
-            <p className="text-gray-600">Jobs</p>
-          </div>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
+        
 
           <div className="p-4">
             <h3 className="text-3xl md:text-4xl font-bold text-primary mb-1">{stats?.totalJobseekers}</h3>
             <p className="text-gray-600">Jobseekers</p>
+          </div>
+
+          
+          <div className="p-4">
+            <h3 className="text-3xl md:text-4xl font-bold text-primary mb-1">{stats?.totalJobs}</h3>
+            <p className="text-gray-600"> Active Jobs</p>
+          </div>
+            
+          <div className="p-4">
+            <h3 className="text-3xl md:text-4xl font-bold text-primary mb-1">{stats?.totalApplications}</h3>
+            <p className="text-gray-600">Applications Received</p>
           </div>
 
           <div className="p-4">
