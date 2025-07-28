@@ -12,7 +12,7 @@ const About = () => {
                         className="w-full h-[70%] object-cover rounded-lg shadow-lg"
                     />
                 </div>
-                <div className="w-full md:w-1/2 pl-4 mb-8 md:mb-0 md:pr-8">
+                <div className="w-full md:w-1/2 pl-6 mb-8 md:mb-0 md:pr-8">
                     <h1 className="text-4xl md:text-5xl font-bold mb-4">
                         About Star Jobs
                     </h1>
@@ -38,27 +38,32 @@ const About = () => {
                 <div className="max-w-6xl mx-auto px-6 text-center">
                     <h2 className="text-3xl font-bold mb-8">Our Core Values</h2>
                     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8 text-left">
-                        <div className="bg-white p-6 rounded-lg shadow-md">
-                            <h3 className="text-xl font-semibold mb-2">People First</h3>
-                            <p className="text-gray-600">
-                                We believe that people are the most valuable asset of any organization.
-                            </p>
-                        </div>
-                        <div className="bg-white p-6 rounded-lg shadow-md">
-                            <h3 className="text-xl font-semibold mb-2">Integrity</h3>
-                            <p className="text-gray-600">
-                                We operate with transparency, honesty, and respect in everything we do.
-                            </p>
-                        </div>
-                        <div className="bg-white p-6 rounded-lg shadow-md">
-                            <h3 className="text-xl font-semibold mb-2">Innovation</h3>
-                            <p className="text-gray-600">
-                                We use smart tools and forward-thinking strategies to meet evolving HR needs.
-                            </p>
-                        </div>
+                        {[
+                            {
+                                title: "People First",
+                                desc: "We believe that people are the most valuable asset of any organization.",
+                            },
+                            {
+                                title: "Integrity",
+                                desc: "We operate with transparency, honesty, and respect in everything we do.",
+                            },
+                            {
+                                title: "Innovation",
+                                desc: "We use smart tools and forward-thinking strategies to meet evolving HR needs.",
+                            },
+                        ].map((value, index) => (
+                            <div
+                                key={index}
+                                className="bg-white p-6 rounded-lg shadow-md hover:shadow-lg hover:scale-105 transition-transform duration-300"
+                            >
+                                <h3 className="text-xl font-semibold mb-2">{value.title}</h3>
+                                <p className="text-gray-600">{value.desc}</p>
+                            </div>
+                        ))}
                     </div>
                 </div>
             </div>
+
 
             {/* Contact Section */}
             <div className="bg-white py-16 px-6 md:px-0">
@@ -107,8 +112,7 @@ const About = () => {
                                 ></textarea>
                             </div>
                             <button
-                                type="submit"
-                                className="bg-primary text-white px-6 py-2 rounded-lg shadow hover:bg-blue-700 transition"
+                                className="bg-primary text-white px-6 py-2 rounded-lg shadow hover:bg-primary hover:scale-105 transition"
                             >
                                 Send Message
                             </button>
