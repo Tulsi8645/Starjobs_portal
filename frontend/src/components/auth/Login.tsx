@@ -4,6 +4,7 @@ import { Eye } from 'lucide-react';
 import googleIcon from '../../assets/authImages/google.png';
 import Logo from '../../assets/star 1.svg';
 import { loginUser } from './authApi/authApi';
+import loginimg from '../../assets/authImages/loginimg.webp'
 
 const Login: React.FC = () => {
   const navigate = useNavigate();
@@ -56,7 +57,7 @@ const Login: React.FC = () => {
       <div className="max-w-4xl w-full bg-white rounded-lg shadow-card flex">
         <div className="w-1/2 hidden md:block">
           <img
-            src="https://images.pexels.com/photos/3184465/pexels-photo-3184465.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"
+            src={loginimg}
             alt="Team working together"
             className="w-full h-full object-cover rounded-lg"
           />

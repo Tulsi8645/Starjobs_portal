@@ -38,6 +38,7 @@ import Resume from './components/resumeBuilder/Resume';
 import WhiteTemplateEditor from './components/resumeBuilder/WhiteTemplateEditor';
 import GreenTemplateEditor from './components/resumeBuilder/GreenTemplateEditor';
 import BlueTemplateEditor from './components/resumeBuilder/BlueTemplateEditor';
+import About from './components/jobseeker/user/about';
 
 function AppWrapper() {
   const location = useLocation();
@@ -82,6 +83,7 @@ function AppWrapper() {
 
           {/* home routes */}
           <Route path="/" element={<HomePageJobSeeker />} />
+          <Route path="/about" element={<About />} />
 
           {/* resume builder */}
           <Route path="/resume" element={<Resume />} />
