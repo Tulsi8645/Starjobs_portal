@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import {
   Users,
   Briefcase,
@@ -16,7 +16,12 @@ import {
   Bar,
   CartesianGrid,
 } from "recharts";
-import { getAdminProfile, getAdminStats, getAllJobStatsByDate } from "./adminApi/api";
+import { useQuery } from "@tanstack/react-query";
+import {
+  getAdminProfile,
+  getAdminStats,
+  getAllJobStatsByDate,
+} from "./adminApi/api";
 
 interface Stat {
   id: number;
@@ -41,6 +46,21 @@ interface ChartDataPoint {
   value: number;
 }
 
+interface JobInsights {
+  data: {
+    views: {
+      daily?: any[];
+      weekly?: any[];
+      monthly?: any[];
+    };
+    applications: {
+      daily?: any[];
+      weekly?: any[];
+      monthly?: any[];
+    };
+  };
+}
+
 type TimeFrame = "Day" | "Week" | "Month";
 
 const backendKeyMap = {
@@ -52,23 +72,12 @@ const backendKeyMap = {
 const MEDIA_URL = import.meta.env.VITE_MEDIA_URL || "";
 
 const AdminDashboard = () => {
-  const [profile, setProfile] = useState<AdminProfile>({ name: "Admin" });
-  const [stats, setStats] = useState<Stat[]>([]);
   const [timeFrame, setTimeFrame] = useState<TimeFrame>("Day");
-  const [viewsData, setViewsData] = useState<ChartDataPoint[]>([]);
-  const [applicationsData, setApplicationsData] = useState<ChartDataPoint[]>([]);
 
   const getLabel = (entry: any, frame: TimeFrame) => {
-    if (frame === "Day") {
-      // day/month/year
-      return `${entry._id.day}/${entry._id.month}/${entry._id.year}`;
-    }
-    if (frame === "Week") {
-      return `W${entry._id.week} ${entry._id.year}`;
-    }
-    if (frame === "Month") {
-      return `${entry._id.month}/${entry._id.year}`;
-    }
+    if (frame === "Day") return `${entry._id.day}/${entry._id.month}/${entry._id.year}`;
+    if (frame === "Week") return `W${entry._id.week} ${entry._id.year}`;
+    if (frame === "Month") return `${entry._id.month}/${entry._id.year}`;
     return "";
   };
 
@@ -83,61 +92,54 @@ const AdminDashboard = () => {
       label: getLabel(entry, frame),
       value: entry[key],
     }));
-
-    // If daily, only show last 10 days
-    if (frame === "Day") {
-      // Assuming data is sorted descending, so take first 10 and reverse for chronological
-      data = data.slice(0, 10).reverse();
-    }
-
-    return data;
+    return frame === "Day" ? data.slice(0, 10).reverse() : data;
   };
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const profileData = await getAdminProfile();
-        const statsData: AdminStats = await getAdminStats();
-        const insights = await getAllJobStatsByDate();
+  const { data: profile } = useQuery<AdminProfile>({
+    queryKey: ["adminProfile"],
+    queryFn: getAdminProfile,
+  });
 
-        setProfile({
-          name: profileData.name || "Admin",
-          profilePic: profileData.profilePic,
-        });
+  const { data: statsData } = useQuery<AdminStats>({
+    queryKey: ["adminStats"],
+    queryFn: getAdminStats,
+  });
 
-        setStats([
-          {
-            id: 1,
-            title: "Total Jobseekers",
-            value: statsData.totalJobseekers.toString(),
-            icon: <Users className="text-green-500" size={24} />,
-          },
-          {
-            id: 2,
-            title: "Total Employer",
-            value: statsData.totalEmployers.toString(),
-            icon: <Building className="text-yellow-500" size={24} />,
-          },
-          {
-            id: 3,
-            title: "Active Jobs",
-            value: statsData.totalJobs.toString(),
-            icon: <Briefcase className="text-blue-500" size={24} />,
-          },
-        ]);
+  const { data: insights } = useQuery<JobInsights>({
+    queryKey: ["jobInsights", timeFrame],
+    queryFn: getAllJobStatsByDate,
+  });
 
-        const views = formatChartData(insights.data.views, timeFrame, "totalViews");
-        const applications = formatChartData(insights.data.applications, timeFrame, "totalApplications");
+  const viewsData = insights
+    ? formatChartData(insights.data.views, timeFrame, "totalViews")
+    : [];
 
-        setViewsData(views);
-        setApplicationsData(applications);
-      } catch (error) {
-        console.error("Error fetching admin data:", error);
-      }
-    };
+  const applicationsData = insights
+    ? formatChartData(insights.data.applications, timeFrame, "totalApplications")
+    : [];
 
-    fetchData();
-  }, [timeFrame]);
+  const stats: Stat[] = statsData
+    ? [
+      {
+        id: 1,
+        title: "Total Jobseekers",
+        value: statsData.totalJobseekers.toString(),
+        icon: <Users className="text-green-500" size={24} />,
+      },
+      {
+        id: 2,
+        title: "Total Employer",
+        value: statsData.totalEmployers.toString(),
+        icon: <Building className="text-yellow-500" size={24} />,
+      },
+      {
+        id: 3,
+        title: "Active Jobs",
+        value: statsData.totalJobs.toString(),
+        icon: <Briefcase className="text-blue-500" size={24} />,
+      },
+    ]
+    : [];
 
   return (
     <div className="overflow-auto p-6" style={{ maxHeight: "calc(100vh - 50px)" }}>
@@ -153,7 +155,7 @@ const AdminDashboard = () => {
             </button>
           </div>
           <div className="w-8 h-8 rounded-full overflow-hidden bg-gray-200 flex items-center justify-center">
-            {profile.profilePic ? (
+            {profile?.profilePic ? (
               <img
                 src={`${MEDIA_URL.replace(/\/$/, "")}/${profile.profilePic.replace(/^\//, "")}`}
                 alt={profile.name}
@@ -161,11 +163,11 @@ const AdminDashboard = () => {
               />
             ) : (
               <span className="text-lg font-bold text-gray-600">
-                {profile.name?.charAt(0).toUpperCase()}
+                {profile?.name?.charAt(0).toUpperCase() || "A"}
               </span>
             )}
           </div>
-          <span>{profile.name}</span>
+          <span>{profile?.name || "Admin"}</span>
         </div>
       </div>
 
@@ -191,7 +193,8 @@ const AdminDashboard = () => {
             {(["Day", "Week", "Month"] as TimeFrame[]).map(tf => (
               <button
                 key={tf}
-                className={`px-3 py-1 text-sm rounded ${timeFrame === tf ? "bg-blue-600 text-white" : "bg-gray-100"}`}
+                className={`px-3 py-1 text-sm rounded ${timeFrame === tf ? "bg-blue-600 text-white" : "bg-gray-100"
+                  }`}
                 onClick={() => setTimeFrame(tf)}
               >
                 {tf}
