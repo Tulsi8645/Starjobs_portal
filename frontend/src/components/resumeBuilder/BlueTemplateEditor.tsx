@@ -164,7 +164,7 @@ const BlueTemplateEditor = () => {
 
                         <div className="flex">
                             {/* Left Column */}
-                            <div className="w-1/3 p-6" style={{ backgroundColor: '#323b4c' }}>
+                            <div className="w-1/3 p-6" style={{ backgroundColor: '#27927bff' }}>
                                 <div className="mb-6">
                                     <h3 className="text-lg font-bold text-gray-800 mb-3 border-b-2 border-blue-600 pb-1">CONTACT</h3>
                                     <div className="space-y-2 text-sm">

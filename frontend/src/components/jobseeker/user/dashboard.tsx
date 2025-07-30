@@ -68,8 +68,8 @@ const UserDashboard = () => {
             <div key={stat.id} className="bg-white p-6 rounded-lg shadow-sm">
               <div className="flex justify-between items-center">
                 <div>
-                  <h3 className="text-3xl font-bold">{stat.value}</h3>
-                  <p className="text-gray-600 mt-1">{stat.title}</p>
+                  <h3 className="text-3xl  font-bold">{stat.value}</h3>
+                  <p className="text-primary text-l font-semibold mt-1">{stat.title}</p>
                 </div>
                 <span className="text-2xl">{stat.icon}</span>
               </div>

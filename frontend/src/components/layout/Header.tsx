@@ -1,14 +1,22 @@
 import React, { useState, useEffect } from 'react';
 import { Menu, Home, BriefcaseIcon, Info, FileText } from 'lucide-react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import Sidebar from './Sidebar';
 import StarLogo from '../../assets/star 1.svg';
+import { jwtDecode } from 'jwt-decode';
+
+
+interface DecodedToken {
+  id: string;
+  role: 'jobseeker' | 'employer' | 'admin';
+  exp: number;
+}
 
 const Header: React.FC = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(() => !!localStorage.getItem('token'));
   const location = useLocation();
-
+  const navigate = useNavigate();
 
   useEffect(() => {
     const checkAuth = () => setIsLoggedIn(!!localStorage.getItem('token'));
@@ -17,13 +25,30 @@ const Header: React.FC = () => {
   }, []);
 
   const toggleSidebar = () => {
-    setIsSidebarOpen((open) => !open);
+    const token = localStorage.getItem('token');
+
+    if (token) {
+      try {
+        const decoded: DecodedToken = jwtDecode(token);
+        const role = decoded.role;
+
+        if (role === 'employer') {
+          navigate('/employer/profile');
+        } else if (role === 'admin') {
+          navigate('/admin/dashboard');
+        } else if (role === 'jobseeker') {
+          setIsSidebarOpen((open) => !open);
+        }
+      } catch (error) {
+        console.error('Invalid token format', error);
+      }
+    }
   };
 
   const navItems = [
     { name: 'Home', icon: <Home size={22} />, path: '/' },
     { name: 'Job Listings', icon: <BriefcaseIcon size={22} />, path: '/jobs' },
-    { name: 'Resume Builder', icon: <FileText  size={22} />, path: '/resume' },
+    { name: 'Resume Builder', icon: <FileText size={22} />, path: '/resume' },
     { name: 'About Us', icon: <Info size={22} />, path: '/about' },
   ];
 
@@ -81,8 +106,8 @@ const Header: React.FC = () => {
         </div>
       </div>
 
-      {/* Sidebar (only if logged in) */}
-      {isLoggedIn && (
+      {/* Sidebar (only for jobseeker) */}
+      {isLoggedIn && isSidebarOpen && (
         <Sidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
       )}
     </header>
