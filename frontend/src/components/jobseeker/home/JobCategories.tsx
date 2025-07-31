@@ -50,7 +50,7 @@ const JobCategories: React.FC = () => {
       <div className="container mx-auto px-8 md:px-60 my-20">
         <h2 className="text-2xl font-bold text-center mb-8">Popular Job Category</h2>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-x-4 gap-y-6 justify-items-center">
+        <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 gap-x-4 gap-y-6 justify-items-center">
           {categories.map((category) => (
             <div
               key={category.id}

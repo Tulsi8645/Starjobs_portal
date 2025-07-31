@@ -1,12 +1,20 @@
 ``
 
 import { useEffect, useState } from 'react';
-import { useParams, useNavigate, Link } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import {
   MapPin, Clock, DollarSign, Users, Share2, MoreHorizontal,
   Briefcase, BarChart, ThumbsUp, ThumbsDown
 } from 'lucide-react';
 import { fetchJobById, fetchJobs, likeJob, dislikeJob } from '../jobseekerApi/api';
+import { jwtDecode } from 'jwt-decode';
+
+
+interface DecodedToken {
+  id: string;
+  role: 'jobseeker' | 'employer' | 'admin';
+  exp: number;
+}
 
 interface Employer {
   _id: string;
@@ -36,6 +44,7 @@ interface Job {
 }
 
 const MEDIA_URL = import.meta.env.VITE_MEDIA_URL || '';
+
 
 const JobDetailPage = () => {
   const { id } = useParams<{ id: string }>();
@@ -85,6 +94,30 @@ const JobDetailPage = () => {
 
     loadSimilarJobs();
   }, [job?._id, job?.jobcategory]);
+
+
+  const handleApply = () => {
+    const token = localStorage.getItem('token');
+
+    if (!token) {
+      alert('Please log in to apply.');
+      return;
+    }
+
+    try {
+      const decoded: DecodedToken = jwtDecode(token);
+      if (decoded.role === 'jobseeker') {
+        if (job) {
+          navigate(`/jobs/${job._id}/apply`);
+        }
+      } else {
+        alert('Only jobseekers can apply for jobs.');
+      }
+    } catch (error) {
+      console.error('Invalid token format', error);
+      alert('Authentication error. Please log in again.');
+    }
+  };
 
 
   const handleLike = async () => {
@@ -147,7 +180,7 @@ const JobDetailPage = () => {
                     <span><MapPin size={14} className="inline mr-1" />{job.location}</span>
                     <span><Clock size={14} className="inline mr-1" />{job.jobtype}</span>
                     <span
-                      className={`text-white text-xs font-semibold px-3 py-1 rounded-full
+                      className={`text-white text-xs font-semibold px-2 py-1 rounded-full
                          ${job.status === 'Active' ? 'bg-green-600' :
                           job.status === 'Inactive' ? 'bg-yellow-800' :
                             'bg-gray-500'}`}
@@ -159,11 +192,13 @@ const JobDetailPage = () => {
                 </div>
               </div>
               <div className="flex flex-col items-end space-y-2 ml-4">
-                <Link to={`/jobs/${job._id}/apply`}>
-                  <button className="bg-green-600 text-white px-4 py-2 rounded">
-                    Apply Now
+                  <button
+                    onClick={handleApply}
+                    className="bg-green-600 text-white px-2 py-1 rounded text-sm font-medium"
+                  >
+                    <span className="inline md:hidden">Apply</span>
+                    <span className="hidden md:inline">Apply Now</span>
                   </button>
-                </Link>
                 <div className="flex space-x-2 text-gray-500">
                   <button><Share2 size={18} /></button>
                   <button><MoreHorizontal size={18} /></button>
@@ -221,8 +256,6 @@ const JobDetailPage = () => {
             </div>
           </div>
           
-
-
           {/* Similar Jobs Section */}
           <div className="space-y-6">
             <div className="bg-gray-100 p-4 rounded-lg shadow-sm border-2">

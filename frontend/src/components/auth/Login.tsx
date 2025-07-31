@@ -131,9 +131,9 @@ const Login: React.FC = () => {
                     Remember me
                   </label>
                 </div>
-                <a href="/forgot-password" className="text-sm text-primary hover:text-primary/80">
+                <button onClick={() => navigate('/forgot-password')} className="text-sm text-primary hover:text-primary/80">
                   Forgot password?
-                </a>
+                </button>
               </div>
 
               <button

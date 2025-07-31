@@ -138,7 +138,7 @@ const AllJobListing = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <div className="container mx-auto px-4 py-8">
+      <div className="container mx-auto px-4 md:px-6 lg:px-8 py-8">
         {/* Search */}
         <div className="bg-white rounded-lg shadow-sm p-2 mb-6">
           <div className="flex gap-4">
@@ -158,7 +158,7 @@ const AllJobListing = () => {
             </div>
             <button
               onClick={handleSearchOrClear}
-              className={`px-6 py-3 rounded-lg focus:outline-none focus:ring-2 ${searchQuery || filters.location
+              className={`px-4 py-2 text-sm rounded-md focus:outline-none focus:ring-2 ${searchQuery || filters.location
                   ? 'bg-gray-200 text-gray-800 hover:bg-gray-300'
                   : 'bg-primary text-white hover:bg-primary/90'
                 }`}
@@ -168,9 +168,9 @@ const AllJobListing = () => {
           </div>
         </div>
 
-        <div className="flex gap-8">
+        <div className="flex md:gap-8">
           {/* Filters */}
-          <div className="w-64 rounded-xl bg-gray-100 p-6 space-y-6">
+          <div className="hidden md:block w-64 rounded-xl bg-gray-100 p-6 space-y-6">
             <div className="flex items-center justify-between">
               <h2 className="text-lg font-bold">Filter</h2>
               <button
@@ -214,16 +214,14 @@ const AllJobListing = () => {
             <div>
               <label className="block text-sm font-medium mb-1">Job Type</label>
               <select
-                className="w-full p-2 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary"
-                value={filters.jobType}
-                onChange={(e) =>
-                  setFilters((prev) => ({ ...prev, jobType: e.target.value }))
-                }
+                value={sortBy}
+                onChange={(e) => setSortBy(e.target.value)}
+                className="border rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary text-gray-700"
               >
-                <option value="">Choose a Job Type...</option>
-                <option value="Full-time">Full-time</option>
-                <option value="Part-time">Part-time</option>
-                <option value="Internship">Internship</option>
+                <option value="newest">Newest</option>
+                <option value="oldest">Oldest</option>
+                <option value="salaryHigh">Salary ↑</option>
+                <option value="salaryLow">Salary ↓</option>
               </select>
             </div>
 
@@ -250,9 +248,9 @@ const AllJobListing = () => {
 
           {/* Job Cards */}
 
-          <div className="flex-1">
-            <div className="flex justify-between items-center mb-6">
-              <p className="text-gray-600">Showing {sortedJobs.length} jobs</p>
+          <div className="flex-1 pr-4 md:pr-0">
+            <div className="flex justify-between items-center mb-4">
+              <p className="text-gray-600 text-sm">Showing {sortedJobs.length} jobs</p>
               <select
                 value={sortBy}
                 onChange={(e) => setSortBy(e.target.value)}

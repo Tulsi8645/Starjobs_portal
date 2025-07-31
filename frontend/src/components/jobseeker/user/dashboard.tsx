@@ -33,7 +33,7 @@ const UserDashboard = () => {
           _id: job._id,
           title: job.title,
           location: job.location,
-          type: job.jobtype || 'Full Time',         // use job.jobtype not job.type
+          type: job.jobtype || 'Full Time',  
           applicationStatus: job.applicationStatus || 'Pending',
           appliedAt: job.appliedAt || '',
         }));

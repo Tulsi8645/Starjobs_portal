@@ -7,10 +7,9 @@ const Hero: React.FC = () => {
   const [searchInput, setSearchInput] = useState('');
   const staticPopularJobs = [
     'Frontend Developer',
-    'Backend Developer',
+    'QA Engineer',
     'UI/UX Designer',
     'Data Analyst',
-    'DevOps Engineer'
   ];
 
   const handleSearch = () => {
@@ -45,16 +44,19 @@ const Hero: React.FC = () => {
                 value={searchInput}
                 onChange={(e) => setSearchInput(e.target.value)}
                 onKeyDown={handleKeyDown}
-                className="w-full p-3 pl-10 rounded-lg text-gray-800 focus:outline-none focus:ring-2 focus:ring-primary"
+                className="w-full p-3 pl-10 pr-10 rounded-lg text-gray-800 focus:outline-none focus:ring-2 focus:ring-primary"
               />
+              {/* Left icon */}
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
+
+              {/* Right icon */}
+              <button
+                onClick={handleSearch}
+                className="absolute right-2 top-1/2 transform -translate-y-1/2 text-primary hover:opacity-80 transition-colors duration-200"
+              >
+                <SlidersHorizontal size={20} />
+              </button>
             </div>
-            <button
-              onClick={handleSearch}
-              className="bg-secondary text-primary p-3 rounded-lg hover:bg-opacity-90 transition-colors duration-200"
-            >
-              <SlidersHorizontal size={20} />
-            </button>
           </div>
 
           <div className="mt-4 flex flex-wrap justify-center gap-2">
