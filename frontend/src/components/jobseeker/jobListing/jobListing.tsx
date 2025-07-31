@@ -38,7 +38,7 @@ const AllJobListing = () => {
   });
   const [sortBy, setSortBy] = useState('newest');
   const [page, setPage] = useState(1);
-  const limit = 6;
+  const limit = 9;
 
   const MEDIA_URL = import.meta.env.VITE_MEDIA_URL;
 
