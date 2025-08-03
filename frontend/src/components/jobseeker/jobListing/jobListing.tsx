@@ -24,7 +24,7 @@ const getTimeAgo = (dateString: string): string => {
 
 const AllJobListing = () => {
   const navigate = useNavigate();
-  const [searchParams] = useSearchParams(); // ✅ move this inside the component
+  const [searchParams] = useSearchParams(); 
   const initialQuery = searchParams.get('q') || '';
 
   const [pendingSearchQuery, setPendingSearchQuery] = useState(initialQuery);
@@ -310,7 +310,7 @@ const AllJobListing = () => {
                   <div className="mt-4 flex justify-between items-center text-sm text-gray-500">
                     <span>{getTimeAgo(job.createdAt)}</span>
                     <button
-                      onClick={() => navigate(`/job/${job._id}`)}
+                      onClick={() => navigate(`/jobs/${job._id}`)}
                       className="bg-primary text-white px-4 py-2 rounded-lg text-sm hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-primary"
                     >
                       View Details

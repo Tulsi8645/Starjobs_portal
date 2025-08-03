@@ -94,7 +94,7 @@ function AppWrapper() {
 
           {/* jobseeker routes */}
           <Route path="/jobs" element={<AllJobListing />} />
-          <Route path="/job/:id" element={<JobDetailPage />} />
+          <Route path="/jobs/:id" element={<JobDetailPage />} />
           <Route path="/jobs/:jobId/apply" element={<ApplyPage />} />
 
           {/* jobseeker dashboard */}

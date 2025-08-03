@@ -145,7 +145,7 @@ const UserSavedJobs = () => {
                       <div className="flex items-center space-x-3">
                         <button
                           className="text-primary hover:text-primary/80"
-                          onClick={() => navigate(`/job/${job._id}`)}
+                          onClick={() => navigate(`/jobs/${job._id}`)}
                         >
                           View Details
                         </button>

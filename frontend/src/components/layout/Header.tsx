@@ -65,7 +65,11 @@ const Header: React.FC = () => {
         {/* Desktop Nav */}
         <nav className="hidden md:flex items-center space-x-6">
           {navItems.map((item) => {
-            const isActive = location.pathname === item.path;
+            const isHome = item.path === '/';
+            const isActive = isHome
+              ? location.pathname === '/'
+              : location.pathname.startsWith(item.path);
+
             return (
               <Link
                 key={item.name}
@@ -78,6 +82,8 @@ const Header: React.FC = () => {
               </Link>
             );
           })}
+
+
         </nav>
 
         {/* Right Side Buttons */}

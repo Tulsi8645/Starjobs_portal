@@ -107,7 +107,7 @@ const RecentJobs: React.FC = () => {
 
                   <div className="flex justify-end mt-4">
                     <button
-                      onClick={() => navigate(`/job/${job._id}`)}
+                      onClick={() => navigate(`/jobs/${job._id}`)}
                       className="bg-primary text-white py-2 px-6 rounded-md hover:bg-primary/90 transition-colors duration-200"
                     >
                       View details

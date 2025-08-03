@@ -310,7 +310,7 @@ const JobDetailPage = () => {
 
                         <div className="flex justify-end">
                           <button
-                            onClick={() => navigate(`/job/${sJob._id}`)}
+                            onClick={() => navigate(`/jobs/${sJob._id}`)}
                             className="bg-primary text-white py-2 px-6 rounded-md hover:bg-primary/90 transition-colors duration-200 text-sm font-medium"
                           >
                             View Details
