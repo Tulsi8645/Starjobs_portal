@@ -121,6 +121,18 @@ export const updateJob = async (jobId: string, updatedData: Partial<Job>) => {
 };
 
 
+export const makeAnnouncement = async (data: {
+  message: string;
+  targetRole: "all" | "jobseeker" | "employer";
+}) => {
+  const res = await axios.post(
+    `${API_BASE_URL}/api/notification/announcement`,
+    data,
+    authHeader
+  );
+  return res.data;
+};
+
 export const toggleTrendingStatus = async (jobId: string, istrending: boolean) => {
   const res = await axios.patch(
     `${API_BASE_URL}/api/admin/jobs/${jobId}/trending`,

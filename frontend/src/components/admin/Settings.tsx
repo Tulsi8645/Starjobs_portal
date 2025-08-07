@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Eye } from 'lucide-react';
-import { getAdminProfile } from './adminApi/api';
+import { getAdminProfile, makeAnnouncement } from './adminApi/api';
 import { changePassword } from '../auth/authApi/authApi';
 
 const MEDIA_URL = import.meta.env.VITE_MEDIA_URL || "";
@@ -16,10 +16,11 @@ const AdminSettings = () => {
   const [loading, setLoading] = useState(false);
 
   const [user, setUser] = useState<{ name: string; profilePic: string } | null>(null);
-  const [notifications, setNotifications] = useState({
-    allNotifications: false,
-    newEmployerRegistration: false,
-  });
+
+
+  const [announcementMessage, setAnnouncementMessage] = useState('');
+  const [announcementRole, setAnnouncementRole] = useState<'all' | 'jobseeker' | 'employer'>('all');
+  const [announcementLoading, setAnnouncementLoading] = useState(false);
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -33,13 +34,6 @@ const AdminSettings = () => {
 
     fetchProfile();
   }, []);
-
-  const handleNotificationChange = (key: keyof typeof notifications) => {
-    setNotifications(prev => ({
-      ...prev,
-      [key]: !prev[key]
-    }));
-  };
 
   const handleChangePassword = async () => {
     if (newPassword !== confirmPassword) {
@@ -58,6 +52,30 @@ const AdminSettings = () => {
       alert(err?.message || 'Failed to update password');
     } finally {
       setLoading(false);
+    }
+  };
+
+
+  const handleMakeAnnouncement = async () => {
+    if (!announcementMessage.trim()) {
+      alert("Please enter an announcement message.");
+      return;
+    }
+
+    try {
+      setAnnouncementLoading(true);
+      await makeAnnouncement({
+        message: announcementMessage,
+        targetRole: announcementRole,
+      });
+      alert("Announcement sent successfully.");
+      setAnnouncementMessage('');
+      setAnnouncementRole('all');
+    } catch (err: any) {
+      console.error(err);
+      alert(err?.response?.data?.message || "Failed to send announcement.");
+    } finally {
+      setAnnouncementLoading(false);
     }
   };
 
@@ -167,32 +185,46 @@ const AdminSettings = () => {
               </div>
             </div>
 
-            {/* Notification Settings */}
+            {/* General Announcement Section */}
             <div>
-              <h2 className="text-lg font-semibold mb-4">Notification Setting</h2>
+              <h2 className="text-lg font-semibold mb-4">Make General Announcements</h2>
               <div className="space-y-4">
-                {['allNotifications', 'newEmployerRegistration'].map((key) => (
-                  <div className="flex items-center justify-between" key={key}>
-                    <span>
-                      {({
-                        allNotifications: 'All notifications',
-                        newEmployerRegistration: 'Notify me on new employer registration',
-                      }[key as keyof typeof notifications])}
-                    </span>
-                    <button
-                      onClick={() => handleNotificationChange(key as keyof typeof notifications)}
-                      className={`w-12 h-6 rounded-full transition-colors duration-200 ${notifications[key as keyof typeof notifications] ? 'bg-primary' : 'bg-gray-300'
-                        }`}
-                    >
-                      <div
-                        className={`w-4 h-4 bg-white rounded-full transform transition-transform duration-200 ${notifications[key as keyof typeof notifications] ? 'translate-x-7' : 'translate-x-1'
-                          }`}
-                      />
-                    </button>
-                  </div>
-                ))}
+                <div>
+                  <label className="block text-sm text-gray-600 mb-1">Target Audience</label>
+                  <select
+                    value={announcementRole}
+                    onChange={(e) => setAnnouncementRole(e.target.value as any)}
+                    className="w-full px-3 py-2 border rounded-lg"
+                  >
+                    <option value="all">All Users</option>
+                    <option value="jobseeker">Jobseekers</option>
+                    <option value="employer">Employers</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-sm text-gray-600 mb-1">Announcement Message</label>
+                  <textarea
+                    value={announcementMessage}
+                    onChange={(e) => setAnnouncementMessage(e.target.value)}
+                    rows={4}
+                    className="w-full px-3 py-2 border rounded-lg"
+                    placeholder="Write your message here..."
+                  />
+                </div>
+                <div className="flex justify-end">
+                  <button
+                    onClick={handleMakeAnnouncement}
+                    disabled={announcementLoading}
+                    className="bg-primary p-4 text-white py-2 rounded-lg"
+                  >
+                    {announcementLoading ? 'Sending...' : 'Send Announcement'}
+                  </button>
+                </div>
+
               </div>
             </div>
+
           </div>
         </div>
       </div>

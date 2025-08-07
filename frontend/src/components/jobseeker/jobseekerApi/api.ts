@@ -241,3 +241,29 @@ export const fetchDashboardStats = async (): Promise<{
 
   return response.data;
 };
+
+
+export type JobseekerNotification = {
+  _id: string;
+  message: string;
+  createdAt: string;
+  relatedJob?: string;
+  relatedApplication?: string;
+  relatedRevenue?: string;
+};
+
+export const getJobseekerNotifications = async (): Promise<JobseekerNotification[]> => {
+  const token = localStorage.getItem("token");
+  if (!token) throw new Error("Not authenticated");
+
+  const response = await axios.get(
+    `${API_BASE_URL}/api/notification/jobseeker`,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+
+  return response.data;
+};

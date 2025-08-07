@@ -1,7 +1,12 @@
 import React, { useEffect, useState } from "react";
-import { Eye, Mail, BarChart, Briefcase, UserCheck} from "lucide-react";
-import { format } from 'date-fns';
-import { getAllApplicants, getEmployerDashboardStats } from "../employerApi/api";
+import { Eye, Mail, BarChart, Briefcase, UserCheck, Bell } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
+import { format } from "date-fns";
+import {
+  getAllApplicants,
+  getEmployerDashboardStats,
+  getEmployerNotifications,
+} from "../employerApi/api";
 
 const MEDIA_URL = import.meta.env.VITE_MEDIA_URL || "";
 
@@ -27,8 +32,17 @@ const Dashboard = () => {
   const [stats, setStats] = useState<Stat[]>([]);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
-
   const limit = 5;
+
+  // ✅ React Query for Notifications
+  const {
+    data: notifications = [],
+    isLoading: loadingNotifications,
+    error: notificationsError,
+  } = useQuery({
+    queryKey: ["employerNotifications"],
+    queryFn: getEmployerNotifications,
+  });
 
   useEffect(() => {
     const fetchStats = async () => {
@@ -85,7 +99,6 @@ const Dashboard = () => {
           });
         });
 
-        // Optional: already sorted in backend
         setApplications(flatApps);
         setTotalPages(data.totalPages);
       } catch (err) {
@@ -144,10 +157,12 @@ const Dashboard = () => {
                     {/* Info */}
                     <div className="flex-1 gap-8">
                       <div className="flex items-center gap-4 mb-2">
-                      <p className="font-medium">
-                        {applicant.name || <span className="italic text-gray-400">No name</span>}
-                      </p>
-                      <span className="text-sm text-gray-500">{format(new Date(applicant.appliedAt), 'yyyy/MM/dd')}</span>
+                        <p className="font-medium">
+                          {applicant.name || <span className="italic text-gray-400">No name</span>}
+                        </p>
+                        <span className="text-sm text-gray-500">
+                          {format(new Date(applicant.appliedAt), "yyyy/MM/dd")}
+                        </span>
                       </div>
                       <div className="flex items-center text-sm text-gray-500">
                         <Mail size={14} className="mr-1" />
@@ -181,7 +196,7 @@ const Dashboard = () => {
               )}
             </div>
 
-            {/* Pagination Controls */}
+            {/* Pagination */}
             {totalPages > 1 && (
               <div className="flex justify-between items-center mt-6">
                 <button
@@ -205,10 +220,32 @@ const Dashboard = () => {
             )}
           </div>
 
-          {/* Recent Activities */}
+          {/* ✅ Recent Activities (Notifications) */}
           <div className="bg-white rounded-lg shadow-sm p-6 h-full">
-            <h2 className="text-lg font-semibold mb-4">Recent Activities</h2>
-            <p className="text-gray-500 text-sm">No recent activities</p>
+            <div className="flex gap-2">
+              <h2 className="text-lg font-semibold mb-4">Recent Notifications</h2>
+              <Bell size={20} className="text-primary mt-1" />   
+            </div>
+
+            {loadingNotifications ? (
+              <p className="text-gray-500 text-sm">Loading...</p>
+            ) : notificationsError ? (
+              <p className="text-red-500 text-sm">Failed to load notifications</p>
+            ) : notifications.length === 0 ? (
+              <p className="text-gray-500 text-sm">No notifications</p>
+            ) : (
+              <ul className="space-y-4">
+                {notifications.slice(0, 5).map((notif) => (
+                  <li key={notif._id} className="flex items-start space-x-2">
+                    
+                    <div className=" border-b mb-2">
+                      <p className="font-medium text-blue-600 hover:text-blue-800">{notif.message}</p>
+                      <p className="text-xs text-gray-500">{format(new Date(notif.createdAt), "yyyy/MM/dd HH:mm")}</p>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            )}
           </div>
         </div>
       </div>

@@ -4,6 +4,8 @@ const Employer = require("../models/Employer");
 const sendMail = require("../utils/sendMail");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
+const sendNotification = require("../utils/sendNotifications");
+
 
 // Register User
 const registerUser = async (req, res) => {
@@ -46,7 +48,9 @@ const registerUser = async (req, res) => {
   try {
     const existingUser = await User.findOne({ email });
     if (existingUser) {
-      return res.status(409).json({ message: "User with this email already exists." });
+      return res
+        .status(409)
+        .json({ message: "User with this email already exists." });
     }
 
     const salt = await bcrypt.genSalt(10);
@@ -73,7 +77,9 @@ const registerUser = async (req, res) => {
           parsedSkills = JSON.parse(skills);
         } catch (e) {
           console.error("Failed to parse skills JSON:", skills, e);
-          return res.status(400).json({ message: "Invalid format for skills." });
+          return res
+            .status(400)
+            .json({ message: "Invalid format for skills." });
         }
       }
 
@@ -82,8 +88,14 @@ const registerUser = async (req, res) => {
         try {
           parsedQualifications = JSON.parse(qualifications);
         } catch (e) {
-          console.error("Failed to parse qualifications JSON:", qualifications, e);
-          return res.status(400).json({ message: "Invalid format for qualifications." });
+          console.error(
+            "Failed to parse qualifications JSON:",
+            qualifications,
+            e
+          );
+          return res
+            .status(400)
+            .json({ message: "Invalid format for qualifications." });
         }
       }
 
@@ -93,7 +105,9 @@ const registerUser = async (req, res) => {
           parsedExperiences = JSON.parse(experiences);
         } catch (e) {
           console.error("Failed to parse experiences JSON:", experiences, e);
-          return res.status(400).json({ message: "Invalid format for experiences." });
+          return res
+            .status(400)
+            .json({ message: "Invalid format for experiences." });
         }
       }
 
@@ -137,6 +151,22 @@ const registerUser = async (req, res) => {
     await user.save();
 
     await sendMail(email, "Verify your email", `Your OTP code is ${otp}`);
+
+    // Send notification to  admins if a new employer registers
+    if (role === "employer") {
+      const admins = await User.find({ role: "admin" });
+
+      for (const admin of admins) {
+        await sendNotification({
+          recipient: admin._id,
+          type: "employer_registration",
+          message: `A new employer "${user.name}" has registered and is awaiting verification.`,
+          relatedJob: null,
+          relatedApplication: null,
+          relatedRevenue: null,
+        });
+      }
+    }
 
     res.status(201).json({ message: "User registered successfully!" });
   } catch (error) {
@@ -215,15 +245,20 @@ const forgotPassword = async (req, res) => {
   }
 };
 
+
 const resetPassword = async (req, res) => {
   const { email, otp, newPassword } = req.body;
 
   if (!email || !otp || !newPassword) {
-    return res.status(400).json({ message: "Email, OTP, and new password are required" });
+    return res
+      .status(400)
+      .json({ message: "Email, OTP, and new password are required" });
   }
 
   if (newPassword.length < 6) {
-    return res.status(400).json({ message: "Password must be at least 6 characters" });
+    return res
+      .status(400)
+      .json({ message: "Password must be at least 6 characters" });
   }
 
   try {
@@ -232,17 +267,27 @@ const resetPassword = async (req, res) => {
     if (!user) return res.status(404).json({ message: "User not found" });
 
     if (user.otpCode !== otp || user.otpExpires < Date.now()) {
+      await sendNotification({
+        recipient: user._id,
+        type: "password_reset",
+        message:
+          "Unsuccessful password reset attempt due to invalid or expired OTP",
+      });
       return res.status(400).json({ message: "Invalid or expired OTP" });
     }
 
     const salt = await bcrypt.genSalt(10);
     user.password = await bcrypt.hash(newPassword, salt);
-
-    // Clear OTP fields
     user.otpCode = undefined;
     user.otpExpires = undefined;
 
     await user.save();
+
+    await sendNotification({
+      recipient: user._id,
+      type: "password_reset",
+      message: "Your password was successfully reset",
+    });
 
     res.json({ message: "Password reset successful" });
   } catch (error) {
@@ -252,15 +297,19 @@ const resetPassword = async (req, res) => {
 };
 
 const changePassword = async (req, res) => {
-  const userId = req.user?.id; // authenticated user ID
+  const userId = req.user?.id;
   const { currentPassword, newPassword } = req.body;
 
   if (!currentPassword || !newPassword) {
-    return res.status(400).json({ message: "Current and new passwords are required" });
+    return res
+      .status(400)
+      .json({ message: "Current and new passwords are required" });
   }
 
   if (newPassword.length < 6) {
-    return res.status(400).json({ message: "New password must be at least 6 characters" });
+    return res
+      .status(400)
+      .json({ message: "New password must be at least 6 characters" });
   }
 
   try {
@@ -270,17 +319,33 @@ const changePassword = async (req, res) => {
 
     const isMatch = await bcrypt.compare(currentPassword, user.password);
     if (!isMatch) {
+      await sendNotification({
+        recipient: user._id,
+        type: "password_change",
+        message:
+          "Unsuccessful password change attempt with incorrect current password",
+      });
       return res.status(401).json({ message: "Current password is incorrect" });
     }
 
     const isSamePassword = await bcrypt.compare(newPassword, user.password);
     if (isSamePassword) {
-      return res.status(400).json({ message: "New password cannot be the same as the current password" });
+      return res
+        .status(400)
+        .json({
+          message: "New password cannot be the same as the current password",
+        });
     }
 
     const salt = await bcrypt.genSalt(10);
     user.password = await bcrypt.hash(newPassword, salt);
     await user.save();
+
+    await sendNotification({
+      recipient: user._id,
+      type: "password_change",
+      message: "Your password was successfully changed",
+    });
 
     res.json({ message: "Password changed successfully" });
   } catch (error) {
@@ -288,5 +353,6 @@ const changePassword = async (req, res) => {
     res.status(500).json({ message: "Server error" });
   }
 };
+
 
 module.exports = { registerUser, loginUser, forgotPassword, resetPassword, changePassword };

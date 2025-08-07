@@ -2,6 +2,7 @@ const Job = require("../models/Job");
 const Application = require("../models/Application");
 const User = require("../models/User");
 const Jobseeker = require("../models/Jobseeker");
+const sendNotification = require("../utils/sendNotifications");
 
 // Get All Jobs
 const getJobs = async (req, res) => {
@@ -186,12 +187,11 @@ const applyInJob = async (req, res) => {
   const { jobId, howDidYouHear, coverLetter } = req.body;
   const jobseekerId = req.user.id;
 
-  // Make sure multer uploaded the file
   if (!req.file) {
     return res.status(400).json({ message: "Resume file is required." });
   }
 
-  const resumePath = req.file.path; // multer sets this automatically
+  const resumePath = req.file.path;
 
   try {
     const user = await User.findById(jobseekerId);
@@ -199,7 +199,7 @@ const applyInJob = async (req, res) => {
       return res.status(403).json({ message: "Unauthorized" });
     }
 
-    const job = await Job.findById(jobId);
+    const job = await Job.findById(jobId).populate("employer"); 
     if (!job) {
       return res.status(404).json({ message: "Job not found" });
     }
@@ -220,15 +220,26 @@ const applyInJob = async (req, res) => {
       applicant: jobseekerId,
       howDidYouHear,
       coverLetter,
-      resume: resumePath,  // Use the uploaded file path here
+      resume: resumePath,
     });
 
     await application.save();
 
-    // Optional: update job.jobseekers list
+    // Update job's jobseekers list
     await Job.findByIdAndUpdate(jobId, {
       $addToSet: { jobseekers: jobseekerId },
     });
+
+    // Send notification to the employer
+    if (job.employer && job.employer._id) {
+      await sendNotification({
+        recipient: job.employer._id,
+        type: "job_application",
+        message: `${user.name} applied to your job: ${job.title}`,
+        relatedJob: job._id,
+        relatedApplication: application._id,
+      });
+    }
 
     res.status(201).json({ message: "Application submitted successfully" });
   } catch (error) {

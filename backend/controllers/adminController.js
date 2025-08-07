@@ -3,6 +3,7 @@ const User = require("../models/User");
 const Jobseeker = require("../models/Jobseeker");
 const Employer = require("../models/Employer");
 const Application = require("../models/Application");
+const sendNotification = require("../utils/sendNotifications");
 const fs = require("fs");
 const path = require("path");
 
@@ -47,6 +48,7 @@ const getAdminStats = async (req, res) => {
 };
 
 // Verify Employer
+
 const verifyEmployer = async (req, res) => {
   const userId = req.params.id;
 
@@ -58,6 +60,15 @@ const verifyEmployer = async (req, res) => {
 
     user.isVerified = !user.isVerified;
     await user.save();
+
+    // Send notification to the employer
+    await sendNotification({
+      recipient: user._id,
+      type: "account_verification",
+      message: user.isVerified
+        ? "Your account has been verified by Star Jobs."
+        : "Your account has been banned Star Jobs.",
+    });
 
     res.json({
       message: user.isVerified

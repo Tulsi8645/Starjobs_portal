@@ -3,6 +3,7 @@ const Job = require("../models/Job");
 const User = require("../models/User");
 const Employer = require("../models/Employer");
 const Application = require("../models/Application");
+const sendNotification = require("../utils/sendNotifications");
 const fs = require("fs");
 const path = require("path");
 
@@ -127,6 +128,18 @@ const createJob = async (req, res) => {
     });
 
     await job.save();
+
+    // Notify  admins about new job posting
+    const admins = await User.find({ role: "admin" });
+    for (const admin of admins) {
+      await sendNotification({
+        recipient: admin._id,
+        type: "job_post",
+        message: `Employer "${employer.name}" posted a new job: "${title}"`,
+        relatedJob: job._id,
+      });
+    }
+
     res.status(201).json(job);
   } catch (error) {
     console.error("Error creating job:", error);
@@ -135,7 +148,9 @@ const createJob = async (req, res) => {
 };
 
 
+
 // Edit Job
+
 const editJob = async (req, res) => {
   const { jobId } = req.params;
   const employerId = req.user.id;
@@ -153,7 +168,9 @@ const editJob = async (req, res) => {
         .json({ message: "Not authorized to edit this job" });
     }
 
-    // Update only fields present in req.body
+    const previousStatus = job.status;
+
+    // Updatable fields
     const updatableFields = [
       "title",
       "location",
@@ -176,6 +193,22 @@ const editJob = async (req, res) => {
     });
 
     await job.save();
+
+    // Send notifications if status changed
+    if (req.body.status && req.body.status !== previousStatus) {
+      const applications = await Application.find({ job: job._id });
+
+      const notifications = applications.map((app) => ({
+        recipient: app.applicant, 
+        type: "job_status_update",
+        message: `The status of the job "${job.title}" has been updated to "${job.status}".`,
+        relatedJob: job._id,
+        relatedApplication: app._id,
+      }));
+
+      await Notification.insertMany(notifications);
+    }
+
     res.json(job);
   } catch (error) {
     console.error("Error editing job:", error);
@@ -196,19 +229,36 @@ const updateApplication = async (req, res) => {
 
   try {
     // Find the application
-    const application = await Application.findById(applicationId).populate("job");
+    const application = await Application.findById(applicationId)
+      .populate("job")
+      .populate("applicant");
     if (!application) {
       return res.status(404).json({ message: "Application not found" });
     }
 
     // Check if the employer owns the job related to the application
     if (application.job.employer.toString() !== employerId) {
-      return res.status(403).json({ message: "Not authorized to update this application" });
+      return res
+        .status(403)
+        .json({ message: "Not authorized to update this application" });
     }
 
     // Update status
     application.status = status;
     await application.save();
+
+    // Create a notification for the jobseeker
+    const notification = new Notification({
+      recipient: application.applicant._id,
+      type: "application_update",
+      message: `Your application for "${
+        application.job.title
+      }" has been ${status.toLowerCase()}.`,
+      relatedJob: application.job._id,
+      relatedApplication: application._id,
+    });
+
+    await notification.save();
 
     res.json({
       message: "Application status updated successfully",

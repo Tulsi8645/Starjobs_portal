@@ -208,3 +208,31 @@ export const getAllApplicants = async (page = 1, limit = 5) => {
 
   return res.data;
 };
+
+
+
+
+export type EmployerNotification = {
+  _id: string;
+  message: string;
+  createdAt: string;
+  relatedJob?: string;
+  relatedApplication?: string;
+  relatedRevenue?: string;
+};
+
+export const getEmployerNotifications = async (): Promise<EmployerNotification[]> => {
+  const token = localStorage.getItem("token");
+  if (!token) throw new Error("Not authenticated");
+
+  const response = await axios.get(
+    `${API_BASE_URL}/api/notification/employer`,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+
+  return response.data;
+};
