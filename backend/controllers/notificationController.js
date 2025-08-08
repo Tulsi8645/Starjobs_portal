@@ -1,21 +1,33 @@
 const User = require("../models/User");
 const Notification = require("../models/Notification");
+const Announcement = require("../models/Announcement");
+
 
 exports.getJobseekerNotifications = async (req, res) => {
   try {
+    // Fetch user-specific notifications
     const notifications = await Notification.find({ recipient: req.user.id })
       .sort({ createdAt: -1 })
       .populate("relatedJob")
       .populate("relatedApplication")
       .populate("relatedRevenue");
 
-    res.json(notifications);
+    // Fetch announcements for jobseekers and all users
+    const announcements = await Announcement.find({
+      targetRole: { $in: ["jobseeker", "all"] },
+    }).sort({ createdAt: -1 });
+
+    // Merge and sort by date
+    const merged = [...notifications, ...announcements].sort(
+      (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+    );
+
+    res.json(merged);
   } catch (error) {
-    console.error("Error fetching notifications:", error);
+    console.error("Error fetching jobseeker notifications:", error);
     res.status(500).json({ message: "Server error" });
   }
 };
-
 
 exports.getEmployerNotifications = async (req, res) => {
   try {
@@ -25,13 +37,20 @@ exports.getEmployerNotifications = async (req, res) => {
       .populate("relatedApplication")
       .populate("relatedRevenue");
 
-    res.json(notifications);
+    const announcements = await Announcement.find({
+      targetRole: { $in: ["employer", "all"] },
+    }).sort({ createdAt: -1 });
+
+    const merged = [...notifications, ...announcements].sort(
+      (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+    );
+
+    res.json(merged);
   } catch (error) {
     console.error("Error fetching employer notifications:", error);
     res.status(500).json({ message: "Server error" });
   }
 };
-
 
 exports.getAdminNotifications = async (req, res) => {
   try {
@@ -41,13 +60,20 @@ exports.getAdminNotifications = async (req, res) => {
       .populate("relatedApplication")
       .populate("relatedRevenue");
 
-    res.json(notifications);
+    const announcements = await Announcement.find({
+      targetRole: { $in: ["admin", "all"] },
+    }).sort({ createdAt: -1 });
+
+    const merged = [...notifications, ...announcements].sort(
+      (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+    );
+
+    res.json(merged);
   } catch (error) {
     console.error("Error fetching admin notifications:", error);
     res.status(500).json({ message: "Server error" });
   }
 };
-
 
 
 
@@ -61,31 +87,17 @@ exports.generalAnnouncement = async (req, res) => {
   }
 
   try {
-    let filter = {};
-
-    if (targetRole && targetRole !== "all") {
-      filter.role = targetRole;
-    }
-
-    const users = await User.find(filter);
-
-    if (!users.length) {
-      return res
-        .status(404)
-        .json({ message: "No users found for this announcement" });
-    }
-
-    const notifications = users.map((user) => ({
-      recipient: user._id,
-      type: "general_announcement",
+    const announcement = new Announcement({
       message,
-    }));
+      targetRole: targetRole || "all",
+      createdBy: req.user._id, 
+    });
 
-    await Notification.insertMany(notifications);
+    await announcement.save();
 
     res
       .status(201)
-      .json({ message: `Announcement sent to ${users.length} user(s)` });
+      .json({ message: "Announcement created successfully", announcement });
   } catch (error) {
     console.error("Error creating announcement:", error);
     res.status(500).json({ message: "Server error" });

@@ -103,7 +103,7 @@ const Login: React.FC = () => {
                     onChange={handleChange}
                     name="password"
                     placeholder="Enter password"
-                    className="w-full px-3 py-2 pr-10 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+                    className="w-full px-3 py-2 border rounded-lg rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
                   />
                   <div className="absolute inset-y-0 right-3 flex items-center pointer-events-none">
                     <button
