@@ -2,9 +2,42 @@ import React from 'react';
 import StarFooter from '../../assets/star 2.svg';
 import { Home, User, BriefcaseIcon, Linkedin, Facebook, Twitter } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import {jwtDecode} from 'jwt-decode';
+
+interface DecodedToken {
+  id: string;
+  role: 'jobseeker' | 'employer' | 'admin';
+  exp: number;
+}
 
 const Footer: React.FC = () => {
   const navigate = useNavigate();
+
+  // Check authentication and role
+  const token = localStorage.getItem('token');
+  let role: string | null = null;
+  let isAuthenticated = false;
+
+  if (token) {
+    try {
+      const decoded = jwtDecode<DecodedToken>(token);
+      // Check if token expired
+      if (decoded.exp * 1000 > Date.now()) {
+        isAuthenticated = true;
+        role = decoded.role;
+      }
+    } catch (error) {
+      console.error('Invalid token', error);
+    }
+  }
+
+  const handleProtectedNavigation = (path: string, allowedRole: string) => {
+    if (isAuthenticated && role === allowedRole) {
+      navigate(path);
+    } else {
+      alert('Access denied. Please log in with the correct account.');
+    }
+  };
 
   return (
     <footer className="bg-dark text-white py-12">
@@ -60,7 +93,7 @@ const Footer: React.FC = () => {
               </li>
               <li
                 className="text-gray-300 hover:text-white cursor-pointer"
-                onClick={() => navigate('/user/dashboard')}
+                onClick={() => handleProtectedNavigation('/user/dashboard', 'jobseeker')}
               >
                 Jobseeker Dashboard
               </li>
@@ -72,19 +105,19 @@ const Footer: React.FC = () => {
             <ul className="space-y-2">
               <li
                 className="text-gray-300 hover:text-white cursor-pointer"
-                onClick={() => navigate('/employer/postjob')}
+                onClick={() => handleProtectedNavigation('/employer/postjob', 'employer')}
               >
                 Post Jobs
               </li>
               <li
                 className="text-gray-300 hover:text-white cursor-pointer"
-                onClick={() => navigate('/employer/insight')}
+                onClick={() => handleProtectedNavigation('/employer/insight', 'employer')}
               >
                 Insights
               </li>
               <li
                 className="text-gray-300 hover:text-white cursor-pointer"
-                onClick={() => navigate('/employer/dashboard')}
+                onClick={() => handleProtectedNavigation('/employer/dashboard', 'employer')}
               >
                 Employer Dashboard
               </li>
