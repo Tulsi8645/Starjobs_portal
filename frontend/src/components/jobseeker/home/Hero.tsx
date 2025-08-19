@@ -47,7 +47,10 @@ const Hero: React.FC = () => {
                 className="w-full p-3 pl-10 pr-10 rounded-lg text-gray-800 focus:outline-none focus:ring-2 focus:ring-primary"
               />
               {/* Left icon */}
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
+              <Search
+                className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
+                size={18}
+              />
 
               {/* Right icon */}
               <button
@@ -67,7 +70,8 @@ const Hero: React.FC = () => {
                 onClick={() => handlePopularJobClick(job)}
                 className="text-white hover:underline text-sm hover:text-white/90 transition-colors duration-200 bg-transparent border-none p-0"
               >
-                {job}{index < staticPopularJobs.length - 1 && ","}&nbsp;
+                {job}
+                {index < staticPopularJobs.length - 1 && ','}&nbsp;
               </button>
             ))}
           </div>

@@ -40,7 +40,7 @@ const Footer: React.FC = () => {
   };
 
   return (
-    <footer className="bg-dark text-white py-12">
+    <footer className="bg-primary text-white py-12">
       <div className="container mx-auto px-4 md:px-6">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           <div>
@@ -53,21 +53,21 @@ const Footer: React.FC = () => {
             <h3 className="text-lg font-semibold mb-4">Quick Links</h3>
             <ul className="space-y-2">
               <li
-                className="text-gray-300 hover:text-white flex items-center cursor-pointer"
+                className="text-white hover:text-white flex items-center cursor-pointer"
                 onClick={() => navigate('/')}
               >
                 <Home size={16} className="mr-2" />
                 Home
               </li>
               <li
-                className="text-gray-300 hover:text-white flex items-center cursor-pointer"
+                className="text-white hover:text-white flex items-center cursor-pointer"
                 onClick={() => navigate('/jobs')}
               >
                 <BriefcaseIcon size={16} className="mr-2" />
                 Job Listings
               </li>
               <li
-                className="text-gray-300 hover:text-white flex items-center cursor-pointer"
+                className="text-white hover:text-white flex items-center cursor-pointer"
                 onClick={() => navigate('/about')}
               >
                 <User size={16} className="mr-2" />
@@ -80,19 +80,19 @@ const Footer: React.FC = () => {
             <h3 className="text-lg font-semibold mb-4">For Job Seekers</h3>
             <ul className="space-y-2">
               <li
-                className="text-gray-300 hover:text-white cursor-pointer"
+                className="text-white hover:text-white cursor-pointer"
                 onClick={() => navigate('/resume')}
               >
                 Build your CV
               </li>
               <li
-                className="text-gray-300 hover:text-white cursor-pointer"
+                className="text-white hover:text-white cursor-pointer"
                 onClick={() => navigate('/jobs')}
               >
                 Find Jobs
               </li>
               <li
-                className="text-gray-300 hover:text-white cursor-pointer"
+                className="text-white hover:text-white cursor-pointer"
                 onClick={() => handleProtectedNavigation('/user/dashboard', 'jobseeker')}
               >
                 Jobseeker Dashboard
@@ -104,19 +104,19 @@ const Footer: React.FC = () => {
             <h3 className="text-lg font-semibold mb-4">For Job Provider</h3>
             <ul className="space-y-2">
               <li
-                className="text-gray-300 hover:text-white cursor-pointer"
+                className="text-white hover:text-white cursor-pointer"
                 onClick={() => handleProtectedNavigation('/employer/postjob', 'employer')}
               >
                 Post Jobs
               </li>
               <li
-                className="text-gray-300 hover:text-white cursor-pointer"
+                className="text-white hover:text-white cursor-pointer"
                 onClick={() => handleProtectedNavigation('/employer/insight', 'employer')}
               >
                 Insights
               </li>
               <li
-                className="text-gray-300 hover:text-white cursor-pointer"
+                className="text-white hover:text-white cursor-pointer"
                 onClick={() => handleProtectedNavigation('/employer/dashboard', 'employer')}
               >
                 Employer Dashboard
@@ -125,24 +125,24 @@ const Footer: React.FC = () => {
           </div>
         </div>
 
-        <div className="mt-8 pt-8 border-t border-gray-700 flex flex-col md:flex-row justify-between items-center">
-          <p className="text-gray-400 text-sm">© 2025 Star Euro Group. All rights reserved.</p>
+        <div className="mt-8 pt-8 border-t border-white flex flex-col md:flex-row justify-between items-center">
+          <p className="text-white text-sm">© 2025 Star Euro Group. All rights reserved.</p>
 
           <div className="flex space-x-4 mt-4 md:mt-0">
             <span
-              className="text-gray-400 hover:text-white transition-colors duration-200 cursor-pointer"
+              className="text-white hover:text-white transition-colors duration-200 cursor-pointer"
               onClick={() => window.open('#', '_blank')}
             >
               <Linkedin size={20} />
             </span>
             <span
-              className="text-gray-400 hover:text-white transition-colors duration-200 cursor-pointer"
+              className="text-white hover:text-white transition-colors duration-200 cursor-pointer"
               onClick={() => window.open('#', '_blank')}
             >
               <Facebook size={20} />
             </span>
             <span
-              className="text-gray-400 hover:text-white transition-colors duration-200 cursor-pointer"
+              className="text-white hover:text-white transition-colors duration-200 cursor-pointer"
               onClick={() => window.open('#', '_blank')}
             >
               <Twitter size={20} />

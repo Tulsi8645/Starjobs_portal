@@ -53,7 +53,7 @@ const Resume = () => {
     return (
         <div className="min-h-screen">
             {/* Hero Section */}
-            <div className="bg-gradient-to-br from-indigo-900 via-purple-900 to-pink-800 text-white">
+            <div className="bg-gradient-to-br from-indigo-900 via-amber-900 to-gray-800 text-white">
                 <div className="container mx-auto px-6 py-20">
                     <div className="text-center max-w-4xl mx-auto">
                         <div className="flex justify-center mb-6">
