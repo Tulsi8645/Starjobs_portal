@@ -39,6 +39,7 @@ import WhiteTemplateEditor from './components/resumeBuilder/WhiteTemplateEditor'
 import GreenTemplateEditor from './components/resumeBuilder/GreenTemplateEditor';
 import BlueTemplateEditor from './components/resumeBuilder/BlueTemplateEditor';
 import About from './components/jobseeker/user/about';
+import { BlogList, BlogDetail, BlogCreate, BlogEdit } from './components/blog';
 
 function AppWrapper() {
   const location = useLocation();
@@ -91,6 +92,11 @@ function AppWrapper() {
           <Route path="/resume/green-simple" element={<GreenTemplateEditor />} />
           <Route path="/resume/blue-professional" element={<BlueTemplateEditor />} />
 
+          {/* blog routes */}
+          <Route path="/blog" element={<BlogList />} />
+          <Route path="/blog/create" element={<BlogCreate />} />
+          <Route path="/blog/edit/:id" element={<BlogEdit />} />
+          <Route path="/blog/:id" element={<BlogDetail />} />
 
           {/* jobseeker routes */}
           <Route path="/jobs" element={<AllJobListing />} />

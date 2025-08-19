@@ -6,7 +6,9 @@ import {
   LayoutDashboard,
   Bookmark,
   Settings,
-  LogOut
+  LogOut,
+  BookOpen,
+  PlusCircle
 } from 'lucide-react';
 
 interface SidebarItem {
@@ -20,8 +22,10 @@ const sidebarItems: SidebarItem[] = [
   { id: '1', name: 'Profile', icon: <User size={24} />, path: '/user/profile' },
   { id: '2', name: 'Dashboard', icon: <LayoutDashboard size={24} />, path: '/user/dashboard' },
   { id: '3', name: 'Saved Jobs', icon: <Bookmark size={24} />, path: '/user/savedjobs' },
-  { id: '4', name: 'Settings', icon: <Settings size={24} />, path: '/user/settings' },
-  { id: '5', name: 'Logout', icon: <LogOut size={24} />, path: '/logout' }
+  { id: '4', name: 'My Blogs', icon: <BookOpen size={24} />, path: '/blog?user=true' },
+  { id: '5', name: 'Create Blog', icon: <PlusCircle size={24} />, path: '/blog/create' },
+  { id: '6', name: 'Settings', icon: <Settings size={24} />, path: '/user/settings' },
+  { id: '7', name: 'Logout', icon: <LogOut size={24} />, path: '/logout' }
 ];
 
 interface SidebarProps {

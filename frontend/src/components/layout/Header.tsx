@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Menu, Home, BriefcaseIcon, Info, FileText } from 'lucide-react';
+import { Menu, Home, BriefcaseIcon, Info, FileText, BookOpen } from 'lucide-react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import Sidebar from './Sidebar';
 import StarLogo from '../../assets/star 1.svg';
@@ -48,6 +48,7 @@ const Header: React.FC = () => {
   const navItems = [
     { name: 'Home', icon: <Home size={22} />, path: '/' },
     { name: 'Job Listings', icon: <BriefcaseIcon size={22} />, path: '/jobs' },
+    { name: 'Feeds', icon: <BookOpen size={22} />, path: '/blog' },
     { name: 'Resume Builder', icon: <FileText size={22} />, path: '/resume' },
     { name: 'About Us', icon: <Info size={22} />, path: '/about' },
   ];
