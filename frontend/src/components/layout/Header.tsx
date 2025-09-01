@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { Menu, Home, BriefcaseIcon, Info, FileText, BookOpen } from 'lucide-react';
+import React, { useState, useEffect, useRef } from 'react';
+import { Menu, Home, BriefcaseIcon, Info, FileText, BookOpen, ChevronDown, SparkleIcon } from 'lucide-react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import Sidebar from './Sidebar';
 import StarLogo from '../../assets/star 1.svg';
@@ -14,9 +14,58 @@ interface DecodedToken {
 
 const Header: React.FC = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [isJobsDropdownOpen, setIsJobsDropdownOpen] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(() => !!localStorage.getItem('token'));
   const location = useLocation();
   const navigate = useNavigate();
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  const jobCategories = [
+    'Accounting / Finance',
+    'Architecture / Interior Designing',
+    'Banking / Insurance / Financial Services',
+    'Commercial / Logistics / Supply Chain',
+    'Construction / Engineering / Architects',
+    'Creative / Graphics / Designing',
+    'Education Counseling / Career Counseling',
+    'Fashion / Textile Designing',
+    'General Mgmt. / Administration / Operation',
+    'Healthcare / Pharma / Biotech / Medical',
+    'Hospitality',
+    'Human Resource / Org. Development',
+    'IT & Telecommunication',
+    'Journalism / Editor / Media',
+    'Legal Services',
+    'Marketing / Advertising / Customer Service',
+    'NGO / INGO / Social work',
+    'Production / Maintenance / Quality',
+    'Research and Development',
+    'Sales / Public Relations',
+    'Secretarial / Frontdesk Officer / Data-Entry',
+    'Teaching / Education',
+    'Others',
+  ];
+  
+
+  const handleCategoryClick = (categoryName: string) => {
+    const query = encodeURIComponent(categoryName);
+    navigate(`/jobs?q=${query}`);
+    setIsJobsDropdownOpen(false);
+  };
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setIsJobsDropdownOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
 
   useEffect(() => {
     const checkAuth = () => setIsLoggedIn(!!localStorage.getItem('token'));
@@ -83,6 +132,39 @@ const Header: React.FC = () => {
               </Link>
             );
           })}
+          
+          {/* Browse Jobs Dropdown */}
+          <div className="relative" ref={dropdownRef}>
+            <button
+              onClick={() => setIsJobsDropdownOpen(!isJobsDropdownOpen)}
+              className="flex items-center px-3 py-1 rounded-md text-md font-medium text-brown hover:text-primary transition duration-200"
+            >
+              <span className="mr-1"><SparkleIcon size={22} /></span>
+              Browse Jobs
+              <ChevronDown size={18} className="ml-1" />
+            </button>
+            
+            {isJobsDropdownOpen && (
+              <div className="fixed left-0 right-0 mt-2 bg-white shadow-lg p-4 z-50 w-full">
+                <div className="container mx-auto">
+                  <div className="px-2 py-1 text-sm text-gray-700 mb-2">
+                    <p className="font-medium text-lg">Browse Job Categories</p>
+                  </div>
+                  <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
+                  {jobCategories.map((category) => (
+                    <button
+                      key={category}
+                      onClick={() => handleCategoryClick(category)}
+                      className="text-left px-3 py-1.5 text-md text-gray-700 hover:bg-primary hover:text-white rounded whitespace-nowrap"
+                    >
+                      {category}
+                    </button>
+                  ))}
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
 
 
         </nav>
