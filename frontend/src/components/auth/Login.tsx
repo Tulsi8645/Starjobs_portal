@@ -5,6 +5,7 @@ import googleIcon from '../../assets/authImages/google.png';
 import Logo from '../../assets/star 1.svg';
 import { loginUser } from './authApi/authApi';
 import loginimg from '../../assets/authImages/loginimg.webp'
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 
 
@@ -51,16 +52,9 @@ const Login: React.FC = () => {
   };
 
   const handleGoogleSignIn = () => {
-    // Use the correct backend URL based on environment
-    const backendUrl = process.env.NODE_ENV === 'production' 
-      ? 'https://api.rupeshkumar.com.np' 
-      : 'http://localhost:8000';
-      
-    // Encode the frontend callback URL
-    const frontendCallback = encodeURIComponent(`${window.location.origin}/auth/callback`);
-    
-    // Redirect to the Google OAuth endpoint
-    window.location.href = `${backendUrl}/api/auth/google?redirect_uri=${frontendCallback}`;
+    // Redirect to backend Google OAuth endpoint with the current origin as the redirect_uri
+    const redirectUri = encodeURIComponent(`${window.location.origin}/auth/callback`);
+    window.location.href = `${API_BASE_URL}/api/auth/google?redirect_uri=${redirectUri}`;
   };
 
   // Handle OAuth callback

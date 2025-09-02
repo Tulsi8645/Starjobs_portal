@@ -87,18 +87,15 @@ const googleAuth = (req, res, next) => {
 // Google OAuth callback
 const googleAuthCallback = (req, res, next) => {
   passport.authenticate('google', (err, user, info) => {
-    // Get the frontend redirect URI from session or use default
-    const frontendBase = req.session.frontend_redirect 
-      ? req.session.frontend_redirect.split('/auth/callback')[0]
-      : process.env.FRONTEND_URL || 'http://localhost:5173';
+    // Get the redirect_uri from the session or use the default
+    const redirectUri = req.session.redirect_uri || `${process.env.FRONTEND_URL || 'http://localhost:5173'}/auth/callback`;
+    const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
     
     if (err) {
-      console.error('Google OAuth error:', err);
-      return res.redirect(`${frontendBase}/login?error=${encodeURIComponent('Authentication failed')}`);
+      return res.redirect(`${frontendUrl}/login?error=${encodeURIComponent('Authentication failed')}`);
     }
     if (!user) {
-      console.error('No user returned from Google OAuth');
-      return res.redirect(`${frontendBase}/login?error=Authentication%20failed`);
+      return res.redirect(`${frontendUrl}/login?error=Authentication%20failed`);
     }
     
     try {
@@ -109,18 +106,11 @@ const googleAuthCallback = (req, res, next) => {
         { expiresIn: "1d" }
       );
       
-      // Determine the frontend base URL
-      const frontendBase = req.session.frontend_redirect 
-        ? req.session.frontend_redirect.split('/auth/callback')[0]
-        : (process.env.FRONTEND_URL || 'http://localhost:5173');
-      
-      // Clean up the session
-      if (req.session) {
-        req.session.destroy();
-      }
+      // Get the base URL from the redirect_uri
+      const redirectBase = redirectUri.split('/auth/callback')[0];
       
       // Redirect to the frontend callback URL with token and role
-      return res.redirect(`${frontendBase}/auth/callback?token=${token}&role=${user.role}`);
+      return res.redirect(`${redirectBase}/auth/callback?token=${token}&role=${user.role}`);
     } catch (error) {
       console.error('Error generating token:', error);
       return res.redirect(`${frontendUrl}/login?error=${encodeURIComponent('Authentication error')}`);
