@@ -6,6 +6,8 @@ import Logo from '../../assets/star 1.svg';
 import SignUpImage from '../../assets/authImages/Signup.png';
 import { registerJobseeker } from './authApi/authApi';
 import Cookies from 'js-cookie';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+
 // Defines the shape of the form data
 interface FormData {
   name: string;
@@ -297,7 +299,8 @@ const JobseekerSignup: React.FC = () => {
   };
 
   const handleGoogleSignIn = () => {
-    console.log('Google Sign-In Clicked (Not implemented yet)');
+    // Redirect to backend Google OAuth endpoint
+    window.location.href = `${API_BASE_URL}/api/auth/google`;
   };
 
   return (

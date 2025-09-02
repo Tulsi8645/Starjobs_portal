@@ -40,6 +40,7 @@ import GreenTemplateEditor from './components/resumeBuilder/GreenTemplateEditor'
 import BlueTemplateEditor from './components/resumeBuilder/BlueTemplateEditor';
 import About from './components/jobseeker/user/about';
 import { BlogList, BlogDetail, BlogCreate, BlogEdit } from './components/blog';
+import OAuthCallback from './components/auth/OAuthCallback';
 
 function AppWrapper() {
   const location = useLocation();
@@ -97,6 +98,9 @@ function AppWrapper() {
           <Route path="/blog/create" element={<BlogCreate />} />
           <Route path="/blog/edit/:id" element={<BlogEdit />} />
           <Route path="/blog/:id" element={<BlogDetail />} />
+          
+          {/* OAuth Callback */}
+          <Route path="/auth/callback" element={<OAuthCallback />} />
 
           {/* jobseeker routes */}
           <Route path="/jobs" element={<AllJobListing />} />

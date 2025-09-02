@@ -44,7 +44,7 @@ const PostJob = () => {
   const mutation = useMutation({
     mutationFn: (data: any) =>
       isEdit ? editJob(jobId!, data) : createJob(data),
-    onSuccess: (data) => {
+    onSuccess: ( ) => {
       alert(isEdit ? "Job updated successfully!" : "Job posted successfully!");
       navigate("/employer/dashboard");
     },
