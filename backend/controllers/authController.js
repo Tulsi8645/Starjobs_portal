@@ -7,8 +7,9 @@ const GoogleStrategy = require('passport-google-oauth20').Strategy;
 passport.use(new GoogleStrategy({
     clientID: process.env.GOOGLE_CLIENT_ID,
     clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-    callbackURL: "/api/auth/google/callback",
-    passReqToCallback: true
+    callbackURL: `${process.env.BACKEND_URL}/api/auth/google/callback`,
+    passReqToCallback: true,
+    proxy: true
   },
   async (req, accessToken, refreshToken, profile, done) => {
     try {
@@ -66,21 +67,38 @@ const generateToken = (user) => {
 };
 
 // Google OAuth authentication
-const googleAuth = passport.authenticate('google', {
-  scope: ['profile', 'email'],
-  prompt: 'select_account'
-});
+const googleAuth = (req, res, next) => {
+  // Get the redirect_uri from the query parameters or use the default
+  const redirectUri = req.query.redirect_uri || `${process.env.FRONTEND_URL || 'http://localhost:5173'}/auth/callback`;
+  
+  // Store the redirect_uri in the session
+  req.session.redirect_uri = redirectUri;
+  
+  // Initialize the Google OAuth authentication with the stored redirect_uri
+  const auth = passport.authenticate('google', {
+    scope: ['profile', 'email'],
+    prompt: 'select_account',
+    state: redirectUri // Optional: you can also use state to pass the redirect_uri
+  });
+  
+  auth(req, res, next);
+};
 
 // Google OAuth callback
 const googleAuthCallback = (req, res, next) => {
   passport.authenticate('google', (err, user, info) => {
-    const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
+    // Get the frontend redirect URI from session or use default
+    const frontendBase = req.session.frontend_redirect 
+      ? req.session.frontend_redirect.split('/auth/callback')[0]
+      : process.env.FRONTEND_URL || 'http://localhost:5173';
     
     if (err) {
-      return res.redirect(`${frontendUrl}/login?error=${encodeURIComponent('Authentication failed')}`);
+      console.error('Google OAuth error:', err);
+      return res.redirect(`${frontendBase}/login?error=${encodeURIComponent('Authentication failed')}`);
     }
     if (!user) {
-      return res.redirect(`${frontendUrl}/login?error=Authentication%20failed`);
+      console.error('No user returned from Google OAuth');
+      return res.redirect(`${frontendBase}/login?error=Authentication%20failed`);
     }
     
     try {
@@ -91,8 +109,18 @@ const googleAuthCallback = (req, res, next) => {
         { expiresIn: "1d" }
       );
       
-      // Redirect to frontend with token and role
-      return res.redirect(`${frontendUrl}/auth/callback?token=${token}&role=${user.role}`);
+      // Determine the frontend base URL
+      const frontendBase = req.session.frontend_redirect 
+        ? req.session.frontend_redirect.split('/auth/callback')[0]
+        : (process.env.FRONTEND_URL || 'http://localhost:5173');
+      
+      // Clean up the session
+      if (req.session) {
+        req.session.destroy();
+      }
+      
+      // Redirect to the frontend callback URL with token and role
+      return res.redirect(`${frontendBase}/auth/callback?token=${token}&role=${user.role}`);
     } catch (error) {
       console.error('Error generating token:', error);
       return res.redirect(`${frontendUrl}/login?error=${encodeURIComponent('Authentication error')}`);
