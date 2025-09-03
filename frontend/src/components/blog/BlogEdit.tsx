@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Save, Plus, X } from 'lucide-react';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000';
 
 interface BlogImage {
   url: string;
@@ -35,7 +36,7 @@ const BlogEdit: React.FC = () => {
     try {
       setFetchingBlog(true);
       const token = localStorage.getItem('token');
-      const response = await fetch(`http://localhost:8000/api/blogs/${id}`, {
+      const response = await fetch(`${API_BASE_URL}/api/blogs/${id}`, {
         headers: {
           'Authorization': `Bearer ${token}`,
         },
@@ -103,7 +104,7 @@ const BlogEdit: React.FC = () => {
         tags: formData.tags.split(',').map(tag => tag.trim()).filter(tag => tag),
       };
 
-      const response = await fetch(`http://localhost:8000/api/blogs/${id}`, {
+      const response = await fetch(`${API_BASE_URL}/api/blogs/${id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',

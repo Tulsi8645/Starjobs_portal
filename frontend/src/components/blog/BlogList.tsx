@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Heart, MessageCircle, Eye, Calendar, Search, Plus } from 'lucide-react';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000';
 
 interface Blog {
   _id: string;
@@ -54,7 +55,7 @@ const BlogList: React.FC<BlogListProps> = ({ showUserBlogs = false }) => {
         ...(searchTerm && { search: searchTerm }),
       });
 
-      const response = await fetch(`http://localhost:8000${endpoint}?${params}`, {
+      const response = await fetch(`${API_BASE_URL}${endpoint}?${params}`, {
         headers: {
           ...(token && { Authorization: `Bearer ${token}` }),
         },

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Save, Wand2, Plus, X } from 'lucide-react';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000';
 
 interface BlogImage {
   url: string;
@@ -35,7 +36,7 @@ const BlogCreate: React.FC = () => {
       setGeneratingContent(true);
       const token = localStorage.getItem('token');
       
-      const response = await fetch('http://localhost:8000/api/blogs/generate-content', {
+      const response = await fetch(`${API_BASE_URL}/api/blogs/generate-content`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -97,7 +98,7 @@ const BlogCreate: React.FC = () => {
         isAIGenerated: generatingContent,
       };
 
-      const response = await fetch('http://localhost:8000/api/blogs', {
+      const response = await fetch(`${API_BASE_URL}/api/blogs`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

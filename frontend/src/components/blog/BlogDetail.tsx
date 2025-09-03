@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { Heart, MessageCircle, Eye, Calendar, User, Edit, Trash2, Send } from 'lucide-react';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000';
 
 interface Blog {
   _id: string;
@@ -60,7 +61,7 @@ const BlogDetail: React.FC = () => {
   const fetchBlog = async () => {
     try {
       setLoading(true);
-      const response = await fetch(`http://localhost:8000/api/blogs/${id}`);
+      const response = await fetch(`${API_BASE_URL}/api/blogs/${id}`);
       
       if (response.ok) {
         const data = await response.json();
@@ -92,7 +93,7 @@ const BlogDetail: React.FC = () => {
     }
 
     try {
-      const response = await fetch(`http://localhost:8000/api/blogs/${id}/like`, {
+      const response = await fetch(`${API_BASE_URL}/api/blogs/${id}/like`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -121,7 +122,7 @@ const BlogDetail: React.FC = () => {
 
     try {
       setSubmittingComment(true);
-      const response = await fetch(`http://localhost:8000/api/blogs/${id}/comment`, {
+      const response = await fetch(`${API_BASE_URL}/api/blogs/${id}/comment`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -146,7 +147,7 @@ const BlogDetail: React.FC = () => {
 
     const token = localStorage.getItem('token');
     try {
-      const response = await fetch(`http://localhost:8000/api/blogs/${id}`, {
+      const response = await fetch(`${API_BASE_URL}/api/blogs/${id}`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${token}`,
