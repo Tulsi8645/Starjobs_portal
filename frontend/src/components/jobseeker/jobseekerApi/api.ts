@@ -212,7 +212,7 @@ export const fetchSavedJobs = async (): Promise<Job[]> => {
   const token = localStorage.getItem("token");
   if (!token) throw new Error("Not authenticated");
 
-  const response = await api.get('/api/jobseeker/saved-jobs');
+  const response = await api.get('/api/jobs/saved-jobs');
 
   return response.data;
 };

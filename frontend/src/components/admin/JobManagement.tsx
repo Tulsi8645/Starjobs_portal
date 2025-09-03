@@ -230,7 +230,6 @@ const JobManagement = () => {
                   { label: "Location", name: "location" },
                   { label: "Salary", name: "salary" },
                   { label: "Experience", name: "experience" },
-                  { label: "Job Category", name: "jobcategory" },
                 ].map(({ label, name }) => (
                   <div key={name}>
                     <label className="block mb-1 font-medium">{label}</label>
@@ -243,6 +242,42 @@ const JobManagement = () => {
                     />
                   </div>
                 ))}
+                
+                <div>
+                  <label className="block mb-1 font-medium">Job Category</label>
+                  <select
+                    name="jobcategory"
+                    value={formData.jobcategory || ""}
+                    onChange={handleChange}
+                    required
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md bg-white text-sm"
+                  >
+                    <option value="">Select a category</option>
+                    <option value="Accounting / Finance">Accounting / Finance</option>
+                    <option value="Architecture / Interior Designing">Architecture / Interior Designing</option>
+                    <option value="Banking / Insurance / Financial Services">Banking / Insurance / Financial Services</option>
+                    <option value="Commercial / Logistics / Supply Chain">Commercial / Logistics / Supply Chain</option>
+                    <option value="Construction / Engineering / Architects">Construction / Engineering / Architects</option>
+                    <option value="Creative / Graphics / Designing">Creative / Graphics / Designing</option>
+                    <option value="Education Counseling / Career Counseling">Education Counseling / Career Counseling</option>
+                    <option value="Fashion / Textile Designing">Fashion / Textile Designing</option>
+                    <option value="General Mgmt. / Administration / Operation">General Mgmt. / Administration / Operation</option>
+                    <option value="Healthcare / Pharma / Biotech / Medical">Healthcare / Pharma / Biotech / Medical</option>
+                    <option value="Hospitality">Hospitality</option>
+                    <option value="Human Resource / Org. Development">Human Resource / Org. Development</option>
+                    <option value="IT & Telecommunication">IT & Telecommunication</option>
+                    <option value="Journalism / Editor / Media">Journalism / Editor / Media</option>
+                    <option value="Legal Services">Legal Services</option>
+                    <option value="Marketing / Advertising / Customer Service">Marketing / Advertising / Customer Service</option>
+                    <option value="NGO / INGO / Social work">NGO / INGO / Social work</option>
+                    <option value="Production / Maintenance / Quality">Production / Maintenance / Quality</option>
+                    <option value="Research and Development">Research and Development</option>
+                    <option value="Sales / Public Relations">Sales / Public Relations</option>
+                    <option value="Secretarial / Front Office / Data Entry">Secretarial / Front Office / Data Entry</option>
+                    <option value="Teaching / Education">Teaching / Education</option>
+                    <option value="Others">Others</option>
+                  </select>
+                </div>
 
                 <div>
                   <label className="block mb-1 font-medium">Job Type</label>
