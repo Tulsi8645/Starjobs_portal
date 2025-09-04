@@ -115,7 +115,7 @@ const JobCategories = () => {
   };
 
   return (
-    <div className="p-6">
+    <div className="p-6 h-[calc(100vh-64px)] overflow-y-auto w-full">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold">Job Categories</h1>
         <button
@@ -139,16 +139,16 @@ const JobCategories = () => {
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50">
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-md font-medium text-gray-500 uppercase tracking-wider">
                   Icon
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-md font-medium text-gray-500 uppercase tracking-wider">
                   Category Name
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-md font-medium text-gray-500 uppercase tracking-wider">
                   Trending
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-md font-medium text-gray-500 uppercase tracking-wider">
                   Actions
                 </th>
               </tr>
