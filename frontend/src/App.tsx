@@ -34,6 +34,7 @@ import UsersProfile from './components/admin/UsersProfile';
 import JobManagement from './components/admin/JobManagement';
 import EmployerSettings from './components/employer/dashboard/Settings';
 import RevenueManagement from './components/admin/RevenueManagement';
+import JobCategoryManagement from './components/admin/JobCategoryManagement';
 import Resume from './components/resumeBuilder/Resume';
 import WhiteTemplateEditor from './components/resumeBuilder/WhiteTemplateEditor';
 import GreenTemplateEditor from './components/resumeBuilder/GreenTemplateEditor';
@@ -135,6 +136,7 @@ function AppWrapper() {
             <Route path="employers" element={<EmployerManagement />} />
             <Route path="jobs" element={<JobManagement />} />
             <Route path="revenue" element={<RevenueManagement />} />
+            <Route path="jobcategories" element={<JobCategoryManagement />} />
             <Route path="employer/:employerId/applicants" element={<EmployerApplicants />} />
             <Route path="settings" element={<AdminSettings />} />
           </Route>

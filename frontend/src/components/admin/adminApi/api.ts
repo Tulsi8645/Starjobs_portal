@@ -11,6 +11,15 @@ const authHeader = {
   },
 };
 
+export interface JobCategory {
+  _id: string;
+  name: string;
+  icon: string;
+  isTrending: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
 export interface Job {
   _id: string;
   title: string;
@@ -167,3 +176,51 @@ export const updateRevenue = (id: string, payload: any) =>
 
 export const deleteRevenue = (id: string) =>
   axios.delete(`${API_BASE_URL}/api/revenue/${id}`, authHeader).then(res => res.data);
+
+
+
+
+// Job Category APIs
+export const getJobCategories = async () => {
+  const res = await axios.get(`${API_BASE_URL}/api/jobcategories`);
+  return res.data;
+};
+
+export const createJobCategory = async (formData: FormData) => {
+  const res = await axios.post(`${API_BASE_URL}/api/jobcategories`, formData, {
+    headers: {
+      ...authHeader.headers,
+      'Content-Type': 'multipart/form-data',
+    },
+  });
+  return res.data;
+};
+
+export const updateJobCategory = async (id: string, formData: FormData) => {
+  const res = await axios.put(`${API_BASE_URL}/api/jobcategories/${id}`, formData, {
+    headers: {
+      ...authHeader.headers,
+      'Content-Type': 'multipart/form-data',
+    },
+  });
+  return res.data;
+};
+
+export const deleteJobCategory = async (id: string) => {
+  const res = await axios.delete(`${API_BASE_URL}/api/jobcategories/${id}`, authHeader);
+  return res.data;
+};
+
+export const toggleJobCategoryTrending = async (id: string, isTrending: boolean) => {
+  const res = await axios.patch(
+    `${API_BASE_URL}/api/jobcategories/${id}/trending`,
+    { isTrending },
+    authHeader
+  );
+  return res.data;
+};
+
+export const getTrendingCategories = async () => {
+  const res = await axios.get(`${API_BASE_URL}/api/jobcategories/trending/all`);
+  return res.data;
+};
