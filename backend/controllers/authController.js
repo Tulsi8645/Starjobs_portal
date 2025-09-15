@@ -92,9 +92,17 @@ const googleAuthCallback = (req, res, next) => {
     const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
     
     if (err) {
+      // Check if this is a mobile app request
+      if (redirectUri.includes('com.mandmbsofttech.starjobs://')) {
+        return res.redirect(`com.mandmbsofttech.starjobs://callback?error=${encodeURIComponent('Authentication failed')}`);
+      }
       return res.redirect(`${frontendUrl}/login?error=${encodeURIComponent('Authentication failed')}`);
     }
     if (!user) {
+      // Check if this is a mobile app request
+      if (redirectUri.includes('com.mandmbsofttech.starjobs://')) {
+        return res.redirect(`com.mandmbsofttech.starjobs://callback?error=Authentication%20failed`);
+      }
       return res.redirect(`${frontendUrl}/login?error=Authentication%20failed`);
     }
     
@@ -106,13 +114,22 @@ const googleAuthCallback = (req, res, next) => {
         { expiresIn: "1d" }
       );
       
-      // Get the base URL from the redirect_uri
-      const redirectBase = redirectUri.split('/auth/callback')[0];
-      
-      // Redirect to the frontend callback URL with token and role
-      return res.redirect(`${redirectBase}/auth/callback?token=${token}&role=${user.role}`);
+      // Check if this is a mobile app request
+      if (redirectUri.includes('com.mandmbsofttech.starjobs://')) {
+        // Redirect to mobile app with token
+        return res.redirect(`com.mandmbsofttech.starjobs://callback?token=${token}&role=${user.role}`);
+      } else {
+        // Get the base URL from the redirect_uri for web
+        const redirectBase = redirectUri.split('/auth/callback')[0];
+        // Redirect to the frontend callback URL with token and role
+        return res.redirect(`${redirectBase}/auth/callback?token=${token}&role=${user.role}`);
+      }
     } catch (error) {
       console.error('Error generating token:', error);
+      // Check if this is a mobile app request
+      if (redirectUri.includes('com.mandmbsofttech.starjobs://')) {
+        return res.redirect(`com.mandmbsofttech.starjobs://callback?error=${encodeURIComponent('Authentication error')}`);
+      }
       return res.redirect(`${frontendUrl}/login?error=${encodeURIComponent('Authentication error')}`);
     }
   })(req, res, next);
