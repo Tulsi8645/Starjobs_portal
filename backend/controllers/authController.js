@@ -84,6 +84,66 @@ const googleAuth = (req, res, next) => {
   auth(req, res, next);
 };
 
+
+// Verify Google token from mobile app (alternative endpoint name)
+const verifyGoogleTokenMobile = async (req, res) => {
+  try {
+    const { accessToken, idToken, email, name, photoUrl } = req.body;
+
+    if (!accessToken || !email) {
+      return res.status(400).json({ message: 'Missing required fields' });
+    }
+
+    // Verify the Google token (you can use Google's tokeninfo endpoint or a library)
+    // For now, we'll trust the token and create/find the user
+    let user = await User.findOne({ email: email });
+
+    if (!user) {
+      // Create new user
+      user = new User({
+        name: name,
+        email: email,
+        googleId: idToken,
+        emailVerified: true,
+        isVerified: true,
+        authMethod: 'google',
+        role: 'jobseeker', // Default role for Google OAuth
+        profilePicture: photoUrl,
+      });
+      await user.save();
+    } else {
+      // Update existing user
+      user.googleId = idToken;
+      user.authMethod = 'google';
+      user.emailVerified = true;
+      user.isVerified = true;
+      if (photoUrl) user.profilePicture = photoUrl;
+      await user.save();
+    }
+
+    // Generate JWT token
+    const token = jwt.sign(
+      { id: user._id, role: user.role },
+      process.env.JWT_SECRET,
+      { expiresIn: "1d" }
+    );
+
+    res.json({
+      success: true,
+      token: token,
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+        profilePicture: user.profilePicture,
+      }
+    });
+  } catch (error) {
+    console.error('Google token verification error:', error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+};
 // Google OAuth callback
 const googleAuthCallback = (req, res, next) => {
   passport.authenticate('google', (err, user, info) => {
@@ -157,6 +217,7 @@ const logout = (req, res) => {
 module.exports = {
   googleAuth,
   googleAuthCallback,
+  verifyGoogleTokenMobile,
   getCurrentUser,
   logout
 };

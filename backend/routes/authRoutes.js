@@ -18,6 +18,12 @@ router.get('/me', (req, res) => {
   res.json(req.user);
 });
 
+
+
+// Google token verification for mobile app
+router.post('/google-mobile', authController.verifyGoogleTokenMobile);
+
+
 // Logout
 router.get('/logout', authController.logout);
 
