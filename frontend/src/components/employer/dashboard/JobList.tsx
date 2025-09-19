@@ -1,7 +1,8 @@
-import { MapPin, Clock, DollarSign, Users, PenSquare, MoreVertical } from "lucide-react";
+import { MapPin, Clock, DollarSign, Users, PenSquare, MoreVertical, Trash2 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { getEmployerJobs, patchJob } from "../employerApi/api";
+import { getEmployerJobs, patchJob, deleteJob } from "../employerApi/api";
+import { toast } from "react-toastify";
 import { FaWhatsapp } from "react-icons/fa";
 interface Job {
   _id: string;
@@ -69,8 +70,24 @@ const JobList = () => {
           job._id === jobId ? { ...job, status: newStatus } : job
         )
       );
+      toast.success("Job status updated successfully!");
     } catch (error) {
       console.error("Failed to update job status:", error);
+      toast.error("Failed to update job status");
+    }
+  };
+
+  const handleDeleteJob = async (jobId: string) => {
+    if (window.confirm("Are you sure you want to delete this job? This action cannot be undone.")) {
+      try {
+        await deleteJob(jobId);
+        setJobs(prevJobs => prevJobs.filter(job => job._id !== jobId));
+        setFilteredJobs(prevJobs => prevJobs.filter(job => job._id !== jobId));
+        toast.success("Job deleted successfully!");
+      } catch (error) {
+        console.error("Error deleting job:", error);
+        toast.error("Failed to delete job");
+      }
     }
   };
 
@@ -196,6 +213,14 @@ const JobList = () => {
                   >
                     <PenSquare size={20} className="mr-2" />
                     Edit Job
+                  </button>
+                  <button
+                    className="flex items-center text-gray-600 hover:text-red-600"
+                    onClick={() => handleDeleteJob(job._id)}
+                    title="Delete Job"
+                  >
+                    <Trash2 size={20} className="mr-2" />
+                    Delete
                   </button>
 
                   <select

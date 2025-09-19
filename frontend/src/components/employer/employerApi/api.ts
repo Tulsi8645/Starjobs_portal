@@ -74,6 +74,22 @@ export const editJob = async (jobId: string, updatedData: any) => {
 };
 
 
+export const deleteJob = async (jobId: string) => {
+  const token = localStorage.getItem("token");
+  if (!token) throw new Error("Not authenticated");
+
+  const res = await axios.delete(
+    `${API_BASE_URL}/api/employer/jobs/${jobId}`,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+
+  return res.data;
+};
+
 export const getEmployerProfile = async () => {
     const token = localStorage.getItem("token");
     if (!token) throw new Error("Not authenticated");
