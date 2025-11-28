@@ -40,6 +40,7 @@ api.interceptors.response.use(
 export interface Job {
   _id: string;
   title: string;
+  country: string;
   location: string;
   jobtype: string;
   status: string;
@@ -113,6 +114,17 @@ export const fetchRecentJobs = async () => {
   return response.data.jobs;
 };
 
+<<<<<<< HEAD
+=======
+
+// Fetch job counts by country
+export const fetchJobCountsByCountry = async () => {
+  const response = await axios.get(`${API_BASE_URL}/api/jobs/counts-by-country`);
+  return response.data;
+};
+
+
+>>>>>>> ef77a63 (add new route for job counts by country and added on ui)
 // Fetch a specific job by ID
 export const fetchJobById = async (id: string): Promise<Job> => {
   const response = await api.get(`/api/jobs/${id}`);

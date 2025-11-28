@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import {
   Search,
@@ -8,7 +8,7 @@ import {
   DollarSign,
   Bookmark,
 } from 'lucide-react';
-import { fetchJobs, fetchSavedJobs, toggleSaveJob } from '../jobseekerApi/api';
+import { fetchJobs, fetchSavedJobs, toggleSaveJob, fetchJobCountsByCountry } from '../jobseekerApi/api';
 
 
 const getTimeAgo = (dateString: string): string => {
@@ -38,6 +38,7 @@ const AllJobListing = () => {
   });
   const [sortBy, setSortBy] = useState('newest');
   const [page, setPage] = useState(1);
+  const [jobCounts, setJobCounts] = useState<Array<{country: string, jobCount: number}>>([]);
   const limit = 9;
 
   const MEDIA_URL = import.meta.env.VITE_MEDIA_URL;
@@ -53,6 +54,19 @@ const AllJobListing = () => {
     },
     staleTime: 0,
   });
+
+  // Fetch job counts by country
+  useEffect(() => {
+    const fetchCountryCounts = async () => {
+      try {
+        const counts = await fetchJobCountsByCountry();
+        setJobCounts(counts);
+      } catch (error) {
+        console.error('Error fetching job counts by country:', error);
+      }
+    };
+    fetchCountryCounts();
+  }, []);
 
   const { data, isLoading, isError } = useQuery({
     queryKey: ['jobs', page, searchQuery, filters],
@@ -250,7 +264,23 @@ const AllJobListing = () => {
 
           <div className="flex-1 pr-4 md:pr-0">
             <div className="flex justify-between items-center mb-4">
-              <p className="text-gray-600 text-sm">Showing {sortedJobs.length} jobs</p>
+              <div className="w-full">
+                <p className="text-gray-600 text-lg">Showing {sortedJobs.length} jobs</p>
+                {jobCounts.length > 0 && (
+                  <div className="flex flex-wrap gap-2 sm:gap-4 md:gap-6 mt-1 overflow-x-auto pb-2 -mx-2 px-2">
+                    {jobCounts.map(({ country, jobCount }, index) => (
+                      <div key={country} className="whitespace-nowrap">
+                        <span className="text-md sm:text-md font-bold text-gray-500">
+                          {country} <span className="font-medium text-primary">{jobCount}</span>
+                        </span>
+                        {index < jobCounts.length - 1 && (
+                          <span className="text-gray-400 hidden sm:inline"></span>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
               <select
                 value={sortBy}
                 onChange={(e) => setSortBy(e.target.value)}

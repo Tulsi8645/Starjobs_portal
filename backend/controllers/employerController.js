@@ -87,6 +87,7 @@ const updateEmployerProfile = async (req, res) => {
 const createJob = async (req, res) => {
   const {
     title,
+    country,
     location,
     jobtype,
     salary,
@@ -113,6 +114,7 @@ const createJob = async (req, res) => {
 
     const job = new Job({
       title,
+      country,
       location,
       jobtype,
       salary,
@@ -173,6 +175,7 @@ const editJob = async (req, res) => {
     // Updatable fields
     const updatableFields = [
       "title",
+      "country",
       "location",
       "jobtype",
       "salary",

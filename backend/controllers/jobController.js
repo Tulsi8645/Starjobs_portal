@@ -143,6 +143,37 @@ const getJobById = async (req, res) => {
   }
 };
 
+// Get job counts by country
+const getJobCountsByCountry = async (req, res) => {
+  try {
+    const jobCounts = await Job.aggregate([
+      {
+        $group: {
+          _id: '$country',
+          count: { $sum: 1 }
+        }
+      },
+      { 
+        $match: { count: { $gt: 0 } } // Only include countries with jobs
+      },
+      {
+        $project: {
+          _id: 0,
+          country: '$_id',
+          jobCount: '$count'
+        }
+      },
+      { 
+        $sort: { jobCount: -1 } // Sort by job count in descending order
+      }
+    ]);
+
+    res.json(jobCounts);
+  } catch (error) {
+    console.error('Error getting job counts by country:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+};
 
 
 // Get job views per unique ip
@@ -405,6 +436,7 @@ const getAppliedJobs = async (req, res) => {
 module.exports = {
   getJobs,
   getTrendingJobs,
+  getJobCountsByCountry,
   getRecentJobs,
   getJobById,
   getJobViews,

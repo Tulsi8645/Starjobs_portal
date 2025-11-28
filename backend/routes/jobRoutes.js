@@ -6,6 +6,7 @@ const {
   getJobs,
   getTrendingJobs,
   getRecentJobs,
+  getJobCountsByCountry,
   applyInJob,
   getJobById,
   getJobViews,
@@ -24,6 +25,10 @@ router.get("/trending", getTrendingJobs);
 
 // Route to get recent jobs
 router.get("/recent", getRecentJobs);
+
+
+// Get job counts by country
+router.get("/counts-by-country", getJobCountsByCountry);
 
 // Get saved jobs for a jobseeker
 router.get("/saved-jobs", authenticate, getSavedJobs);

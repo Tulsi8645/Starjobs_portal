@@ -26,6 +26,7 @@ interface Employer {
 interface Job {
   _id: string;
   title: string;
+  country?: string;
   employer?: Employer;
   location: string;
   jobtype: string;
@@ -178,6 +179,7 @@ const JobDetailPage = () => {
                   )}
                   <div className="flex flex-wrap text-sm text-gray-500 gap-x-3 gap-y-1">
                     <span><MapPin size={14} className="inline mr-1" />{job.location}</span>
+                    <p className="text-gray-600 mr-1">{job.country}</p>
                     <span><Clock size={14} className="inline mr-1" />{job.jobtype}</span>
                     <span
                       className={`text-white text-xs font-semibold px-2 py-1 rounded-full
