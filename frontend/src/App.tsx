@@ -40,6 +40,7 @@ import WhiteTemplateEditor from './components/resumeBuilder/WhiteTemplateEditor'
 import GreenTemplateEditor from './components/resumeBuilder/GreenTemplateEditor';
 import BlueTemplateEditor from './components/resumeBuilder/BlueTemplateEditor';
 import About from './components/jobseeker/user/about';
+import PrivacyPolicy from './components/jobseeker/user/privacy';
 import { BlogList, BlogDetail, BlogCreate, BlogEdit } from './components/blog';
 import OAuthCallback from './components/auth/OAuthCallback';
 
@@ -87,6 +88,7 @@ function AppWrapper() {
           {/* home routes */}
           <Route path="/" element={<HomePageJobSeeker />} />
           <Route path="/about" element={<About />} />
+          <Route path="/privacy" element={<PrivacyPolicy />} />
 
           {/* resume builder */}
           <Route path="/resume" element={<Resume />} />
