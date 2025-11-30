@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Link, useLocation, Outlet, useNavigate } from 'react-router-dom';
-import { LayoutDashboard, Users, FileText, HammerIcon,  Settings, DollarSign, WorkflowIcon , LogOut } from 'lucide-react';
-import logo from '../../assets/star 1.svg';
+import { LayoutDashboard, Users, FileText, HammerIcon, Settings, DollarSign, WorkflowIcon, LogOut } from 'lucide-react';
+import logo from '../../assets/starlogo.png';
 
 const AdminLayout = () => {
   const location = useLocation();
@@ -31,12 +31,12 @@ const AdminLayout = () => {
         <aside className="w-64 bg-white border-r flex flex-col justify-between">
           <div>
             <div className="p-4 border-b">
-                <div className="flex items-center cursor-pointer"
-                  onClick={() => navigate('/')}
-                >
-                  <img src={logo} alt="Logo" className="w-30 h-30 mr-2" />
+              <div className="flex items-center cursor-pointer"
+                onClick={() => navigate('/')}
+              >
+                <img src={logo} alt="Logo" className="w-30 h-30 mr-2" />
               </div>
-      
+
             </div>
             <nav className="p-4">
               {menuItems.map((item) => (
@@ -44,8 +44,8 @@ const AdminLayout = () => {
                   key={item.path}
                   to={item.path}
                   className={`flex items-center space-x-3 px-4 py-3 rounded-lg mb-1 ${location.pathname === item.path
-                      ? 'bg-primary text-white'
-                      : 'text-gray-600 font-semibold hover:bg-gray-100'
+                    ? 'bg-primary text-white'
+                    : 'text-gray-600 font-semibold hover:bg-gray-100'
                     }`}
                 >
                   {item.icon}

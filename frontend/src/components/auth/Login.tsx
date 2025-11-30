@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Eye } from 'lucide-react';
 import googleIcon from '../../assets/authImages/google.png';
-import Logo from '../../assets/star 1.svg';
+import Logo from '../../assets/starlogo.png';
 import { loginUser } from './authApi/authApi';
 import loginimg from '../../assets/authImages/loginimg.webp'
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
@@ -62,11 +62,11 @@ const Login: React.FC = () => {
     const urlParams = new URLSearchParams(window.location.search);
     const token = urlParams.get('token');
     const role = urlParams.get('role');
-    
+
     if (token && role) {
       // Store the token
       localStorage.setItem('token', token);
-      
+
       // Redirect based on role
       if (role === 'jobseeker') {
         navigate('/');

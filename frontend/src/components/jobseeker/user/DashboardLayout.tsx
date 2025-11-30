@@ -1,4 +1,4 @@
-import logo from '../../../assets/star 1.svg';
+import logo from '../../../assets/starlogo.png';
 import { Link, useLocation, Outlet, useNavigate } from 'react-router-dom';
 import { LayoutDashboard, Users, FileText, Settings, LogOut } from 'lucide-react';
 import { useState } from 'react';
@@ -42,8 +42,8 @@ const UserDashboardLayout = () => {
               key={item.path}
               to={item.path}
               className={`flex items-center space-x-3 px-4 py-3 rounded-lg mb-1 ${location.pathname === item.path
-                  ? 'bg-primary text-white'
-                  : 'text-gray-600 font-semibold hover:bg-gray-100'
+                ? 'bg-primary text-white'
+                : 'text-gray-600 font-semibold hover:bg-gray-100'
                 }`}
             >
               {item.icon}

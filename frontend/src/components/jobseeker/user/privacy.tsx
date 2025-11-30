@@ -2,22 +2,10 @@
 const PrivacyPolicy = () => {
     return (
         <div className="flex flex-col min-h-screen bg-white text-gray-800">
-            
-            {/* Hero Section */}
-            <div className="bg-gray-50 py-16 px-6">
-                <div className="max-w-4xl mx-auto text-center">
-                    <h1 className="text-4xl md:text-5xl font-bold mb-4">
-                        Privacy Policy
-                    </h1>
-                    <p className="text-lg text-gray-600">
-                        Last Updated: November 2024
-                    </p>
-                </div>
-            </div>
 
             {/* Main Content */}
             <div className="max-w-4xl mx-auto px-6 py-12">
-                <p className="text-gray-600 mb-8">
+                <p className="text-gray-600  text-lg mb-8">
                     This Privacy Policy explains how Star Jobs collects, uses, and discloses information from both Employers and Candidates who use our job posting and job search platform.
                 </p>
 
@@ -27,7 +15,7 @@ const PrivacyPolicy = () => {
                     <p className="text-gray-600 mb-4">
                         We collect information to provide and improve our services, including:
                     </p>
-                    
+
                     <div className="bg-gray-50 p-6 rounded-lg mb-4">
                         <h3 className="text-xl font-semibold mb-3">For Candidates (Job Seekers)</h3>
                         <p className="text-gray-600 mb-2">

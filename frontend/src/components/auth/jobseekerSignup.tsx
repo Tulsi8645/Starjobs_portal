@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Eye, Upload, PlusCircle, MinusCircle, UserRoundPlus, XCircle } from 'lucide-react'; //
 import { useMutation } from '@tanstack/react-query';
-import Logo from '../../assets/star 1.svg';
+import Logo from '../../assets/starlogo.png';
 import SignUpImage from '../../assets/authImages/Signup.png';
 import { registerJobseeker } from './authApi/authApi';
 import Cookies from 'js-cookie';
@@ -15,7 +15,7 @@ interface FormData {
   password: string;
   confirmPassword: string;
   profilePic: File | null;
-  skills: string[]; 
+  skills: string[];
   qualifications: { degree: string; institution: string; year: number | '' }[];
   experiences: { jobPosition: string; institution: string; duration: string }[];
   resume: File | null;
@@ -47,7 +47,7 @@ const QualificationEntry: React.FC<QualificationEntryProps> = ({
     />
     <input
       type="text" name="year" value={qualification.year} onChange={(e) => onChange(index, e)}
-      placeholder="Year" 
+      placeholder="Year"
       className="px-3 py-1.5 border border-gray-300 rounded focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
     />
     {showRemoveButton && (
@@ -306,8 +306,8 @@ const JobseekerSignup: React.FC = () => {
   return (
     <div className="min-h-screen bg-secondary flex items-center justify-center p-4">
       <div className="max-w-5xl w-full bg-white rounded-lg shadow-card flex overflow-hidden">
-         {/* Left Panel - Image */}
-         <div className="w-1/2 hidden md:flex items-center justify-center bg-primary p-10 rounded-l-lg">
+        {/* Left Panel - Image */}
+        <div className="w-1/2 hidden md:flex items-center justify-center bg-primary p-10 rounded-l-lg">
           <img src={SignUpImage} alt="Sign Up" className="max-h-[500px] object-contain" />
         </div>
 

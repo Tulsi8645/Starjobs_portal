@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Menu, Home, BriefcaseIcon, Info, FileText, BookOpen, ChevronDown, SparkleIcon } from 'lucide-react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import Sidebar from './Sidebar';
-import StarLogo from '../../assets/star 1.svg';
+import StarLogo from '../../assets/starlogo.png';
 import { jwtDecode } from 'jwt-decode';
 
 
@@ -45,7 +45,7 @@ const Header: React.FC = () => {
     'Teaching / Education',
     'Others',
   ];
-  
+
 
   const handleCategoryClick = (categoryName: string) => {
     const query = encodeURIComponent(categoryName);
@@ -132,7 +132,7 @@ const Header: React.FC = () => {
               </Link>
             );
           })}
-          
+
           {/* Browse Jobs Dropdown */}
           <div className="relative" ref={dropdownRef}>
             <button
@@ -143,7 +143,7 @@ const Header: React.FC = () => {
               Browse Jobs
               <ChevronDown size={18} className="ml-1" />
             </button>
-            
+
             {isJobsDropdownOpen && (
               <div className="fixed left-0 right-0 mt-2 bg-white shadow-lg p-4 z-50 w-full">
                 <div className="container mx-auto">
@@ -151,15 +151,15 @@ const Header: React.FC = () => {
                     <p className="font-medium text-lg">Browse Job Categories</p>
                   </div>
                   <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
-                  {jobCategories.map((category) => (
-                    <button
-                      key={category}
-                      onClick={() => handleCategoryClick(category)}
-                      className="text-left px-3 py-1.5 text-md text-gray-700 hover:bg-primary hover:text-white rounded whitespace-nowrap"
-                    >
-                      {category}
-                    </button>
-                  ))}
+                    {jobCategories.map((category) => (
+                      <button
+                        key={category}
+                        onClick={() => handleCategoryClick(category)}
+                        className="text-left px-3 py-1.5 text-md text-gray-700 hover:bg-primary hover:text-white rounded whitespace-nowrap"
+                      >
+                        {category}
+                      </button>
+                    ))}
                   </div>
                 </div>
               </div>
