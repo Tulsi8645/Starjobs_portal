@@ -1,5 +1,5 @@
 import React from 'react';
-import StarFooter from '../../assets/starlogo.png';
+import StarFooter from '../../assets/quickjobs.png';
 import { Home, User, BriefcaseIcon, Linkedin, Facebook, Twitter } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { jwtDecode } from 'jwt-decode';

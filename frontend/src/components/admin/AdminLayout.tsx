@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Link, useLocation, Outlet, useNavigate } from 'react-router-dom';
 import { LayoutDashboard, Users, FileText, HammerIcon, Settings, DollarSign, WorkflowIcon, LogOut } from 'lucide-react';
-import logo from '../../assets/starlogo.png';
+import logo from '../../assets/quickjobs.png';
 
 const AdminLayout = () => {
   const location = useLocation();

@@ -1,4 +1,4 @@
-import logo from '../../../assets/starlogo.png';
+import logo from '../../../assets/quickjobs.png';
 import { Link, useLocation, Outlet, useNavigate } from 'react-router-dom';
 import { LayoutDashboard, Users, FileText, Settings, LogOut } from 'lucide-react';
 import { useState } from 'react';

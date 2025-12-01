@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Eye, Upload, PlusCircle, MinusCircle, UserRoundPlus, XCircle } from 'lucide-react'; //
 import { useMutation } from '@tanstack/react-query';
-import Logo from '../../assets/starlogo.png';
+import Logo from '../../assets/quickjobs.png';
 import SignUpImage from '../../assets/authImages/Signup.png';
 import { registerJobseeker } from './authApi/authApi';
 import Cookies from 'js-cookie';

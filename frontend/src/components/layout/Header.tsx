@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Menu, Home, BriefcaseIcon, Info, FileText, BookOpen, ChevronDown, SparkleIcon } from 'lucide-react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import Sidebar from './Sidebar';
-import StarLogo from '../../assets/starlogo.png';
+import StarLogo from '../../assets/quickjobs.png';
 import { jwtDecode } from 'jwt-decode';
 
 
