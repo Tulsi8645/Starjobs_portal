@@ -1,4 +1,4 @@
-# Star Jobs Portal - API Documentation
+# Quick Jobs  - API Documentation
 
 ## Authentication & Authorization
 

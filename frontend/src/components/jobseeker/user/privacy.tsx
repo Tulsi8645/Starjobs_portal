@@ -6,7 +6,7 @@ const PrivacyPolicy = () => {
             {/* Main Content */}
             <div className="max-w-4xl mx-auto px-6 py-12">
                 <p className="text-gray-600  text-lg mb-8">
-                    This Privacy Policy explains how Star Jobs collects, uses, and discloses information from both Employers and Candidates who use our job posting and job search platform.
+                    This Privacy Policy explains how Quick Jobs collects, uses, and discloses information from both Employers and Candidates who use our job posting and job search platform.
                 </p>
 
                 {/* Section 1 */}
@@ -106,7 +106,7 @@ const PrivacyPolicy = () => {
                         <div className="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300 md:col-span-2">
                             <h3 className="text-xl font-semibold mb-2">Legal Requirements</h3>
                             <p className="text-gray-600">
-                                If required by law, governmental request, or to protect the rights, property, or safety of Star Jobs, our Users, or the public.
+                                If required by law, governmental request, or to protect the rights, property, or safety of Quick Jobs, our Users, or the public.
                             </p>
                         </div>
                     </div>
@@ -116,7 +116,7 @@ const PrivacyPolicy = () => {
                 <section className="mb-10">
                     <h2 className="text-3xl font-bold mb-4">4. Data Security</h2>
                     <p className="text-gray-600">
-                        Star Jobs implements appropriate technical and organizational measures to protect the security of your Personal Data. However, no method of transmission over the Internet is 100% secure. You are also responsible for keeping your password confidential.
+                        Quick Jobs implements appropriate technical and organizational measures to protect the security of your Personal Data. However, no method of transmission over the Internet is 100% secure. You are also responsible for keeping your password confidential.
                     </p>
                 </section>
 
@@ -132,7 +132,7 @@ const PrivacyPolicy = () => {
                 <section className="mb-10">
                     <h2 className="text-3xl font-bold mb-4">6. Changes to this Privacy Policy</h2>
                     <p className="text-gray-600">
-                        Star Jobs reserves the right to update this Privacy Policy at any time. We will notify you of any significant changes by posting the new policy on the Platform. Your continued use of the Platform after changes are posted constitutes your acceptance of the revised policy.
+                        Quick Jobs reserves the right to update this Privacy Policy at any time. We will notify you of any significant changes by posting the new policy on the Platform. Your continued use of the Platform after changes are posted constitutes your acceptance of the revised policy.
                     </p>
                 </section>
 
@@ -143,7 +143,8 @@ const PrivacyPolicy = () => {
                         If you have any questions or concerns about this Privacy Policy, please contact us:
                     </p>
                     <div className="space-y-2 text-gray-600">
-                        <p><span className="font-semibold">Email:</span> privacy@starjobs.com</p>
+                        <p><span className="font-semibold">Email:</span> quickjobs0000@gmail.com</p>
+                         <p><span className="font-semibold">Phone:</span> +97430075999</p>
                         <p><span className="font-semibold">Address:</span> Kathmandu, Nepal</p>
                     </div>
                 </section>

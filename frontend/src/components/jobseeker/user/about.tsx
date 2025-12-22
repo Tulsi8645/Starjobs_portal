@@ -14,7 +14,7 @@ const About = () => {
                 </div>
                 <div className="w-full md:w-1/2 pl-6 mb-8 md:mb-0 md:pr-8">
                     <h1 className="text-4xl md:text-5xl font-bold mb-4">
-                        About Star Jobs
+                        About Quick Jobs
                     </h1>
                     <p className="text-lg text-gray-600 mb-6">
                         We are a human resource solutions company dedicated to helping businesses grow by empowering their people.

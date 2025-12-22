@@ -122,7 +122,7 @@ const JobList = () => {
           </div>
         </div>
 
-        {/* contact star jobs */}
+        {/* contact Quick jobs */}
 
         <div className="flex w-full justify-end mb-4">
           <div className="bg-white rounded-lg shadow-sm p-6">
