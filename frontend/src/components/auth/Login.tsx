@@ -93,7 +93,7 @@ const Login: React.FC = () => {
           <div className="mb-8 text-center">
             <div className="flex justify-center mb-4">
               <div className="text-primary font-bold text-2xl flex items-center">
-                <img src={Logo} alt="Logo" />
+                <img className="max-h-12 object-contain" src={Logo} alt="Logo" />
               </div>
             </div>
             <h2 className="text-2xl font-bold text-gray-800">Welcome back</h2>
