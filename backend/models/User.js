@@ -20,17 +20,18 @@ const userSchema = new mongoose.Schema({
     type: String,
     enum: ["email", "google"],
     default: "email"
-  }
+  },
+  lastLogin: { type: Date }
 }, options);
 
 // Add method to find or create user from Google profile
-userSchema.statics.findOrCreate = async function(profile) {
+userSchema.statics.findOrCreate = async function (profile) {
   let user = await this.findOne({ googleId: profile.id });
-  
+
   if (!user) {
     // Check if user with this email already exists
     user = await this.findOne({ email: profile.emails[0].value });
-    
+
     if (!user) {
       // Create new user
       user = new this({
@@ -51,7 +52,7 @@ userSchema.statics.findOrCreate = async function(profile) {
       await user.save();
     }
   }
-  
+
   return user;
 };
 

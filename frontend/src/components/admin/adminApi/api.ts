@@ -55,16 +55,21 @@ export const getAdminStats = async () => {
   return res.data;
 };
 
- 
+
+export const getDailyLoggedInUsers = async () => {
+  const res = await axios.get(`${API_BASE_URL}/api/admin/daily-logins`, authHeader);
+  return res.data;
+};
+
 export const getAllJobStatsByDate = async () => {
   const res = await axios.get(`${API_BASE_URL}/api/insights/all-job-stats`, authHeader);
   return res.data;
 };
 
 export const getAllUsers = async () => {
-    const res = await axios.get(`${API_BASE_URL}/api/admin/users`, authHeader);
-    return res.data;
-  };
+  const res = await axios.get(`${API_BASE_URL}/api/admin/users`, authHeader);
+  return res.data;
+};
 
 export const updateUser = async (userId: string, data: FormData) => {
   const res = await axios.put(
@@ -81,34 +86,34 @@ export const updateUser = async (userId: string, data: FormData) => {
   return res.data;
 };
 
-export const deleteUser = async (userId:any) => {
-    const res = await axios.delete(`${API_BASE_URL}/api/admin/user/${userId}`, authHeader);
-    return res.data;
-  };
+export const deleteUser = async (userId: any) => {
+  const res = await axios.delete(`${API_BASE_URL}/api/admin/user/${userId}`, authHeader);
+  return res.data;
+};
 
-  export const verifyEmployer = async (userId: string) => {
-    const res = await axios.patch(`${API_BASE_URL}/api/admin/verify-employer/${userId}`, {}, authHeader);
-    return res.data;
-  };
+export const verifyEmployer = async (userId: string) => {
+  const res = await axios.patch(`${API_BASE_URL}/api/admin/verify-employer/${userId}`, {}, authHeader);
+  return res.data;
+};
 
-  export const getAllApplicantsForEmployerJobs = async (employerId: string) => {
-    const res = await axios.get(
-      `${API_BASE_URL}/api/admin/employer/${employerId}/applicants`,
-      authHeader
-    );
-    return res.data;
-  };
+export const getAllApplicantsForEmployerJobs = async (employerId: string) => {
+  const res = await axios.get(
+    `${API_BASE_URL}/api/admin/employer/${employerId}/applicants`,
+    authHeader
+  );
+  return res.data;
+};
 
 
-  export const updateApplicationStatus = async (applicationId: string, status: string) => {
-    const res = await axios.patch(
-      `${API_BASE_URL}/api/admin/applications/${applicationId}/status`,
-      { status },
-      authHeader
-    );
-    return res.data;
-  };
-  
+export const updateApplicationStatus = async (applicationId: string, status: string) => {
+  const res = await axios.patch(
+    `${API_BASE_URL}/api/admin/applications/${applicationId}/status`,
+    { status },
+    authHeader
+  );
+  return res.data;
+};
+
 
 export const fetchJobs = async (page = 1, limit = 6, search = "") => {
   const res = await axios.get(
@@ -152,10 +157,10 @@ export const toggleTrendingStatus = async (jobId: string, istrending: boolean) =
 
 
 
-export const deleteJob = async (jobId:any) => {
-    const res = await axios.delete(`${API_BASE_URL}/api/admin/job/${jobId}`, authHeader);
-    return res.data;
-  };
+export const deleteJob = async (jobId: any) => {
+  const res = await axios.delete(`${API_BASE_URL}/api/admin/job/${jobId}`, authHeader);
+  return res.data;
+};
 
 
 export const fetchRevenues = () =>

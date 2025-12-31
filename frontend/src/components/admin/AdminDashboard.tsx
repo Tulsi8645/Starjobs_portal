@@ -21,6 +21,7 @@ import {
   getAdminProfile,
   getAdminStats,
   getAllJobStatsByDate,
+  getDailyLoggedInUsers,
 } from "./adminApi/api";
 
 interface Stat {
@@ -59,6 +60,19 @@ interface JobInsights {
       monthly?: any[];
     };
   };
+}
+
+interface UserLoginInfo {
+  name: string;
+  email: string;
+  lastLogin: string;
+  role: string;
+}
+
+interface DailyLoginsResponse {
+  success: boolean;
+  count: number;
+  users: UserLoginInfo[];
 }
 
 type TimeFrame = "Day" | "Week" | "Month";
@@ -108,6 +122,11 @@ const AdminDashboard = () => {
   const { data: insights } = useQuery<JobInsights>({
     queryKey: ["jobInsights", timeFrame],
     queryFn: getAllJobStatsByDate,
+  });
+
+  const { data: dailyLogins } = useQuery<DailyLoginsResponse>({
+    queryKey: ["dailyLogins"],
+    queryFn: getDailyLoggedInUsers,
   });
 
   const viewsData = insights
@@ -223,6 +242,47 @@ const AdminDashboard = () => {
               <Bar dataKey="value" fill="#82ca9d" />
             </BarChart>
           </div>
+        </div>
+      </div>
+
+      <div className="bg-white rounded-lg shadow-sm p-6">
+        <h2 className="text-lg font-semibold mb-4">Today's Logged-In Users ({dailyLogins?.count || 0})</h2>
+        <div className="overflow-x-auto">
+          <table className="w-full text-left">
+            <thead>
+              <tr className="border-b">
+                <th className="pb-2">Name</th>
+                <th className="pb-2">Email</th>
+                <th className="pb-2">Role</th>
+                <th className="pb-2">Last Login</th>
+              </tr>
+            </thead>
+            <tbody>
+              {dailyLogins?.users && dailyLogins.users.length > 0 ? (
+                dailyLogins.users.map((user, index) => (
+                  <tr key={index} className="border-b last:border-0">
+                    <td className="py-2">{user.name}</td>
+                    <td className="py-2">{user.email}</td>
+                    <td className="py-2">
+                      <span className={`px-2 py-1 rounded-full text-xs font-semibold ${user.role === 'admin' ? 'bg-purple-100 text-purple-700' :
+                          user.role === 'employer' ? 'bg-yellow-100 text-yellow-700' :
+                            'bg-green-100 text-green-700'
+                        }`}>
+                        {user.role}
+                      </span>
+                    </td>
+                    <td className="py-2 text-sm text-gray-500">
+                      {new Date(user.lastLogin).toLocaleTimeString()}
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan={4} className="py-4 text-center text-gray-500">No logins recorded today.</td>
+                </tr>
+              )}
+            </tbody>
+          </table>
         </div>
       </div>
     </div>

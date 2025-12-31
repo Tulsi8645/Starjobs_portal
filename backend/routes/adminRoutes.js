@@ -1,11 +1,11 @@
 const express = require("express");
 const router = express.Router();
 const { authenticate, authorizeAdmin } = require("../middleware/authMiddleware");
-const {getAdminProfile, getAdminStats, verifyEmployer, getAllApplicantsForEmployerJobs,updateApplication, getAllUsers, deleteUser, getAllJobs,editJob, deleteJob, toggleTrendingStatus} = require("../controllers/adminController");
+const { getAdminProfile, getAdminStats, verifyEmployer, getAllApplicantsForEmployerJobs, updateApplication, getAllUsers, deleteUser, getAllJobs, editJob, deleteJob, toggleTrendingStatus, getDailyLoggedInUsersCount } = require("../controllers/adminController");
 
 
 // Get employer profile
-router.get("/profile", authenticate,authorizeAdmin, getAdminProfile);
+router.get("/profile", authenticate, authorizeAdmin, getAdminProfile);
 
 // Get admin stats
 router.get("/admin-stats", getAdminStats);
@@ -17,7 +17,7 @@ router.patch("/verify-employer/:id", authenticate, authorizeAdmin, verifyEmploye
 router.get("/employer/:employerId/applicants", authenticate, authorizeAdmin, getAllApplicantsForEmployerJobs);
 
 // Update application
-router.patch("/applications/:applicationId/status",authenticate, authorizeAdmin,updateApplication);
+router.patch("/applications/:applicationId/status", authenticate, authorizeAdmin, updateApplication);
 
 // Get all users
 router.get("/users", authenticate, authorizeAdmin, getAllUsers);
@@ -37,6 +37,9 @@ router.delete("/job/:id", authenticate, authorizeAdmin, deleteJob);
 
 // Update job trending status
 router.patch("/jobs/:id/trending", toggleTrendingStatus);
+
+// Get daily logged in users
+router.get("/daily-logins", authenticate, authorizeAdmin, getDailyLoggedInUsersCount);
 
 
 module.exports = router;

@@ -12,7 +12,7 @@ const getAdminProfile = async (req, res) => {
   try {
     // Fetch the user by ID and ensure they are an admin
     const admin = await User.findById(req.user.id).select("-password");
-    
+
     // Check if the user exists and is an admin
     if (!admin || admin.role !== "admin") {
       return res.status(404).json({ message: "Admin not found" });
@@ -33,7 +33,7 @@ const getAdminStats = async (req, res) => {
     const totalJobseekers = await User.countDocuments({ role: "jobseeker" });
     const totalEmployers = await User.countDocuments({ role: "employer" });
     const totalJobs = await Job.countDocuments();
-    const totalApplications = await Application.countDocuments(); 
+    const totalApplications = await Application.countDocuments();
 
     res.status(200).json({
       totalJobseekers,
@@ -222,11 +222,11 @@ const getAllJobs = async (req, res) => {
 
     const query = search
       ? {
-          $or: [
-            { title: { $regex: search, $options: "i" } },
-            { location: { $regex: search, $options: "i" } },
-          ],
-        }
+        $or: [
+          { title: { $regex: search, $options: "i" } },
+          { location: { $regex: search, $options: "i" } },
+        ],
+      }
       : {};
 
     const [jobs, total] = await Promise.all([
@@ -251,7 +251,7 @@ const getAllJobs = async (req, res) => {
 
 // Edit Job as an Admin
 const editJob = async (req, res) => {
-   const { id: jobId } = req.params;
+  const { id: jobId } = req.params;
   const user = req.user;
 
   try {
@@ -322,28 +322,47 @@ const toggleTrendingStatus = async (req, res) => {
   const jobId = req.params.id;
   const { istrending } = req.body;
 
-  if (typeof istrending !== "boolean") {
-    return res.status(400).json({ message: "'istrending' must be a boolean value." });
-  }
-
+  const { id } = req.params;
   try {
-    const updatedJob = await Job.findByIdAndUpdate(
-      jobId,
-      { istrending },
-      { new: true, runValidators: true }
-    );
-
-    if (!updatedJob) {
+    const job = await Job.findById(id);
+    if (!job) {
       return res.status(404).json({ message: "Job not found" });
     }
-
-    res.json({ message: "Trending status updated", job: updatedJob });
+    job.istrending = !job.istrending;
+    await job.save();
+    res.json({ message: `Job trending status updated to ${job.istrending}` });
   } catch (error) {
-    console.error("Error updating trending status:", error);
     res.status(500).json({ message: "Server error" });
+  }
+};
+
+// Get Daily Logged In Users Count
+const getDailyLoggedInUsersCount = async (req, res) => {
+  try {
+    const startOfToday = new Date();
+    startOfToday.setHours(0, 0, 0, 0);
+
+    const endOfToday = new Date();
+    endOfToday.setHours(23, 59, 59, 999);
+
+    const users = await User.find({
+      lastLogin: {
+        $gte: startOfToday,
+        $lte: endOfToday
+      }
+    }).select("name email lastLogin role");
+
+    res.status(200).json({
+      success: true,
+      count: users.length,
+      users
+    });
+  } catch (error) {
+    console.error("Error fetching daily logged in users:", error);
+    res.status(500).json({ success: false, message: "Internal Server Error" });
   }
 };
 
 
 
-module.exports = {getAdminProfile, toggleTrendingStatus, getAdminStats, verifyEmployer, getAllApplicantsForEmployerJobs, updateApplication, getAllUsers, deleteUser, getAllJobs,editJob, deleteJob};
+module.exports = { getAdminProfile, toggleTrendingStatus, getAdminStats, verifyEmployer, getAllApplicantsForEmployerJobs, updateApplication, getAllUsers, deleteUser, getAllJobs, editJob, deleteJob, getDailyLoggedInUsersCount };

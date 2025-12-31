@@ -5,18 +5,18 @@ const GoogleStrategy = require('passport-google-oauth20').Strategy;
 
 // Configure Google OAuth Strategy
 passport.use(new GoogleStrategy({
-    clientID: process.env.GOOGLE_CLIENT_ID,
-    clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-    callbackURL: `${process.env.BACKEND_URL}/api/auth/google/callback`,
-    passReqToCallback: true,
-    proxy: true
-  },
+  clientID: process.env.GOOGLE_CLIENT_ID,
+  clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+  callbackURL: `${process.env.BACKEND_URL}/api/auth/google/callback`,
+  passReqToCallback: true,
+  proxy: true
+},
   async (req, accessToken, refreshToken, profile, done) => {
     try {
       // Only allow jobseeker role for Google OAuth
       const user = await User.findOneAndUpdate(
         { googleId: profile.id },
-        { 
+        {
           $setOnInsert: {
             name: profile.displayName,
             email: profile.emails[0].value,
@@ -25,11 +25,12 @@ passport.use(new GoogleStrategy({
             isVerified: true,
             authMethod: 'google',
             role: 'jobseeker' // Enforce jobseeker role for Google OAuth
-          }
+          },
+          $set: { lastLogin: new Date() }
         },
         { new: true, upsert: true, setDefaultsOnInsert: true }
       );
-      
+
       return done(null, user);
     } catch (error) {
       return done(error, null);
@@ -70,17 +71,17 @@ const generateToken = (user) => {
 const googleAuth = (req, res, next) => {
   // Get the redirect_uri from the query parameters or use the default
   const redirectUri = req.query.redirect_uri || `${process.env.FRONTEND_URL || 'http://localhost:5173'}/auth/callback`;
-  
+
   // Store the redirect_uri in the session
   req.session.redirect_uri = redirectUri;
-  
+
   // Initialize the Google OAuth authentication with the stored redirect_uri
   const auth = passport.authenticate('google', {
     scope: ['profile', 'email'],
     prompt: 'select_account',
     state: redirectUri // Optional: you can also use state to pass the redirect_uri
   });
-  
+
   auth(req, res, next);
 };
 
@@ -118,6 +119,7 @@ const verifyGoogleTokenMobile = async (req, res) => {
       user.emailVerified = true;
       user.isVerified = true;
       if (photoUrl) user.profilePicture = photoUrl;
+      user.lastLogin = new Date();
       await user.save();
     }
 
@@ -150,7 +152,7 @@ const googleAuthCallback = (req, res, next) => {
     // Get the redirect_uri from the session or use the default
     const redirectUri = req.session.redirect_uri || `${process.env.FRONTEND_URL || 'http://localhost:5173'}/auth/callback`;
     const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
-    
+
     if (err) {
       // Check if this is a mobile app request
       if (redirectUri.includes('com.mandmbsofttech.starjobs://')) {
@@ -165,7 +167,7 @@ const googleAuthCallback = (req, res, next) => {
       }
       return res.redirect(`${frontendUrl}/login?error=Authentication%20failed`);
     }
-    
+
     try {
       // Generate JWT token in the same format as regular login
       const token = jwt.sign(
@@ -173,7 +175,7 @@ const googleAuthCallback = (req, res, next) => {
         process.env.JWT_SECRET,
         { expiresIn: "1d" }
       );
-      
+
       // Check if this is a mobile app request
       if (redirectUri.includes('com.mandmbsofttech.starjobs://')) {
         // Redirect to mobile app with token
