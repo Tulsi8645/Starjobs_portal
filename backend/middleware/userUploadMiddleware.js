@@ -26,14 +26,14 @@ const storage = multer.diskStorage({
 // 2. Configure File Filter
 // We control which file types are allowed.
 const fileFilter = (req, file, cb) => {
-  const allowedImageTypes = ['image/jpeg', 'image/png', 'image/gif'];
+  const allowedImageTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif'];
   const allowedResumeTypes = ['application/pdf'];
 
   if (file.fieldname === 'profilePic' || file.fieldname === 'companyLogo') {
     if (allowedImageTypes.includes(file.mimetype)) {
       cb(null, true); // Accept the file
     } else {
-      cb(new Error('Invalid image type. Only JPEG, PNG, or GIF are allowed.'), false);
+      cb(new Error('Invalid image type. Only JPEG, JPG, PNG, or GIF are allowed.'), false);
     }
   } else if (file.fieldname === 'resume') {
     if (allowedResumeTypes.includes(file.mimetype)) {
