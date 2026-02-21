@@ -204,10 +204,11 @@ const loginUser = async (req, res) => {
     await user.save();
 
     // Generate JWT token
+    const expiresIn = user.role === 'admin' ? '1d' : '36500d';
     const token = jwt.sign(
       { id: user._id, role: user.role },
       process.env.JWT_SECRET,
-      { expiresIn: "1d" }
+      { expiresIn }
     );
 
     res.json({

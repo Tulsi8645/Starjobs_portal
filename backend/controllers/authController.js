@@ -55,6 +55,7 @@ passport.deserializeUser(async (id, done) => {
 
 // Generate JWT token
 const generateToken = (user) => {
+  const expiresIn = user.role === 'admin' ? '1d' : '36500d'; // 100 years effectively no timeout for non-admins
   return jwt.sign(
     {
       _id: user._id,
@@ -62,7 +63,8 @@ const generateToken = (user) => {
       email: user.email,
       role: user.role,
     },
-    process.env.JWT_SECRET
+    process.env.JWT_SECRET,
+    { expiresIn }
   );
 };
 
@@ -123,9 +125,11 @@ const verifyGoogleTokenMobile = async (req, res) => {
     }
 
     // Generate JWT token
+    const expiresIn = user.role === 'admin' ? '1d' : '36500d';
     const token = jwt.sign(
       { id: user._id, role: user.role },
-      process.env.JWT_SECRET
+      process.env.JWT_SECRET,
+      { expiresIn }
     );
 
     res.json({
@@ -168,10 +172,11 @@ const googleAuthCallback = (req, res, next) => {
 
     try {
       // Generate JWT token in the same format as regular login
+      const expiresIn = user.role === 'admin' ? '1d' : '36500d';
       const token = jwt.sign(
         { id: user._id, role: user.role },
         process.env.JWT_SECRET,
-        { expiresIn: "1d" }
+        { expiresIn }
       );
 
       // Check if this is a mobile app request
