@@ -5,7 +5,7 @@ import googleIcon from '../../assets/authImages/google.png';
 import Logo from '../../assets/quickjobs.png';
 import { loginUser } from './authApi/authApi';
 import loginimg from '../../assets/authImages/loginimg.webp'
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://backend-server.rupeshkumar.com.np';
 
 
 

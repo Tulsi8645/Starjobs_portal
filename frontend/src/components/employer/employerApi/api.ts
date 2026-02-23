@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://backend-server.rupeshkumar.com.np';
 
 
 export const createJob = async (jobData: any) => {
@@ -91,17 +91,17 @@ export const deleteJob = async (jobId: string) => {
 };
 
 export const getEmployerProfile = async () => {
-    const token = localStorage.getItem("token");
-    if (!token) throw new Error("Not authenticated");
-  
-    const res = await axios.get(`${API_BASE_URL}/api/employer/profile`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
-  
-    return res.data;
-  };
+  const token = localStorage.getItem("token");
+  if (!token) throw new Error("Not authenticated");
+
+  const res = await axios.get(`${API_BASE_URL}/api/employer/profile`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  return res.data;
+};
 
 export const updateEmployerProfile = async (formData: FormData) => {
   const token = localStorage.getItem("token");
@@ -118,50 +118,50 @@ export const updateEmployerProfile = async (formData: FormData) => {
 };
 
 export const getEmployerJobs = async () => {
-    const token = localStorage.getItem("token");
-    if (!token) throw new Error("Not authenticated");
-  
-    const res = await axios.get(`${API_BASE_URL}/api/employer/my-jobs`, {
+  const token = localStorage.getItem("token");
+  if (!token) throw new Error("Not authenticated");
+
+  const res = await axios.get(`${API_BASE_URL}/api/employer/my-jobs`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  return res.data;
+};
+
+export const getEmployerDashboardStats = async () => {
+  const token = localStorage.getItem("token");
+  if (!token) throw new Error("Not authenticated");
+
+  const res = await axios.get(`${API_BASE_URL}/api/employer/dashboard-stats`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  return res.data;
+};
+
+export const getJobApplicants = async (jobId: string) => {
+  const token = localStorage.getItem("token");
+  if (!token) throw new Error("Not authenticated");
+
+  const res = await axios.get(
+    `${API_BASE_URL}/api/employer/jobs/${jobId}/jobseekers`,
+    {
       headers: {
         Authorization: `Bearer ${token}`,
       },
-    });
-  
-    return res.data;
-  };  
+    }
+  );
 
-   export const getEmployerDashboardStats = async () => {
-    const token = localStorage.getItem("token");
-    if (!token) throw new Error("Not authenticated");
-  
-    const res = await axios.get(`${API_BASE_URL}/api/employer/dashboard-stats`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
-  
-    return res.data;
-  };
+  return res.data;
+};
 
-  export const getJobApplicants = async (jobId: string) => {
-    const token = localStorage.getItem("token");
-    if (!token) throw new Error("Not authenticated");
-  
-    const res = await axios.get(
-      `${API_BASE_URL}/api/employer/jobs/${jobId}/jobseekers`,
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
-  
-    return res.data;
-  };
-  
 
-  
-export const getAllApplicantsForEmployerJobs = async ( page = 1, limit = 10) => {
+
+export const getAllApplicantsForEmployerJobs = async (page = 1, limit = 10) => {
   const token = localStorage.getItem("token");
   if (!token) throw new Error("Not authenticated");
 
@@ -206,7 +206,7 @@ export const getAllApplicantsForEmployer = async (page = 1, limit = 5) => {
     }
   );
 
-  return res.data; 
+  return res.data;
 };
 
 export const getAllApplicants = async (page = 1, limit = 5) => {

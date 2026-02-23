@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://backend-server.rupeshkumar.com.np';
 
 type CategoryType = {
   _id: string;
@@ -12,8 +12,8 @@ type CategoryType = {
 };
 
 const getIconComponent = (iconPath: string, name: string) => {
-  const MEDIA_URL = import.meta.env.VITE_MEDIA_URL || '';
-  
+  const MEDIA_URL = import.meta.env.VITE_MEDIA_URL || 'https://backend-server.rupeshkumar.com.np';
+
   return (
     <img
       src={`${MEDIA_URL.replace(/\/$/, '')}/uploads/icons/${iconPath.replace(/^\//, '')}`}

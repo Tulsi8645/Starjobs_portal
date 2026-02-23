@@ -39,6 +39,9 @@ app.use(cors({
   credentials: true
 }));
 
+// Trust first proxy (needed for secure cookies behind reverse proxy)
+app.set('trust proxy', 1);
+
 // Session configuration
 app.use(session({
   secret: process.env.SESSION_SECRET || 'your-secret-key',
@@ -46,6 +49,7 @@ app.use(session({
   saveUninitialized: false,
   cookie: {
     secure: true,
+    sameSite: 'none', // Required for cross-origin OAuth redirects
     maxAge: 14 * 24 * 60 * 60 * 1000 // 14 days
   }
 }));

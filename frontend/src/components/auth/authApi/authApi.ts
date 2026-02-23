@@ -1,11 +1,11 @@
 import axios from 'axios';
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://backend-server.rupeshkumar.com.np';
 
 export const registerEmployer = async (formData: FormData) => {
   const response = await axios.post(`${API_BASE_URL}/api/users/register`, formData, {
     headers: {
-      'Content-Type': 'multipart/form-data', 
+      'Content-Type': 'multipart/form-data',
     },
   });
   return response.data;
